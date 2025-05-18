@@ -13,6 +13,20 @@
     <meta property="og:description" content="Plataforma de gestão de consumo de itens laboratoriais" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://www.sindsegsp.org.br/site//content/images/noticias/637426727934042608.jpg" />
+    
+    <!-- Dark mode script -->
+    <script>
+      // Check for theme in localStorage
+      const theme = localStorage.getItem('theme') || 
+                   (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      
+      // Apply dark mode class if needed
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
   </head>
 
   <body>
