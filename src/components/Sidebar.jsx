@@ -1,15 +1,17 @@
+
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { 
   LayoutDashboard, 
   Beaker, 
-  ListChecks, 
-  ShoppingCart, 
+  ClipboardList, 
+  Calendar, 
   BarChart3, 
   Settings, 
   ChevronLeft, 
-  ChevronRight
+  ChevronRight,
+  User
 } from 'lucide-react';
 
 const Sidebar = ({ isCollapsed, toggleSidebar }) => {
@@ -72,8 +74,8 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   const navItems = [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { id: 'inventory', name: 'Inventário', icon: Beaker, path: '/inventory' },
-    { id: 'requests', name: 'Solicitações', icon: ListChecks, path: '/requests' },
-    { id: 'orders', name: 'Pedidos', icon: ShoppingCart, path: '/orders' },
+    { id: 'requests', name: 'Últimos Exames', icon: ClipboardList, path: '/requests' },
+    { id: 'orders', name: 'Agendamentos', icon: Calendar, path: '/orders' },
     { id: 'reports', name: 'Relatórios', icon: BarChart3, path: '/reports' },
     { id: 'settings', name: 'Configurações', icon: Settings, path: '/settings' }
   ];
@@ -81,17 +83,16 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   return (
     <div 
       ref={contentRef} 
-      className="sidebar-content h-screen bg-white border-r border-gray-200 flex flex-col transition-all"
+      className="sidebar-content h-screen bg-white dark:bg-sidebar border-r border-gray-200 dark:border-sidebar-border flex flex-col transition-all"
       style={{ width: isCollapsed ? '80px' : '260px' }}
     >
-      <div className="flex items-center p-4 border-b border-gray-200">
+      <div className="flex items-center p-4 border-b border-gray-200 dark:border-sidebar-border">
         <div className="bg-lab-blue rounded-md p-2 flex items-center justify-center">
           <Beaker className="text-white" size={24} />
         </div>
-        <h1 className="sidebar-logo-text text-xl font-bold text-lab-blue ml-2">
+        <h1 className="sidebar-logo-text text-xl font-bold text-lab-blue ml-2 dark:text-white">
           La Elvis Tech
         </h1>
-       
       </div>
 
       <div className="flex-1 overflow-y-auto py-4 space-y-2 px-2">
@@ -102,8 +103,8 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
             onClick={() => setActiveItem(item.id)}
             className={`flex items-center px-3 py-4 rounded-lg transition-all ${
               activeItem === item.id 
-                ? 'bg-lab-lightBlue text-lab-blue'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-lab-lightBlue text-lab-blue dark:bg-sidebar-accent dark:text-sidebar-accent-foreground'
+                : 'text-gray-600 hover:bg-gray-100 dark:text-sidebar-foreground dark:hover:bg-sidebar-accent/50'
             }`}
           >
             <item.icon size={22} />
@@ -111,11 +112,11 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
           </Link>
         ))}
       </div>
+      
       <div className="py-4 space-y-2 px-2">
-
         <button 
           onClick={toggleSidebar} 
-          className="flex items-center mb-0 p-4  rounded-lg hover:bg-gray-100 transition-colors"
+          className="flex items-center mb-0 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-sidebar-accent/50 transition-colors dark:text-sidebar-foreground"
         >
           {isCollapsed ? (
             <ChevronRight size={24} />
@@ -125,14 +126,14 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
         </button>
       </div>
 
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 dark:border-sidebar-border">
         <div className="flex items-center p-2">
           <div className="w-8 h-8 bg-lab-blue rounded-full flex items-center justify-center">
-            <span className="text-white font-medium">LT</span>
+            <User className="text-white" size={16} />
           </div>
           <div className="item-text ml-3">
-            <p className="font-medium text-sm">Laboratório Central</p>
-            <p className="text-xs text-gray-500">Admin</p>
+            <p className="font-medium text-sm dark:text-sidebar-foreground">Laboratório Central</p>
+            <p className="text-xs text-gray-500 dark:text-sidebar-foreground/70">Admin</p>
           </div>
         </div>
       </div>
