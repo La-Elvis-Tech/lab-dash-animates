@@ -1,3 +1,4 @@
+
 import { useState, useEffect, createContext, useContext } from 'react';
 
 type Theme = 'light' | 'dark';
@@ -29,12 +30,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Save theme to localStorage
     localStorage.setItem('theme', theme);
     
-    // Apply theme to document
+    // Apply theme to document with a smooth transition
+    const root = document.documentElement;
+    
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     }
+    
+    // Add a brief transition for theme changes
+    root.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+    
+    return () => {
+      root.style.transition = '';
+    };
   }, [theme]);
 
   const toggleTheme = () => {

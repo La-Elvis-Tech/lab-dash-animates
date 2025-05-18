@@ -122,20 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
         ))}
       </div>
       
-      <div className="py-4 space-y-2 px-2">
-        <button 
-          onClick={toggleSidebar} 
-          className="flex items-center mb-0 p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
-        >
-          {isCollapsed ? (
-            <ChevronRight size={24} />
-          ) : (
-            <ChevronLeft size={24} />
-          )}
-        </button>
-      </div>
-
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center p-2">
           <div className="w-10 h-10 bg-lab-blue rounded-full flex items-center justify-center">
             <User className="text-white" size={18} />
@@ -145,6 +132,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
             <p className="text-xs text-gray-500 dark:text-gray-400">Admin</p>
           </div>
         </div>
+        
+        {isCollapsed ? (
+          <button 
+            onClick={toggleSidebar} 
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
+          >
+            <ChevronRight size={20} />
+          </button>
+        ) : (
+          <button 
+            onClick={toggleSidebar} 
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
+          >
+            <ChevronLeft size={20} />
+          </button>
+        )}
       </div>
     </div>
   );

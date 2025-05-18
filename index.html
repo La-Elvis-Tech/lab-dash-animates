@@ -20,7 +20,7 @@
       const theme = localStorage.getItem('theme') || 
                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       
-      // Apply dark mode class if needed
+      // Apply dark mode class immediately to prevent flash
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
       } else {
@@ -29,7 +29,7 @@
     </script>
   </head>
 
-  <body>
+  <body class="transition-colors duration-300">
     <div id="root"></div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>

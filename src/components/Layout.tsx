@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { gsap } from 'gsap';
 import Sidebar from './Sidebar';
 import { Menu } from 'lucide-react';
+import { ThemeToggle } from './ThemeToggle';
 
 const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -85,7 +86,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Mobile overlay */}
       {isMobileView && (
         <div 
@@ -102,21 +103,24 @@ const Layout = () => {
       {/* Main Content */}
       <div 
         ref={mainContentRef} 
-        className="flex-1 overflow-auto dark:bg-gray-900 dark:text-gray-100"
+        className="flex-1 overflow-auto dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
         style={{ 
           paddingLeft: isMobileView ? '0px' : (isCollapsed ? '80px' : '260px')
         }}
       >
         {/* Mobile Header */}
         {isMobileView && (
-          <div className="bg-white dark:bg-gray-800 p-4 flex items-center shadow-sm">
-            <button 
-              onClick={() => setIsSidebarOpen(true)} 
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <Menu size={24} />
-            </button>
-            <h1 className="text-lg font-semibold text-lab-blue dark:text-white ml-2">La Elvis Tech</h1>
+          <div className="bg-white dark:bg-gray-800 p-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center">
+              <button 
+                onClick={() => setIsSidebarOpen(true)} 
+                className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <Menu size={24} className="dark:text-gray-300" />
+              </button>
+              <h1 className="text-lg font-semibold text-lab-blue dark:text-white ml-2">La Elvis Tech</h1>
+            </div>
+            <ThemeToggle />
           </div>
         )}
 
