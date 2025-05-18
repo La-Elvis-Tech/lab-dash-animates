@@ -103,7 +103,7 @@ const Layout = () => {
       {/* Main Content */}
       <div 
         ref={mainContentRef} 
-        className="flex-1 overflow-auto dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
+        className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300"
         style={{ 
           paddingLeft: isMobileView ? '0px' : (isCollapsed ? '80px' : '260px')
         }}

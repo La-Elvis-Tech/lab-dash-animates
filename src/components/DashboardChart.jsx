@@ -1,9 +1,8 @@
-
 import React, { useRef, useEffect } from 'react';
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { gsap } from 'gsap';
 
-const COLORS = ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+const COLORS = ['#080E49', '#1D2472', '#1D2AD7', '#919AF2', '#8B5CF6', '#C8CCF9'];
 
 const DashboardChart = ({ type, data, title, description }) => {
   const chartRef = useRef(null);
@@ -26,13 +25,21 @@ const DashboardChart = ({ type, data, title, description }) => {
         return (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
+              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
+              <YAxis tick={{ fill: 'currentColor' }} />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'rgb(31 41 55)',
+                  borderColor: 'rgb(55 65 81)',
+                  borderRadius: '0.5rem',
+                  color: 'rgb(243 244 246)'
+                }}
+                itemStyle={{ color: 'rgb(243 244 246)' }}
+              />
               <Legend />
-              <Bar dataKey="value" fill="#2563EB" />
-              {data[0]?.value2 && <Bar dataKey="value2" fill="#10B981" />}
+              <Bar dataKey="value" fill="#080E49" />
+              {data[0]?.value2 && <Bar dataKey="value2" fill="#1D2472" />}
             </BarChart>
           </ResponsiveContainer>
         );
@@ -40,13 +47,21 @@ const DashboardChart = ({ type, data, title, description }) => {
         return (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid /* strokeDasharray="3 6"*/ stroke="currentColor" strokeOpacity={0.3} />
+              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
+              <YAxis tick={{ fill: 'currentColor' }} />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'rgb(31 41 55)',
+                  borderColor: 'rgb(55 65 81)',
+                  borderRadius: '0.5rem',
+                  color: 'rgb(243 244 246)'
+                }}
+                itemStyle={{ color: 'rgb(243 244 246)' }}
+              />
               <Legend />
-              <Line type="monotone" dataKey="value" stroke="#2563EB" strokeWidth={2} />
-              {data[0]?.value2 && <Line type="monotone" dataKey="value2" stroke="#10B981" strokeWidth={2} />}
+              <Line type="monotone" dataKey="value" stroke="#3a45a7" strokeWidth={3} />
+              {data[0]?.value2 && <Line type="monotone" dataKey="value2" stroke="#535dc5" strokeWidth={2} />}
             </LineChart>
           </ResponsiveContainer>
         );
@@ -54,13 +69,21 @@ const DashboardChart = ({ type, data, title, description }) => {
         return (
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
+              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
+              <YAxis tick={{ fill: 'currentColor' }} />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'rgb(31 41 55)',
+                  borderColor: 'rgb(55 65 81)',
+                  borderRadius: '0.5rem',
+                  color: 'rgb(243 244 246)'
+                }}
+                itemStyle={{ color: 'rgb(243 244 246)' }}
+              />
               <Legend />
-              <Area type="monotone" dataKey="value" stroke="#2563EB" fill="#DBEAFE" />
-              {data[0]?.value2 && <Area type="monotone" dataKey="value2" stroke="#10B981" fill="#D1FAE5" />}
+              <Area type="monotone" dataKey="value" stroke="#080E49" fill="rgba(59, 130, 246, 0.2)" />
+              {data[0]?.value2 && <Area type="monotone" dataKey="value2" stroke="#1D2472" fill="#1D2472" />}
             </AreaChart>
           </ResponsiveContainer>
         );
@@ -77,12 +100,21 @@ const DashboardChart = ({ type, data, title, description }) => {
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
+                stroke="#1d247284"
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'rgb(31 41 55)',
+                  borderColor: 'rgb(55 65 81)',
+                  borderRadius: '0.5rem',
+                  color: 'rgb(243 244 246)'
+                }}
+                itemStyle={{ color: 'rgb(243 244 246)' }}
+              />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
@@ -93,9 +125,14 @@ const DashboardChart = ({ type, data, title, description }) => {
   };
 
   return (
-    <div ref={chartRef} className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-      <h2 className="text-lg font-semibold text-gray-800 mb-1">{title}</h2>
-      {description && <p className="text-sm text-gray-500 mb-4">{description}</p>}
+    <div 
+      ref={chartRef}
+      className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg transition-colors duration-300"
+    >
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">{title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
+      </div>
       {renderChart()}
     </div>
   );

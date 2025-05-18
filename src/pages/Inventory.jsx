@@ -211,7 +211,7 @@ const [searchQuery, setSearchQuery] = useState('');
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1 text-gray-400" size={18} />
               <Input
                 placeholder="Buscar item..."
                 className="pl-10"
@@ -229,8 +229,8 @@ const [searchQuery, setSearchQuery] = useState('');
                       className={`px-4 py-2 text-sm font-medium ${
                         selectedCategory === category.id
                           ? 'bg-lab-blue text-white'
-                          : 'bg-white text-gray-700 hover:bg-gray-100'
-                      } border border-gray-200 first:rounded-l-lg last:rounded-r-lg -ml-px first:ml-0 transition-colors`}
+                          : 'bg-white text-gray-700 hover:bg-gray-100 dark: text-gray-400' 
+                      } border border-gray-200 first:rounded-l-lg last:rounded-r-lg -ml-px first:ml-0 transition-colors dark:bg-gray-800 dark:border-gray-700`}
                       onClick={() => handleCategoryChange(category.id)}
                     >
                       {category.name}
