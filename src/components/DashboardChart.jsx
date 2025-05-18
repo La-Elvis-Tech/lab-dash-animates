@@ -98,9 +98,10 @@ const DashboardChart = ({ type, data, title, description }) => {
                 labelLine={false}
                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 outerRadius={100}
-                fill="#8884d8"
+                fill="#ffffff"
                 dataKey="value"
-                stroke="#1d247284"
+                stroke="#8589b484"
+                strokeWidth={2}
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
