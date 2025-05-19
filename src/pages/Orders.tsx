@@ -1,32 +1,329 @@
 
-import React, { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import React, { useState } from 'react';
+import { addDays, format, isAfter, isBefore, isSameDay, startOfDay, startOfMonth, endOfMonth } from 'date-fns';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar as CalendarIcon, Clock } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Table, 
+  TableHeader, 
+  TableBody, 
+  TableRow, 
+  TableHead, 
+  TableCell 
+} from "@/components/ui/table";
 
-const Orders = () => {
-  const pageRef = useRef<HTMLDivElement>(null);
+// Mock data for appointments
+const mockAppointments = [
+  { 
+    id: 'A001',
+    patient: 'João Silva',
+    type: 'Coleta de Sangue',
+    date: new Date(2024, 4, 15, 9, 30), 
+    doctor: 'Dra. Ana Souza',
+    status: 'Concluído'
+  },
+  { 
+    id: 'A002',
+    patient: 'Maria Santos',
+    type: 'Entrega de Resultado',
+    date: new Date(2024, 4, 16, 10, 45), 
+    doctor: 'Dr. Carlos Mendes',
+    status: 'Cancelado'
+  },
+  { 
+    id: 'A003',
+    patient: 'Pedro Oliveira',
+    type: 'Colonoscopia',
+    date: new Date(2024, 4, 22, 8, 0), 
+    doctor: 'Dra. Lucia Freitas',
+    status: 'Confirmado'
+  },
+  { 
+    id: 'A004',
+    patient: 'Ana Pereira',
+    type: 'Ultrassom',
+    date: new Date(2024, 4, 23, 14, 15), 
+    doctor: 'Dr. Roberto Castro',
+    status: 'Confirmado'
+  },
+  { 
+    id: 'A005',
+    patient: 'Carlos Ribeiro',
+    type: 'Raio-X',
+    date: new Date(2024, 4, 24, 11, 0), 
+    doctor: 'Dra. Fernanda Lima',
+    status: 'Confirmado'
+  },
+  { 
+    id: 'A006',
+    patient: 'Luiza Martins',
+    type: 'Eletrocardiograma',
+    date: new Date(2024, 4, 25, 15, 30), 
+    doctor: 'Dr. Paulo Vieira',
+    status: 'Agendado'
+  },
+  { 
+    id: 'A007',
+    patient: 'Paulo Costa',
+    type: 'Coleta de Sangue',
+    date: new Date(2024, 4, 19, 9, 0), 
+    doctor: 'Dra. Ana Souza',
+    status: 'Agendado'
+  },
+  { 
+    id: 'A008',
+    patient: 'Mariana Lima',
+    type: 'Densitometria',
+    date: new Date(2024, 4, 20, 13, 45), 
+    doctor: 'Dr. José Santos',
+    status: 'Agendado'
+  },
+  { 
+    id: 'A009',
+    patient: 'Ricardo Alves',
+    type: 'Tomografia',
+    date: new Date(2024, 4, 28, 10, 30), 
+    doctor: 'Dra. Carla Mendes',
+    status: 'Agendado'
+  },
+  { 
+    id: 'A010',
+    patient: 'Camila Ferreira',
+    type: 'Mamografia',
+    date: new Date(2024, 4, 30, 11, 15), 
+    doctor: 'Dr. André Oliveira',
+    status: 'Agendado'
+  },
+];
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        pageRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }
-      );
+const Orders: React.FC = () => {
+  const today = startOfDay(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [appointments, setAppointments] = useState(mockAppointments);
+
+  // Filter appointments by date range
+  const filterAppointmentsByPeriod = (startDate: Date, endDate?: Date) => {
+    return appointments.filter(app => {
+      const appDate = startOfDay(new Date(app.date));
+      if (endDate) {
+        return (isAfter(appDate, startDate) || isSameDay(appDate, startDate)) && 
+               (isBefore(appDate, endDate) || isSameDay(appDate, endDate));
+      }
+      return isSameDay(appDate, startDate);
     });
+  };
 
-    return () => ctx.revert();
-  }, []);
+  // Get recent appointments (before today)
+  const recentAppointments = appointments.filter(app => {
+    return isBefore(new Date(app.date), today);
+  }).sort((a, b) => b.date.getTime() - a.date.getTime());
+
+  // Get next 7 days appointments
+  const sevenDaysFromNow = addDays(today, 7);
+  const next7DaysAppointments = filterAppointmentsByPeriod(today, sevenDaysFromNow);
+
+  // Get rest of the month appointments
+  const endOfCurrentMonth = endOfMonth(today);
+  const restOfMonthAppointments = appointments.filter(app => {
+    const appDate = startOfDay(new Date(app.date));
+    return isAfter(appDate, sevenDaysFromNow) && 
+           (isBefore(appDate, endOfCurrentMonth) || isSameDay(appDate, endOfCurrentMonth));
+  });
+
+  // Get appointments for selected date
+  const selectedDateAppointments = selectedDate 
+    ? appointments.filter(app => isSameDay(new Date(app.date), selectedDate))
+    : [];
+
+  // Calendar dates with appointments
+  const appointmentDates = appointments.map(app => app.date);
+
+  // Get status badge color
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'Concluído': return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
+      case 'Cancelado': return 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100';
+      case 'Confirmado': return 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100';
+      default: return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100';
+    }
+  };
+
+  // Render appointments table
+  const renderAppointmentsTable = (appointmentsList: typeof mockAppointments) => (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>Paciente</TableHead>
+            <TableHead>Tipo</TableHead>
+            <TableHead>Data</TableHead>
+            <TableHead>Horário</TableHead>
+            <TableHead>Médico</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {appointmentsList.length > 0 ? (
+            appointmentsList.map((appointment) => (
+              <TableRow key={appointment.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                <TableCell>{appointment.id}</TableCell>
+                <TableCell>{appointment.patient}</TableCell>
+                <TableCell>{appointment.type}</TableCell>
+                <TableCell>{format(appointment.date, "dd/MM/yyyy")}</TableCell>
+                <TableCell className="flex items-center">
+                  <Clock className="h-3 w-3 mr-1" />
+                  {format(appointment.date, "HH:mm")}
+                </TableCell>
+                <TableCell>{appointment.doctor}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={getStatusColor(appointment.status)}>
+                    {appointment.status}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-6 text-gray-500 dark:text-gray-400">
+                Nenhum agendamento encontrado para este período.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
 
   return (
-    <div ref={pageRef}>
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Pedidos</h1>
-      <p className="text-gray-500 dark:text-gray-400 mt-1 mb-6">Gerencie os pedidos de itens laboratoriais</p>
-      
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 text-center">
-        <h2 className="text-xl font-medium text-gray-700 dark:text-gray-200">Página em desenvolvimento</h2>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">
-          Esta funcionalidade estará disponível em breve!
-        </p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold tracking-tight dark:text-white">Agendamentos</h1>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="md:col-span-2 dark:bg-gray-800 dark:text-gray-100">
+          <CardHeader>
+            <CardTitle className="text-xl">Agendamentos</CardTitle>
+            <CardDescription>
+              Visualize seus agendamentos recentes e futuros
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="next7days">
+              <TabsList className="mb-4">
+                <TabsTrigger value="recent">Recentes</TabsTrigger>
+                <TabsTrigger value="next7days">Próximos 7 dias</TabsTrigger>
+                <TabsTrigger value="restOfMonth">Resto do mês</TabsTrigger>
+                {selectedDate && (
+                  <TabsTrigger value="selectedDate">
+                    {format(selectedDate, "dd/MM/yyyy")}
+                  </TabsTrigger>
+                )}
+              </TabsList>
+              
+              <TabsContent value="recent" className="mt-0">
+                <h3 className="text-lg font-medium mb-4">Agendamentos recentes</h3>
+                {renderAppointmentsTable(recentAppointments)}
+              </TabsContent>
+              
+              <TabsContent value="next7days" className="mt-0">
+                <h3 className="text-lg font-medium mb-4">
+                  Próximos 7 dias ({format(today, "dd/MM")} - {format(sevenDaysFromNow, "dd/MM")})
+                </h3>
+                {renderAppointmentsTable(next7DaysAppointments)}
+              </TabsContent>
+              
+              <TabsContent value="restOfMonth" className="mt-0">
+                <h3 className="text-lg font-medium mb-4">
+                  Resto do mês ({format(addDays(sevenDaysFromNow, 1), "dd/MM")} - {format(endOfCurrentMonth, "dd/MM")})
+                </h3>
+                {renderAppointmentsTable(restOfMonthAppointments)}
+              </TabsContent>
+              
+              {selectedDate && (
+                <TabsContent value="selectedDate" className="mt-0">
+                  <h3 className="text-lg font-medium mb-4">
+                    Agendamentos em {format(selectedDate, "dd/MM/yyyy")}
+                  </h3>
+                  {renderAppointmentsTable(selectedDateAppointments)}
+                </TabsContent>
+              )}
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card className="dark:bg-gray-800 dark:text-gray-100">
+          <CardHeader>
+            <CardTitle className="text-xl">Calendário</CardTitle>
+            <CardDescription>
+              Selecione uma data para ver os agendamentos
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => {
+                setSelectedDate(date);
+                if (date) {
+                  // Auto-switch to the selected date tab if a date is selected
+                  const tabsList = document.querySelector('[role="tablist"]');
+                  if (tabsList) {
+                    const selectedDateTab = Array.from(tabsList.children).find(
+                      (tab) => tab.textContent === format(date, "dd/MM/yyyy")
+                    );
+                    if (!selectedDateTab) {
+                      const tabs = document.querySelector('[role="tablist"]');
+                      if (tabs) {
+                        const newTab = document.createElement("button");
+                        newTab.setAttribute("data-state", "active");
+                        newTab.setAttribute("value", "selectedDate");
+                        tabs.appendChild(newTab);
+                      }
+                    }
+                  }
+                }
+              }}
+              modifiers={{
+                hasAppointment: appointmentDates,
+              }}
+              modifiersStyles={{
+                hasAppointment: {
+                  fontWeight: 'bold',
+                  textDecoration: 'underline',
+                  color: 'var(--primary)',
+                }
+              }}
+              className="pointer-events-auto"
+            />
+            
+            <div className="mt-4">
+              <div className="text-sm text-gray-500 dark:text-gray-300">
+                * Datas com agendamentos estão destacadas
+              </div>
+              
+              {selectedDate && selectedDateAppointments.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="font-medium mb-2">
+                    {selectedDateAppointments.length} agendamento(s) em {format(selectedDate, "dd/MM/yyyy")}
+                  </h4>
+                  <ul className="space-y-2">
+                    {selectedDateAppointments.map((app) => (
+                      <li key={app.id} className="text-sm border-l-4 border-blue-500 dark:border-blue-400 pl-2 py-1">
+                        <span className="font-medium">{format(app.date, "HH:mm")}</span> - {app.patient} ({app.type})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
