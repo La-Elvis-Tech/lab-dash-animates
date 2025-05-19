@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    fs: {
+      deny: ['.env', '.git', 'node_modules']
+    }
   },
   plugins: [
     react(),
