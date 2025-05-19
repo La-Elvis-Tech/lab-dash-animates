@@ -91,7 +91,7 @@ const Dashboard: React.FC = () => {
 
       {/* Key metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="dashboard-card dark:bg-gray-800 dark:border-gray-700">
+        <Card className="dashboard-card dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card dark:bg-gray-800 dark:border-gray-700">
+        <Card className="dashboard-card dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card dark:bg-gray-800 dark:border-gray-700">
+        <Card className="dashboard-card dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -145,7 +145,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card dark:bg-gray-800 dark:border-gray-700">
+        <Card className="dashboard-card dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -186,7 +186,7 @@ const Dashboard: React.FC = () => {
 
       {/* Items running low */}
       <div className="dashboard-chart">
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Itens em Baixo Estoque</h2>
@@ -197,21 +197,21 @@ const Dashboard: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-700">
-                    <th className="pb-2 font-medium">Nome do Item</th>
-                    <th className="pb-2 font-medium">Estoque Atual</th>
-                    <th className="pb-2 font-medium">Estoque Mínimo</th>
-                    <th className="pb-2 font-medium">Status</th>
+                  <tr className="text-left text-sm text-gray-700 dark:text-gray-400 border-b dark:border-gray-700">
+                    <th className="pb-2 font-bold">Nome do Item</th>
+                    <th className="pb-2 font-bold">Estoque Atual</th>
+                    <th className="pb-2 font-bold">Estoque Mínimo</th>
+                    <th className="pb-2 font-bold">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {itemsNearDepletion.map((item) => (
                     <tr key={item.id} className="border-b dark:border-gray-700 last:border-0">
-                      <td className="py-3 text-sm font-medium dark:text-gray-300">{item.name}</td>
-                      <td className="py-3 text-sm dark:text-gray-300">
+                      <td className="py-3 text-sm font-medium dark:text-gray-300 text-gray-800">{item.name}</td>
+                      <td className="py-3 text-sm dark:text-gray-300 text-gray-800">
                         {item.currentStock} {item.unit}
                       </td>
-                      <td className="py-3 text-sm dark:text-gray-300">
+                      <td className="py-3 text-sm dark:text-gray-300 text-gray-800">
                         {item.minStock} {item.unit}
                       </td>
                       <td className="py-3 text-sm">

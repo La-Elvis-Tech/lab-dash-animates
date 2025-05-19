@@ -323,7 +323,7 @@ const [searchQuery, setSearchQuery] = useState('');
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button 
-                        className="flex-1 bg-lab-blue hover:bg-blue-700 text-white flex items-center justify-center"
+                        className="flex-1 bg-neutral-200 dark:bg-neutral-800 hover:bg-blue-400 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white flex items-center justify-center duration-500 transition-colors ease-in-out"
                       >
                         Ver Estoque
                       </Button>
@@ -337,7 +337,7 @@ const [searchQuery, setSearchQuery] = useState('');
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Package className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm text-gray-700">Disponíveis:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Disponíveis:</span>
                           </div>
                           <span className="font-medium">{stockDetails.available} {item.unit}</span>
                         </div>
@@ -345,7 +345,7 @@ const [searchQuery, setSearchQuery] = useState('');
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Database className="h-4 w-4 text-amber-500" />
-                            <span className="text-sm text-gray-700">Reservadas:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Reservadas:</span>
                           </div>
                           <span className="font-medium">{stockDetails.reserved} {item.unit}</span>
                         </div>
@@ -353,7 +353,7 @@ const [searchQuery, setSearchQuery] = useState('');
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4 text-purple-500" />
-                            <span className="text-sm text-gray-700">Utilizadas neste mês:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Utilizadas neste mês:</span>
                           </div>
                           <span className="font-medium">{stockDetails.usedThisMonth} {item.unit}</span>
                         </div>
@@ -361,7 +361,7 @@ const [searchQuery, setSearchQuery] = useState('');
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-green-500" />
-                            <span className="text-sm text-gray-700">Última reposição:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Última reposição:</span>
                           </div>
                           <span className="font-medium">
                             {new Date(stockDetails.lastReplenishment).toLocaleDateString('pt-BR')}
@@ -371,7 +371,7 @@ const [searchQuery, setSearchQuery] = useState('');
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-red-500" />
-                            <span className="text-sm text-gray-700">Validade do lote:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">Validade do lote:</span>
                           </div>
                           <span className="font-medium">
                             {new Date(stockDetails.batchExpiry).toLocaleDateString('pt-BR')}

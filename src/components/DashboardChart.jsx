@@ -48,8 +48,8 @@ const DashboardChart = ({ type, data, title, description }) => {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data}>
               <CartesianGrid /* strokeDasharray="3 6"*/ stroke="currentColor" strokeOpacity={0.3} />
-              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
-              <YAxis tick={{ fill: 'currentColor' }} />
+              <XAxis dataKey="name" tick={{ color: 'text-gray-700 dark:text-white' }} />
+              <YAxis tick={{ color: 'text-gray-700 dark:text-white' }} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
@@ -61,7 +61,7 @@ const DashboardChart = ({ type, data, title, description }) => {
               />
               <Legend />
               <Line type="monotone" dataKey="value" stroke="#3a45a7" strokeWidth={3} />
-              {data[0]?.value2 && <Line type="monotone" dataKey="value2" stroke="#535dc5" strokeWidth={2} />}
+              {data[0]?.value2 && <Line type="monotone" dataKey="value2" stroke="#3a45a7" strokeWidth={2} />}
             </LineChart>
           </ResponsiveContainer>
         );
@@ -128,11 +128,11 @@ const DashboardChart = ({ type, data, title, description }) => {
   return (
     <div 
       ref={chartRef}
-      className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg transition-colors duration-300"
+      className="bg-white p-6 rounded-xl shadow-lg transition-colors duration-300 dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
     >
       <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
+        <p className="text-sm text-gray-800 dark: text-gray-300">{description}</p>
       </div>
       {renderChart()}
     </div>
