@@ -12,7 +12,7 @@ import {
   TableCell 
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Search, Filter, Building, Flask } from "lucide-react";
+import { Calendar as CalendarIcon, Search, Filter, Building, Database } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -328,7 +328,7 @@ const Requests: React.FC = () => {
                         <TableCell>{exam.doctor}</TableCell>
                         <TableCell>
                           <div className="flex items-center">
-                            <Flask className="h-3 w-3 mr-1" />
+                            <Database className="h-3 w-3 mr-1" />
                             {exam.laboratory}
                           </div>
                         </TableCell>
