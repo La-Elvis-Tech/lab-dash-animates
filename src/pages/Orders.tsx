@@ -315,7 +315,7 @@ const Orders: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight dark:text-white">Agendamentos</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Agendamentos</h1>
         <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline">
@@ -349,7 +349,7 @@ const Orders: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-2 dark:bg-gray-800 dark:text-gray-100">
           <CardHeader>
-            <CardTitle className="text-xl">Agendamentos</CardTitle>
+            <CardTitle className="text-xl">Agendamentos Gerais</CardTitle>
             <CardDescription>
               Visualize seus agendamentos recentes e futuros
             </CardDescription>

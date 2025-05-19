@@ -182,7 +182,7 @@ const Requests: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight dark:text-white">Últimos Exames</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Últimos Exames</h1>
       </div>
       
       <Card className="overflow-hidden dark:bg-gray-800 dark:text-gray-100">
