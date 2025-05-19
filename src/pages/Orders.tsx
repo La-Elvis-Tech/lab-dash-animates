@@ -4,7 +4,7 @@ import { addDays, format, isAfter, isBefore, isSameDay, startOfDay, startOfMonth
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar as CalendarIcon, Clock, User } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, MapPin, Building } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -18,6 +18,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import DashboardChart from '@/components/DashboardChart';
 
 // Mock data for appointments
 const mockAppointments = [
@@ -27,6 +28,8 @@ const mockAppointments = [
     type: 'Coleta de Sangue',
     date: new Date(2024, 4, 15, 9, 30), 
     doctor: 'Dra. Ana Souza',
+    unit: 'Unidade Centro',
+    cost: 120.00,
     status: 'Concluído'
   },
   { 
@@ -35,6 +38,8 @@ const mockAppointments = [
     type: 'Entrega de Resultado',
     date: new Date(2024, 4, 16, 10, 45), 
     doctor: 'Dr. Carlos Mendes',
+    unit: 'Unidade Norte',
+    cost: 0,
     status: 'Cancelado'
   },
   { 
@@ -43,6 +48,8 @@ const mockAppointments = [
     type: 'Colonoscopia',
     date: new Date(2024, 4, 22, 8, 0), 
     doctor: 'Dra. Lucia Freitas',
+    unit: 'Unidade Sul',
+    cost: 550.00,
     status: 'Confirmado'
   },
   { 
@@ -51,6 +58,8 @@ const mockAppointments = [
     type: 'Ultrassom',
     date: new Date(2024, 4, 23, 14, 15), 
     doctor: 'Dr. Roberto Castro',
+    unit: 'Unidade Leste',
+    cost: 280.00,
     status: 'Confirmado'
   },
   { 
@@ -59,6 +68,8 @@ const mockAppointments = [
     type: 'Raio-X',
     date: new Date(2024, 4, 24, 11, 0), 
     doctor: 'Dra. Fernanda Lima',
+    unit: 'Unidade Centro',
+    cost: 180.00,
     status: 'Confirmado'
   },
   { 
@@ -67,6 +78,8 @@ const mockAppointments = [
     type: 'Eletrocardiograma',
     date: new Date(2024, 4, 25, 15, 30), 
     doctor: 'Dr. Paulo Vieira',
+    unit: 'Unidade Norte',
+    cost: 220.00,
     status: 'Agendado'
   },
   { 
@@ -75,6 +88,8 @@ const mockAppointments = [
     type: 'Coleta de Sangue',
     date: new Date(2024, 4, 19, 9, 0), 
     doctor: 'Dra. Ana Souza',
+    unit: 'Unidade Sul',
+    cost: 120.00,
     status: 'Agendado'
   },
   { 
@@ -83,6 +98,8 @@ const mockAppointments = [
     type: 'Densitometria',
     date: new Date(2024, 4, 20, 13, 45), 
     doctor: 'Dr. José Santos',
+    unit: 'Unidade Leste',
+    cost: 320.00,
     status: 'Agendado'
   },
   { 
@@ -91,6 +108,8 @@ const mockAppointments = [
     type: 'Tomografia',
     date: new Date(2024, 4, 28, 10, 30), 
     doctor: 'Dra. Carla Mendes',
+    unit: 'Unidade Centro',
+    cost: 850.00,
     status: 'Agendado'
   },
   { 
@@ -99,6 +118,8 @@ const mockAppointments = [
     type: 'Mamografia',
     date: new Date(2024, 4, 30, 11, 15), 
     doctor: 'Dr. André Oliveira',
+    unit: 'Unidade Norte',
+    cost: 380.00,
     status: 'Agendado'
   },
 ];
@@ -156,22 +177,43 @@ const Orders: React.FC = () => {
     }
   };
 
-  // Get appointments by doctor
-  const doctorAppointments = appointments.reduce((acc, app) => {
-    const doctor = app.doctor;
-    if (!acc[doctor]) {
-      acc[doctor] = [];
+  // Get appointments by unit
+  const unitAppointments = appointments.reduce((acc, app) => {
+    const unit = app.unit;
+    if (!acc[unit]) {
+      acc[unit] = [];
     }
-    acc[doctor].push(app);
+    acc[unit].push(app);
     return acc;
   }, {} as Record<string, typeof mockAppointments>);
 
-  // Doctors list with appointment counts
-  const doctorsList = Object.keys(doctorAppointments).map(doctor => ({
-    name: doctor,
-    count: doctorAppointments[doctor].length,
-    appointments: doctorAppointments[doctor]
+  // Units list with appointment counts
+  const unitsList = Object.keys(unitAppointments).map(unit => ({
+    name: unit,
+    count: unitAppointments[unit].length,
+    appointments: unitAppointments[unit]
   }));
+
+  // Calculate weekly expenses
+  const calculateWeeklyExpenses = () => {
+    const weeklyData = Array(7).fill(0).map((_, i) => {
+      const date = addDays(today, i);
+      const dayAppointments = appointments.filter(app => isSameDay(new Date(app.date), date));
+      const total = dayAppointments.reduce((sum, app) => sum + app.cost, 0);
+      return {
+        name: format(date, "dd/MM"),
+        value: total
+      };
+    });
+    
+    return weeklyData;
+  };
+
+  // Weekly expenses data for chart
+  const weeklyExpenses = calculateWeeklyExpenses();
+  
+  // Calculate total expenses
+  const totalExpenses = next7DaysAppointments.reduce((sum, app) => sum + app.cost, 0);
 
   // Render appointments table
   const renderAppointmentsTable = (appointmentsList: typeof mockAppointments) => (
@@ -186,6 +228,8 @@ const Orders: React.FC = () => {
               <TableHead>Data</TableHead>
               <TableHead>Horário</TableHead>
               <TableHead>Médico</TableHead>
+              <TableHead>Unidade</TableHead>
+              <TableHead>Custo (R$)</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -203,6 +247,15 @@ const Orders: React.FC = () => {
                   </TableCell>
                   <TableCell>{appointment.doctor}</TableCell>
                   <TableCell>
+                    <div className="flex items-center">
+                      <MapPin className="h-3 w-3 mr-1" />
+                      {appointment.unit}
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {appointment.cost.toFixed(2)}
+                  </TableCell>
+                  <TableCell>
                     <Badge variant="outline" className={getStatusColor(appointment.status)}>
                       {appointment.status}
                     </Badge>
@@ -211,7 +264,7 @@ const Orders: React.FC = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-6 text-gray-500 dark:text-gray-400">
+                <TableCell colSpan={9} className="text-center py-6 text-gray-500 dark:text-gray-400">
                   Nenhum agendamento encontrado para este período.
                 </TableCell>
               </TableRow>
@@ -222,62 +275,34 @@ const Orders: React.FC = () => {
     </ScrollArea>
   );
 
-  // Render doctors table
-  const renderDoctorsTable = () => (
+  // Render units table
+  const renderUnitsTable = () => (
     <ScrollArea className="h-[400px] rounded-md">
       <div className="w-full min-w-[500px]">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Médico</TableHead>
+              <TableHead>Unidade</TableHead>
               <TableHead>Exames agendados</TableHead>
-              <TableHead>Visualizar datas</TableHead>
+              <TableHead>Valor total (R$)</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {doctorsList.map((doctor) => (
-              <TableRow key={doctor.name} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
-                <TableCell className="font-medium">{doctor.name}</TableCell>
-                <TableCell>
-                  <Badge className="bg-primary text-primary-foreground">
-                    {doctor.count}
-                  </Badge>
+            {unitsList.map((unit) => (
+              <TableRow key={unit.name} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                <TableCell className="font-medium">
+                  <div className="flex items-center">
+                    <Building className="h-4 w-4 mr-2" />
+                    {unit.name}
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <CalendarIcon className="h-4 w-4 mr-1" />
-                              Ver datas
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={undefined}
-                              onSelect={() => {}}
-                              modifiers={{
-                                hasAppointment: doctor.appointments.map(app => app.date),
-                              }}
-                              modifiersStyles={{
-                                hasAppointment: {
-                                  color: 'red',
-                                  fontWeight: 'bold',
-                                }
-                              }}
-                              className="pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Ver datas de agendamentos</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <Badge className="bg-primary text-primary-foreground">
+                    {unit.count}
+                  </Badge>
+                </TableCell>
+                <TableCell className="font-medium">
+                  {unit.appointments.reduce((sum, app) => sum + app.cost, 0).toFixed(2)}
                 </TableCell>
               </TableRow>
             ))}
@@ -335,9 +360,9 @@ const Orders: React.FC = () => {
                 <TabsTrigger value="recent">Recentes</TabsTrigger>
                 <TabsTrigger value="next7days">Próximos 7 dias</TabsTrigger>
                 <TabsTrigger value="restOfMonth">Resto do mês</TabsTrigger>
-                <TabsTrigger value="doctors">
-                  <User className="h-4 w-4 mr-1" />
-                  Médicos
+                <TabsTrigger value="units">
+                  <Building className="h-4 w-4 mr-1" />
+                  Unidades
                 </TabsTrigger>
                 {selectedDate && (
                   <TabsTrigger value="selectedDate">
@@ -365,11 +390,11 @@ const Orders: React.FC = () => {
                 {renderAppointmentsTable(restOfMonthAppointments)}
               </TabsContent>
 
-              <TabsContent value="doctors" className="mt-0">
+              <TabsContent value="units" className="mt-0">
                 <h3 className="text-lg font-medium mb-4">
-                  Médicos e seus agendamentos
+                  Unidades e seus agendamentos
                 </h3>
-                {renderDoctorsTable()}
+                {renderUnitsTable()}
               </TabsContent>
               
               {selectedDate && (
@@ -386,69 +411,55 @@ const Orders: React.FC = () => {
 
         <Card className="dark:bg-gray-800 dark:text-gray-100">
           <CardHeader>
-            <CardTitle className="text-xl">Calendário</CardTitle>
+            <CardTitle className="text-xl">Despesas Previstas</CardTitle>
             <CardDescription>
-              Selecione uma data para ver os agendamentos
+              Análise de gastos para os próximos 7 dias
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => {
-                setSelectedDate(date);
-                if (date) {
-                  // Auto-switch to the selected date tab if a date is selected
-                  const tabsList = document.querySelector('[role="tablist"]');
-                  if (tabsList) {
-                    const selectedDateTab = Array.from(tabsList.children).find(
-                      (tab) => tab.textContent === format(date, "dd/MM/yyyy")
-                    );
-                    if (!selectedDateTab) {
-                      const tabs = document.querySelector('[role="tablist"]');
-                      if (tabs) {
-                        const newTab = document.createElement("button");
-                        newTab.setAttribute("data-state", "active");
-                        newTab.setAttribute("value", "selectedDate");
-                        tabs.appendChild(newTab);
-                      }
-                    }
-                  }
-                }
-              }}
-              modifiers={{
-                hasAppointment: appointmentDates,
-              }}
-              modifiersStyles={{
-                hasAppointment: {
-                  color: 'red',
-                  fontWeight: 'bold',
-                }
-              }}
-              className="pointer-events-auto"
-            />
+            <div className="mb-6">
+              <DashboardChart
+                type="bar"
+                data={weeklyExpenses}
+                title="Despesas Semanais"
+                description="Gastos previstos para os próximos 7 dias"
+              />
+            </div>
             
-            <div className="mt-4">
-              <div className="text-sm text-gray-500 dark:text-gray-300">
-                * Datas com agendamentos estão destacadas em vermelho
+            <div className="space-y-4">
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <p className="text-sm text-gray-500 dark:text-gray-300 mb-1">Total de despesas previstas</p>
+                <p className="text-2xl font-bold">R$ {totalExpenses.toFixed(2)}</p>
               </div>
               
-              {selectedDate && selectedDateAppointments.length > 0 && (
-                <ScrollArea className="h-40 mt-4 rounded-md">
-                  <div className="p-1">
-                    <h4 className="font-medium mb-2">
-                      {selectedDateAppointments.length} agendamento(s) em {format(selectedDate, "dd/MM/yyyy")}
-                    </h4>
-                    <ul className="space-y-2">
-                      {selectedDateAppointments.map((app) => (
-                        <li key={app.id} className="text-sm border-l-4 border-blue-500 dark:border-blue-400 pl-2 py-1">
-                          <span className="font-medium">{format(app.date, "HH:mm")}</span> - {app.patient} ({app.type})
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </ScrollArea>
-              )}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <p className="text-xs text-gray-500 dark:text-gray-300 mb-1">Média diária</p>
+                  <p className="text-lg font-semibold">R$ {(totalExpenses / 7).toFixed(2)}</p>
+                </div>
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <p className="text-xs text-gray-500 dark:text-gray-300 mb-1">N° de agendamentos</p>
+                  <p className="text-lg font-semibold">{next7DaysAppointments.length}</p>
+                </div>
+              </div>
+              
+              <ScrollArea className="h-40 mt-4 rounded-md">
+                <div className="p-1 space-y-2">
+                  <h4 className="font-medium">Próximos agendamentos</h4>
+                  {next7DaysAppointments.slice(0, 5).map((app) => (
+                    <div key={app.id} className="text-sm border-l-4 border-blue-500 dark:border-blue-400 pl-2 py-1">
+                      <div className="flex justify-between items-center">
+                        <span>{format(app.date, "dd/MM")} - {app.patient}</span>
+                        <span className="font-medium">R$ {app.cost.toFixed(2)}</span>
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{app.type} - {app.unit}</div>
+                    </div>
+                  ))}
+                  {next7DaysAppointments.length > 5 && (
+                    <p className="text-sm text-gray-500 italic">+ {next7DaysAppointments.length - 5} agendamentos</p>
+                  )}
+                </div>
+              </ScrollArea>
             </div>
           </CardContent>
         </Card>
