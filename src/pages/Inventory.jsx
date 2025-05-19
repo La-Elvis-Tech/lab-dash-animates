@@ -1,12 +1,16 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { Search, Filter, ChevronDown, Plus } from 'lucide-react';
+import { Search, Filter, ChevronDown, Plus, Calendar, Package, Database, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Mock data
 const categories = [
@@ -199,6 +203,25 @@ const [searchQuery, setSearchQuery] = useState('');
     }
   };
 
+  const handleViewStock = (itemId) => {
+    toast({
+      title: "Detalhes do estoque",
+      description: "Informações detalhadas sobre o item.",
+    });
+  };
+
+  // Mock data for stock details
+  const getStockDetails = (itemId) => {
+    // This would normally come from an API
+    return {
+      available: 15,
+      reserved: 3,
+      usedThisMonth: 8,
+      lastReplenishment: '2024-05-01',
+      batchExpiry: '2025-12-30'
+    };
+  };
+
   return (
     <div ref={containerRef} className="space-y-6">
       <div>
@@ -250,60 +273,118 @@ const [searchQuery, setSearchQuery] = useState('');
 
       {/* Items List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 item-list">
-        {filteredItems.map((item) => (
-          <Card key={item.id} className="inventory-item overflow-hidden">
-            <div 
-              className={`h-1 ${
-                item.status === 'low' ? 'bg-red-500' : 'bg-green-500'
-              }`}
-            />
-            <CardContent className="p-5">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-medium text-lg">{item.name}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {categories.find(c => c.id === item.category)?.name}
-                  </p>
-                </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)}`}>
-                  {item.stock} {item.unit}
-                </span>
-              </div>
-              
-              <div className="mt-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Localização:</span>
-                  <span className="font-medium">{item.location}</span>
-                </div>
-                
-                {item.expiryDate && (
-                  <div className="flex justify-between text-sm mt-2">
-                    <span className="text-gray-500">Validade:</span>
-                    <span className="font-medium">
-                      {new Date(item.expiryDate).toLocaleDateString('pt-BR')}
-                    </span>
+        {filteredItems.map((item) => {
+          const stockDetails = getStockDetails(item.id);
+          
+          return (
+            <Card key={item.id} className="inventory-item overflow-hidden">
+              <div 
+                className={`h-1 ${
+                  item.status === 'low' ? 'bg-red-500' : 'bg-green-500'
+                }`}
+              />
+              <CardContent className="p-5">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium text-lg">{item.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {categories.find(c => c.id === item.category)?.name}
+                    </p>
                   </div>
-                )}
-                
-                <div className="flex justify-between text-sm mt-2">
-                  <span className="text-gray-500">Último uso:</span>
-                  <span className="font-medium">
-                    {new Date(item.lastUsed).toLocaleDateString('pt-BR')}
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)}`}>
+                    {item.stock} {item.unit}
                   </span>
                 </div>
-              </div>
-              
-              <div className="mt-5 flex">
-                <Button 
-                  className="flex-1 bg-lab-blue hover:bg-blue-700 text-white"
-                  onClick={() => handleConsumeItem(item.id)}
-                >
-                  Registrar Consumo
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                
+                <div className="mt-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Localização:</span>
+                    <span className="font-medium">{item.location}</span>
+                  </div>
+                  
+                  {item.expiryDate && (
+                    <div className="flex justify-between text-sm mt-2">
+                      <span className="text-gray-500">Validade:</span>
+                      <span className="font-medium">
+                        {new Date(item.expiryDate).toLocaleDateString('pt-BR')}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between text-sm mt-2">
+                    <span className="text-gray-500">Último uso:</span>
+                    <span className="font-medium">
+                      {new Date(item.lastUsed).toLocaleDateString('pt-BR')}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="mt-5 flex">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        className="flex-1 bg-lab-blue hover:bg-blue-700 text-white flex items-center justify-center"
+                      >
+                        Ver Estoque
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 p-0">
+                      <div className="p-4 border-b border-gray-200">
+                        <h4 className="font-medium text-base mb-1">{item.name}</h4>
+                        <p className="text-sm text-gray-500">Detalhes do estoque</p>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Package className="h-4 w-4 text-blue-500" />
+                            <span className="text-sm text-gray-700">Disponíveis:</span>
+                          </div>
+                          <span className="font-medium">{stockDetails.available} {item.unit}</span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Database className="h-4 w-4 text-amber-500" />
+                            <span className="text-sm text-gray-700">Reservadas:</span>
+                          </div>
+                          <span className="font-medium">{stockDetails.reserved} {item.unit}</span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-purple-500" />
+                            <span className="text-sm text-gray-700">Utilizadas neste mês:</span>
+                          </div>
+                          <span className="font-medium">{stockDetails.usedThisMonth} {item.unit}</span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-green-500" />
+                            <span className="text-sm text-gray-700">Última reposição:</span>
+                          </div>
+                          <span className="font-medium">
+                            {new Date(stockDetails.lastReplenishment).toLocaleDateString('pt-BR')}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-red-500" />
+                            <span className="text-sm text-gray-700">Validade do lote:</span>
+                          </div>
+                          <span className="font-medium">
+                            {new Date(stockDetails.batchExpiry).toLocaleDateString('pt-BR')}
+                          </span>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {filteredItems.length === 0 && (
