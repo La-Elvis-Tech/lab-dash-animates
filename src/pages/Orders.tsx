@@ -4,7 +4,7 @@ import { addDays, format, isAfter, isBefore, isSameDay, startOfDay, startOfMonth
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar as CalendarIcon, Clock } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, User } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -15,6 +15,9 @@ import {
   TableHead, 
   TableCell 
 } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Mock data for appointments
 const mockAppointments = [
@@ -104,6 +107,7 @@ const Orders: React.FC = () => {
   const today = startOfDay(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [appointments, setAppointments] = useState(mockAppointments);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Filter appointments by date range
   const filterAppointmentsByPeriod = (startDate: Date, endDate?: Date) => {
@@ -152,57 +156,169 @@ const Orders: React.FC = () => {
     }
   };
 
+  // Get appointments by doctor
+  const doctorAppointments = appointments.reduce((acc, app) => {
+    const doctor = app.doctor;
+    if (!acc[doctor]) {
+      acc[doctor] = [];
+    }
+    acc[doctor].push(app);
+    return acc;
+  }, {} as Record<string, typeof mockAppointments>);
+
+  // Doctors list with appointment counts
+  const doctorsList = Object.keys(doctorAppointments).map(doctor => ({
+    name: doctor,
+    count: doctorAppointments[doctor].length,
+    appointments: doctorAppointments[doctor]
+  }));
+
   // Render appointments table
   const renderAppointmentsTable = (appointmentsList: typeof mockAppointments) => (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Paciente</TableHead>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Data</TableHead>
-            <TableHead>Horário</TableHead>
-            <TableHead>Médico</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {appointmentsList.length > 0 ? (
-            appointmentsList.map((appointment) => (
-              <TableRow key={appointment.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
-                <TableCell>{appointment.id}</TableCell>
-                <TableCell>{appointment.patient}</TableCell>
-                <TableCell>{appointment.type}</TableCell>
-                <TableCell>{format(appointment.date, "dd/MM/yyyy")}</TableCell>
-                <TableCell className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {format(appointment.date, "HH:mm")}
-                </TableCell>
-                <TableCell>{appointment.doctor}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={getStatusColor(appointment.status)}>
-                    {appointment.status}
-                  </Badge>
+    <ScrollArea className="h-[400px] rounded-md">
+      <div className="overflow-x-auto p-1">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Paciente</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Horário</TableHead>
+              <TableHead>Médico</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {appointmentsList.length > 0 ? (
+              appointmentsList.map((appointment) => (
+                <TableRow key={appointment.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <TableCell>{appointment.id}</TableCell>
+                  <TableCell>{appointment.patient}</TableCell>
+                  <TableCell>{appointment.type}</TableCell>
+                  <TableCell>{format(appointment.date, "dd/MM/yyyy")}</TableCell>
+                  <TableCell className="flex items-center">
+                    <Clock className="h-3 w-3 mr-1" />
+                    {format(appointment.date, "HH:mm")}
+                  </TableCell>
+                  <TableCell>{appointment.doctor}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={getStatusColor(appointment.status)}>
+                      {appointment.status}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-6 text-gray-500 dark:text-gray-400">
+                  Nenhum agendamento encontrado para este período.
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </ScrollArea>
+  );
+
+  // Render doctors table
+  const renderDoctorsTable = () => (
+    <ScrollArea className="h-[400px] rounded-md">
+      <div className="overflow-x-auto p-1">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-6 text-gray-500 dark:text-gray-400">
-                Nenhum agendamento encontrado para este período.
-              </TableCell>
+              <TableHead>Médico</TableHead>
+              <TableHead>Exames agendados</TableHead>
+              <TableHead>Visualizar datas</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {doctorsList.map((doctor) => (
+              <TableRow key={doctor.name} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                <TableCell className="font-medium">{doctor.name}</TableCell>
+                <TableCell>
+                  <Badge className="bg-primary text-primary-foreground">
+                    {doctor.count}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <CalendarIcon className="h-4 w-4 mr-1" />
+                              Ver datas
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <Calendar
+                              mode="single"
+                              selected={undefined}
+                              onSelect={() => {}}
+                              modifiers={{
+                                hasAppointment: doctor.appointments.map(app => app.date),
+                              }}
+                              modifiersStyles={{
+                                hasAppointment: {
+                                  color: 'red',
+                                  fontWeight: 'bold',
+                                }
+                              }}
+                              className="pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Ver datas de agendamentos</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </ScrollArea>
   );
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold tracking-tight dark:text-white">Agendamentos</h1>
+        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline">
+              <CalendarIcon className="h-4 w-4 mr-2" />
+              Calendário
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => {
+                setSelectedDate(date);
+                setIsCalendarOpen(false);
+              }}
+              modifiers={{
+                hasAppointment: appointmentDates,
+              }}
+              modifiersStyles={{
+                hasAppointment: {
+                  color: 'red',
+                  fontWeight: 'bold',
+                }
+              }}
+              className="pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -219,6 +335,10 @@ const Orders: React.FC = () => {
                 <TabsTrigger value="recent">Recentes</TabsTrigger>
                 <TabsTrigger value="next7days">Próximos 7 dias</TabsTrigger>
                 <TabsTrigger value="restOfMonth">Resto do mês</TabsTrigger>
+                <TabsTrigger value="doctors">
+                  <User className="h-4 w-4 mr-1" />
+                  Médicos
+                </TabsTrigger>
                 {selectedDate && (
                   <TabsTrigger value="selectedDate">
                     {format(selectedDate, "dd/MM/yyyy")}
@@ -243,6 +363,13 @@ const Orders: React.FC = () => {
                   Resto do mês ({format(addDays(sevenDaysFromNow, 1), "dd/MM")} - {format(endOfCurrentMonth, "dd/MM")})
                 </h3>
                 {renderAppointmentsTable(restOfMonthAppointments)}
+              </TabsContent>
+
+              <TabsContent value="doctors" className="mt-0">
+                <h3 className="text-lg font-medium mb-4">
+                  Médicos e seus agendamentos
+                </h3>
+                {renderDoctorsTable()}
               </TabsContent>
               
               {selectedDate && (
@@ -294,9 +421,8 @@ const Orders: React.FC = () => {
               }}
               modifiersStyles={{
                 hasAppointment: {
+                  color: 'red',
                   fontWeight: 'bold',
-                  textDecoration: 'underline',
-                  color: 'var(--primary)',
                 }
               }}
               className="pointer-events-auto"
@@ -304,22 +430,24 @@ const Orders: React.FC = () => {
             
             <div className="mt-4">
               <div className="text-sm text-gray-500 dark:text-gray-300">
-                * Datas com agendamentos estão destacadas
+                * Datas com agendamentos estão destacadas em vermelho
               </div>
               
               {selectedDate && selectedDateAppointments.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="font-medium mb-2">
-                    {selectedDateAppointments.length} agendamento(s) em {format(selectedDate, "dd/MM/yyyy")}
-                  </h4>
-                  <ul className="space-y-2">
-                    {selectedDateAppointments.map((app) => (
-                      <li key={app.id} className="text-sm border-l-4 border-blue-500 dark:border-blue-400 pl-2 py-1">
-                        <span className="font-medium">{format(app.date, "HH:mm")}</span> - {app.patient} ({app.type})
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <ScrollArea className="h-40 mt-4 rounded-md">
+                  <div className="p-1">
+                    <h4 className="font-medium mb-2">
+                      {selectedDateAppointments.length} agendamento(s) em {format(selectedDate, "dd/MM/yyyy")}
+                    </h4>
+                    <ul className="space-y-2">
+                      {selectedDateAppointments.map((app) => (
+                        <li key={app.id} className="text-sm border-l-4 border-blue-500 dark:border-blue-400 pl-2 py-1">
+                          <span className="font-medium">{format(app.date, "HH:mm")}</span> - {app.patient} ({app.type})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </ScrollArea>
               )}
             </div>
           </CardContent>
