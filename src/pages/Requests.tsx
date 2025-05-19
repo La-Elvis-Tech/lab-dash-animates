@@ -12,7 +12,7 @@ import {
   TableCell 
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Search, Filter, Building, Flask } from "lucide-react";
+import { Calendar as CalendarIcon, Search, Filter, Building,  } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -109,7 +109,7 @@ const mockExams = [
 
 // Exam types for filtering
 const examTypes = [
-  'Todos',
+  'Todos Exames',
   'Hemograma',
   'Glicemia',
   'Colonoscopia',
@@ -120,7 +120,7 @@ const examTypes = [
 
 // Units for filtering
 const units = [
-  'Todas',
+  'Todas Unidades',
   'Unidade Centro',
   'Unidade Norte',
   'Unidade Sul',
@@ -129,7 +129,7 @@ const units = [
 
 // Laboratories for filtering
 const laboratories = [
-  'Todos',
+  'Todos Labs',
   'LabTech',
   'BioLab',
   'MedDiag',
@@ -140,9 +140,9 @@ const laboratories = [
 const Requests: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedType, setSelectedType] = useState<string>('Todos');
-  const [selectedUnit, setSelectedUnit] = useState<string>('Todas');
-  const [selectedLaboratory, setSelectedLaboratory] = useState<string>('Todos');
+  const [selectedType, setSelectedType] = useState<string>('Todos Exames');
+  const [selectedUnit, setSelectedUnit] = useState<string>('Todas Unidades');
+  const [selectedLaboratory, setSelectedLaboratory] = useState<string>('Todos Labs');
   const [exams, setExams] = useState(mockExams);
 
   // Filter exams based on search, date, type, unit and laboratory
@@ -158,11 +158,11 @@ const Requests: React.FC = () => {
       ? exam.date.toDateString() === selectedDate.toDateString() 
       : true;
     
-    const matchesType = selectedType === 'Todos' || exam.type === selectedType;
+    const matchesType = selectedType === 'Todos Exames' || exam.type === selectedType;
     
-    const matchesUnit = selectedUnit === 'Todas' || exam.unit === selectedUnit;
+    const matchesUnit = selectedUnit === 'Todas Unidades' || exam.unit === selectedUnit;
     
-    const matchesLaboratory = selectedLaboratory === 'Todos' || exam.laboratory === selectedLaboratory;
+    const matchesLaboratory = selectedLaboratory === 'Todos Labs' || exam.laboratory === selectedLaboratory;
     
     return matchesSearch && matchesDate && matchesType && matchesUnit && matchesLaboratory;
   });
@@ -174,9 +174,9 @@ const Requests: React.FC = () => {
   const resetFilters = () => {
     setSearchQuery('');
     setSelectedDate(undefined);
-    setSelectedType('Todos');
-    setSelectedUnit('Todas');
-    setSelectedLaboratory('Todos');
+    setSelectedType('Todos Exames');
+    setSelectedUnit('Todas Unidades');
+    setSelectedLaboratory('Todos Labs');
   };
 
   return (
@@ -328,7 +328,7 @@ const Requests: React.FC = () => {
                         <TableCell>{exam.doctor}</TableCell>
                         <TableCell>
                           <div className="flex items-center">
-                            <Flask className="h-3 w-3 mr-1" />
+                            
                             {exam.laboratory}
                           </div>
                         </TableCell>
