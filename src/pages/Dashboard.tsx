@@ -96,7 +96,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total de Itens</p>
-                <h3 className="text-2xl font-bold mt-1 dark:text-white">1,284</h3>
+                <h3 className="text-2xl font-bold mt-1 text-gray-700 dark:text-white">1,284</h3>
                 <p className="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
                   <TrendingUp size={14} className="mr-1" />
                   +2.5% este mês
@@ -114,7 +114,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Consumo Mensal</p>
-                <h3 className="text-2xl font-bold mt-1 dark:text-white">187</h3>
+                <h3 className="text-2xl font-bold mt-1  text-gray-700 dark:text-white">187</h3>
                 <p className="text-xs text-red-600 dark:text-red-400 flex items-center mt-1">
                   <TrendingDown size={14} className="mr-1" />
                   -1.8% este mês
@@ -132,7 +132,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Reagentes</p>
-                <h3 className="text-2xl font-bold mt-1 dark:text-white">362</h3>
+                <h3 className="text-2xl font-bold mt-1 text-gray-700 dark:text-white">362</h3>
                 <p className="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
                   <TrendingUp size={14} className="mr-1" />
                   +5.2% este mês
@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Em Alerta</p>
-                <h3 className="text-2xl font-bold mt-1 dark:text-white">12</h3>
+                <h3 className="text-2xl font-bold mt-1 text-gray-700 dark:text-white">12</h3>
                 <p className="text-xs text-yellow-600 dark:text-yellow-400 flex items-center mt-1">
                   <AlertCircle size={14} className="mr-1" />
                   Requer atenção

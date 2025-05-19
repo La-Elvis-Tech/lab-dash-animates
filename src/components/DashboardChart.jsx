@@ -26,8 +26,8 @@ const DashboardChart = ({ type, data, title, description }) => {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
-              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
-              <YAxis tick={{ fill: 'currentColor' }} />
+              <XAxis dataKey="name" tick={{ fill: 'text-gray-700 dark: text-gray-200' }} />
+              <YAxis tick={{ fill: 'text-gray-700 dark: text-gray-200' }} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
@@ -35,7 +35,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                   borderRadius: '0.5rem',
                   color: 'rgb(243 244 246)'
                 }}
-                itemStyle={{ color: 'rgb(243 244 246)' }}
+                itemStyle={{ color: 'text-gray-700 dark: text-gray-200' }}
               />
               <Legend />
               <Bar dataKey="value" fill="#080E49" />
