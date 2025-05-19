@@ -12,7 +12,6 @@ import {
   TableCell 
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Search, Filter, Building,  } from "lucide-react";
 import { Calendar as CalendarIcon, Search, Filter, Building, Database } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -189,7 +188,7 @@ const Requests: React.FC = () => {
       <Card className="overflow-hidden dark:bg-gray-800 dark:text-gray-100">
         <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
           <CardTitle className="text-xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
               {/* Search input */}
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
