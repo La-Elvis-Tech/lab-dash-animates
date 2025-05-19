@@ -11,6 +11,7 @@ const Layout = () => {
   const [isMobileView, setIsMobileView] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const mainContentRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -48,7 +49,7 @@ const Layout = () => {
             display: 'block',
             duration: 0.3
           });
-          gsap.to('.sidebar-content', {
+          gsap.to(sidebarRef.current, {
             x: '0%',
             duration: 0.3,
             ease: 'power2.out'
@@ -59,14 +60,14 @@ const Layout = () => {
             display: 'none',
             duration: 0.3
           });
-          gsap.to('.sidebar-content', {
+          gsap.to(sidebarRef.current, {
             x: '-100%',
             duration: 0.3,
             ease: 'power2.out'
           });
         }
       } else {
-        gsap.to('.sidebar-content', {
+        gsap.to(sidebarRef.current, {
           x: '0%',
           duration: 0.3,
           ease: 'power2.out'
@@ -96,7 +97,11 @@ const Layout = () => {
       )}
       
       {/* Sidebar */}
-      <div className={`fixed left-0 top-0 z-30 h-full ${isMobileView ? 'transform -translate-x-full' : ''}`}>
+      <div 
+        ref={sidebarRef}
+        className={`fixed left-0 top-0 z-30 h-full ${isMobileView ? 'transform' : ''}`}
+        style={{ transform: isMobileView && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)' }}
+      >
         <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
       </div>
       

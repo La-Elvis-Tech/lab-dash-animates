@@ -176,7 +176,7 @@ const Orders: React.FC = () => {
   // Render appointments table
   const renderAppointmentsTable = (appointmentsList: typeof mockAppointments) => (
     <ScrollArea className="h-[400px] rounded-md">
-      <div className="overflow-x-auto p-1">
+      <div className="w-full min-w-[800px]">
         <Table>
           <TableHeader>
             <TableRow>
@@ -225,7 +225,7 @@ const Orders: React.FC = () => {
   // Render doctors table
   const renderDoctorsTable = () => (
     <ScrollArea className="h-[400px] rounded-md">
-      <div className="overflow-x-auto p-1">
+      <div className="w-full min-w-[500px]">
         <Table>
           <TableHeader>
             <TableRow>
