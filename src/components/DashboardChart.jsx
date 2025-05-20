@@ -42,7 +42,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 </div>
                 <div className="flex items-center space-x-3">
                   <span className="text-sm font-bold">R$ {item.value.toFixed(2)}</span>
-                  <span className="text-xs bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/40 dark:to-indigo-900/40 px-2 py-0.5 rounded-full font-medium">
+                  <span className="text-xs px-2 py-0.5 rounded-full font-medium">
                     {percentage}%
                   </span>
                 </div>
@@ -154,14 +154,19 @@ const DashboardChart = ({ type, data, title, description }) => {
               <Pie
                 data={data}
                 cx="50%"
-                cy="50%"
+                cy="80%"
                 labelLine={false}
                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={100}
+                outerRadius={120}
                 fill="#ffffff"
                 dataKey="value"
-                stroke="#8589b484"
-                strokeWidth={2}
+                stroke="#ffffff84"
+                strokeWidth={1}
+                strokeOpacity={0.1}
+                innerRadius={60}
+                paddingAngle={8}
+                startAngle={180}
+                endAngle={0}
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
@@ -190,7 +195,7 @@ const DashboardChart = ({ type, data, title, description }) => {
   return (
     <div 
       ref={chartRef}
-      className="bg-white p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white bg-opacity-40 border-2 border-neutral-300/60 border-opacity-80  border-opacity-80  border-opacity-30 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
+      className="bg-white p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80  border-opacity-80  border-opacity-30 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
     >
       <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">{title}</h3>
