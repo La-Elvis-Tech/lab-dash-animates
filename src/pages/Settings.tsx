@@ -37,7 +37,7 @@ const Settings = () => {
     <div ref={pageRef}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 ">
             Configurações
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">Ajuste as configurações do sistema</p>

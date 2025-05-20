@@ -167,7 +167,7 @@ const Orders: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
           Agendamentos
         </h1>
         <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
@@ -191,7 +191,7 @@ const Orders: React.FC = () => {
       <div>
         <Card className="dark:bg-gray-800 dark:text-gray-100 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
           <CardHeader>
-            <CardTitle className="text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
+            <CardTitle className="text-xl text-gray-900 dark:text-gray-100">
               Agendamentos Gerais
             </CardTitle>
             <CardDescription>

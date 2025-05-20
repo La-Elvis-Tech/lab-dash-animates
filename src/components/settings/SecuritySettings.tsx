@@ -85,7 +85,7 @@ const SecuritySettings = () => {
     <div className="space-y-6">
       <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
+          <CardTitle className="text-xl text-gray-900 dark:text-gray-100">
             Alterar Senha
           </CardTitle>
           <CardDescription>
@@ -108,7 +108,7 @@ const SecuritySettings = () => {
               <button 
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                className="absolute right-3 top-1/2 -translate-y-1 px-2 text-gray-500"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>

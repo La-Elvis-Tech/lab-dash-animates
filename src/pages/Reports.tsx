@@ -196,14 +196,14 @@ const Reports = () => {
 
   return (
     <div ref={pageRef} className="space-y-6">
-      <div className="bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/40 dark:to-indigo-900/40 p-6 rounded-lg">
+      <div className="p-6 rounded-lg">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Relatórios</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Análise de despesas e consumo</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card className="md:col-span-2 dark:bg-gray-800/50 dark:text-gray-100 overflow-hidden bg-gradient-to-br from-white to-purple-50/30 dark:from-gray-800/80 dark:to-purple-900/20">
-          <CardHeader className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 dark:from-purple-500/5 dark:to-indigo-500/5">
+        <Card className="md:col-span-2 dark:bg-gray-800/50 dark:text-gray-100 overflow-hidden">
+          <CardHeader className="">
             <CardTitle className="text-xl">Análise de Despesas</CardTitle>
             <CardDescription className="dark:text-gray-300">
               Visualização detalhada das despesas por período
@@ -211,7 +211,7 @@ const Reports = () => {
           </CardHeader>
           <CardContent className="pt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-6 bg-gradient-to-r from-purple-100/80 to-indigo-100/80 dark:from-purple-900/30 dark:to-indigo-900/30">
+              <TabsList className="mb-6 dark:">
                 <TabsTrigger value="weekly">Semanal</TabsTrigger>
                 <TabsTrigger value="monthly">Mensal por Unidade</TabsTrigger>
                 <TabsTrigger value="byType">Por Tipo de Exame</TabsTrigger>
@@ -227,23 +227,23 @@ const Reports = () => {
                   />
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <div className="bg-gradient-to-br from-purple-500/10 to-indigo-500/10 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg">
+                    <div className="p-4 rounded-lg">
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total de despesas previstas</p>
-                      <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                         R$ {totalWeeklyExpenses.toFixed(2)}
                       </p>
                     </div>
                     
-                    <div className="bg-gradient-to-br from-purple-500/10 to-indigo-500/10 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg">
+                    <div className="p-4 rounded-lg">
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Média diária</p>
-                      <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                         R$ {(totalWeeklyExpenses / 7).toFixed(2)}
                       </p>
                     </div>
                     
-                    <div className="bg-gradient-to-br from-purple-500/10 to-indigo-500/10 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg">
+                    <div className="p-4 rounded-lg">
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">N° de agendamentos</p>
-                      <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                         {mockAppointments.length}
                       </p>
                     </div>
@@ -260,9 +260,9 @@ const Reports = () => {
                     description="Gastos mensais distribuídos por unidade"
                   />
                   
-                  <div className="bg-gradient-to-br from-purple-500/10 to-indigo-500/10 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg">
+                  <div className=" p-4 rounded-lg">
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total de despesas mensais</p>
-                    <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                       R$ {totalMonthlyExpenses.toFixed(2)}
                     </p>
                   </div>
@@ -283,8 +283,8 @@ const Reports = () => {
           </CardContent>
         </Card>
 
-        <Card className="dark:bg-gray-800/50 dark:text-gray-100 bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-800/80 dark:to-blue-900/20">
-          <CardHeader className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 dark:from-blue-500/5 dark:to-cyan-500/5">
+        <Card className="dark:bg-gray-800/50 dark:text-gray-100">
+          <CardHeader className="">
             <CardTitle className="text-xl">Resumo Financeiro</CardTitle>
             <CardDescription className="dark:text-gray-300">
               Visão geral das despesas recentes
@@ -292,7 +292,7 @@ const Reports = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4 mt-2">
-              <ScrollArea className="h-[400px]">
+              <ScrollArea className="h-[600px] overflow-auto">
                 <div className="space-y-4">
                   <h4 className="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">PRÓXIMOS AGENDAMENTOS</h4>
                   {mockAppointments

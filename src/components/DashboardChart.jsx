@@ -96,7 +96,7 @@ const DashboardChart = ({ type, data, title, description }) => {
         return (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data}>
-              <CartesianGrid stroke="currentColor" strokeOpacity={0.3} />
+              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.3} />
               <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
               <YAxis tick={{ fill: 'currentColor' }} />
               <Tooltip 
@@ -108,7 +108,6 @@ const DashboardChart = ({ type, data, title, description }) => {
                 }}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
-              <Legend />
               <Line type="monotone" dataKey="value" stroke="url(#lineGradient)" strokeWidth={3} dot={{ fill: '#8B5CF6' }} activeDot={{ r: 6 }} />
               {data[0]?.value2 && <Line type="monotone" dataKey="value2" stroke="#0EA5E9" strokeWidth={2} dot={{ fill: '#0EA5E9' }} />}
               <defs>
@@ -191,7 +190,7 @@ const DashboardChart = ({ type, data, title, description }) => {
   return (
     <div 
       ref={chartRef}
-      className="bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/30 dark:from-gray-800 dark:via-indigo-900/20 dark:to-purple-900/20 p-6 rounded-xl shadow-lg transition-colors duration-300 dark:border-neutral-800 dark:border-2 dark:border-opacity-20"
+      className="bg-white p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white bg-opacity-40 border-2 border-neutral-300/60 border-opacity-80  border-opacity-80  border-opacity-30 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
     >
       <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">{title}</h3>

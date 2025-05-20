@@ -29,6 +29,7 @@ const inventoryItems = [
     stock: 18,
     unit: 'Litros',
     location: 'Armário A3',
+    size: null,
     expiryDate: '2025-10-15',
     lastUsed: '2023-04-10',
     status: 'ok'
@@ -40,6 +41,7 @@ const inventoryItems = [
     stock: 35,
     unit: 'Unidades',
     location: 'Armário D2',
+    size: null,
     expiryDate: '2025-08-22',
     lastUsed: '2023-04-15', 
     status: 'ok'
@@ -51,17 +53,19 @@ const inventoryItems = [
     stock: 3,
     unit: 'Litros',
     location: 'Armário A1',
+    size: null,
     expiryDate: '2025-12-30',
     lastUsed: '2023-04-12',
     status: 'low'
   },
   {
     id: 4,
-    name: 'Balão Volumétrico 500ml',
+    name: 'Balão Volumétrico',
     category: 'glassware',
     stock: 12,
     unit: 'Unidades',
     location: 'Armário G4',
+    size: '500ml',
     expiryDate: null,
     lastUsed: '2023-03-28',
     status: 'ok'
@@ -73,6 +77,7 @@ const inventoryItems = [
     stock: 10,
     unit: 'Pares',
     location: 'Armário D1',
+    size: null,
     expiryDate: '2024-07-18',
     lastUsed: '2023-04-18',
     status: 'low'
@@ -90,11 +95,12 @@ const inventoryItems = [
   },
   {
     id: 7,
-    name: 'Pipeta Graduada 10ml',
+    name: 'Pipeta Graduada',
     category: 'glassware',
     stock: 25,
     unit: 'Unidades',
     location: 'Armário G2',
+    size: '10ml',
     expiryDate: null,
     lastUsed: '2023-04-14',
     status: 'ok'
@@ -106,6 +112,7 @@ const inventoryItems = [
     stock: 8,
     unit: 'Unidades',
     location: 'Armário G3',
+    size: '15ml',
     expiryDate: null,
     lastUsed: '2023-04-16',
     status: 'low'
@@ -317,8 +324,14 @@ const [searchQuery, setSearchQuery] = useState('');
                       {new Date(item.lastUsed).toLocaleDateString('pt-BR')}
                     </span>
                   </div>
+
+                  {item.size && (<div className="flex justify-between text-sm mt-2">
+                    <span className="text-gray-500">Tamanho:</span>
+                    <span className="font-medium">
+                      {item.size ? item.size : 'N/A'}
+                    </span>
+                  </div>)}
                 </div>
-                
                 <div className="mt-5 flex">
                   <Popover>
                     <PopoverTrigger asChild>

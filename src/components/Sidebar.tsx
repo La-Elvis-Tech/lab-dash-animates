@@ -54,7 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
         gsap.to('.sidebar-logo-text', {
           opacity: 0,
           display: 'none',
-          duration: 0.2,
+          duration: 0.5,
           ease: 'power2.out'
         });
       } else {
@@ -97,9 +97,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <div className="bg-lab-blue rounded-md p-2 flex items-center justify-center">
-            <Beaker className="text-white" size={24} />
+            <Beaker className="text-white" size={22} />
           </div>
-          <h1 className="sidebar-logo-text text-xl font-bold text-lab-blue ml-2 dark:text-white">
+          <h1 className="sidebar-logo-text text-xl font-bold text-lab-blue ml-2 dark:text-white overflow-clip whitespace-nowrap">
             La Elvis Tech
           </h1>
         </div>
@@ -112,7 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
             key={item.id}
             to={item.path}
             onClick={() => setActiveItem(item.id)}
-            className={`flex items-center px-3 py-4 rounded-lg transition-all ${
+            className={`flex items-center px-3 py-4 rounded-lg overflow-clip whitespace-nowrap transition-all ${
               activeItem === item.id 
                 ? 'bg-lab-lightBlue text-lab-blue dark:bg-gray-700 dark:text-white'
                 : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
@@ -125,21 +125,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
           </Link>
         ))}
       </div>
-      
-      <div className="p-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center">
-          <div className="w-10 h-10 bg-lab-blue rounded-full flex items-center justify-center flex-shrink-0">
-            <User className="text-white" size={18} />
-          </div>
-          <div className="item-text ml-3">
-            <p className="font-medium text-sm dark:text-white">Laboratório Central</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Admin</p>
-          </div>
-        </div>
-        
         <button 
           onClick={toggleSidebar} 
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-300 flex items-center justify-center"
+          className="py-2 m-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-300 flex items-center justify-center"
         >
           {isCollapsed ? (
             <ChevronRight size={20} />
@@ -147,6 +135,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
             <ChevronLeft size={20} />
           )}
         </button>
+      
+      <div className="p-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-lab-blue rounded-full flex items-center justify-center flex-shrink-0">
+            <User className="text-white" size={18} />
+          </div>
+          <div className="item-text ml-3">
+            <p className="font-medium text-sm text-gray-700 dark:text-white overflow-clip whitespace-nowrap">Laboratório Central</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Admin</p>
+          </div>
+        </div>
       </div>
     </div>
   );

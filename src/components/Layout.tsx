@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import { gsap } from 'gsap';
-import Sidebar from './Sidebar';
+import Sidebar from './Sidebar.tsx';
 import { Menu } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -90,7 +90,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-indigo-950 dark:to-purple-950 transition-colors duration-300">
+    <div className="flex h-screen transition-colors duration-300">
       {/* Mobile overlay */}
       <div 
         className="sidebar-mobile-overlay fixed inset-0 bg-black opacity-0 hidden z-20"
@@ -109,7 +109,7 @@ const Layout = () => {
       {/* Main Content */}
       <div 
         ref={mainContentRef} 
-        className="flex-1 overflow-auto bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-indigo-900/20 dark:to-purple-900/20 dark:text-gray-100 transition-colors duration-300"
+        className="flex-1 overflow-auto bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:from-gray-400 dark:to-gray-900 transition-colors duration-300"
         style={{ 
           paddingLeft: isMobileView ? '0px' : (isCollapsed ? '80px' : '260px')
         }}

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import DashboardChart from '../components/DashboardChart';
+import DashboardChart, { CHART_COLORS } from '@/components/DashboardChart';
 import { Card, CardContent } from '../components/ui/card';
 import { Activity, TrendingUp, TrendingDown, AlertCircle, Package, Beaker } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -91,7 +91,7 @@ const Dashboard: React.FC = () => {
 
       {/* Key metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="dashboard-card dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-40 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-40 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-40 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -145,7 +145,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-40 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -186,7 +186,7 @@ const Dashboard: React.FC = () => {
 
       {/* Items running low */}
       <div className="dashboard-chart">
-        <Card className="dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="bg-white bg-opacity-40 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Itens em Baixo Estoque</h2>
