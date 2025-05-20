@@ -134,7 +134,7 @@ const Orders: React.FC = () => {
       const appDate = startOfDay(new Date(app.date));
       if (endDate) {
         return (isAfter(appDate, startDate) || isSameDay(appDate, startDate)) && 
-               (isBefore(appDate, endDate) || isSameDay(appDate, endDate));
+              (isBefore(appDate, endDate) || isSameDay(appDate, endDate));
       }
       return isSameDay(appDate, startDate);
     });

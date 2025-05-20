@@ -10,6 +10,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import DashboardChart from '@/components/DashboardChart';
 
 // Mock data for appointments (same as in Orders.tsx)
+
+const COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981', '#6366F1', '#EC4899', '#F59E0B'];
+
 const mockAppointments = [
   { 
     id: 'A001',
