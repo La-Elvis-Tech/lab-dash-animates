@@ -126,26 +126,31 @@ const Orders: React.FC = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Date calculations
-  const sevenDaysFromNow = addDays(today, 7);
+  const sevenDaysFromNow = addDays(today, 6); // 7 dias incluindo hoje (hoje + 6)
   const endOfCurrentMonth = endOfMonth(today);
 
   // Get recent appointments (before today)
   const recentAppointments = appointments.filter(app => {
-    return isBefore(new Date(app.date), today);
+    const appDate = startOfDay(new Date(app.date));
+    return isBefore(appDate, today);
   }).sort((a, b) => b.date.getTime() - a.date.getTime());
 
-  // Get next 7 days appointments - fixed to correctly filter the next 7 days
+  // Get next 7 days appointments - corrigido para incluir hoje até os próximos 6 dias
   const next7DaysAppointments = appointments.filter(app => {
     const appDate = startOfDay(new Date(app.date));
-    return (isAfter(appDate, today) || isSameDay(appDate, today)) && 
-           (isBefore(appDate, sevenDaysFromNow) || isSameDay(appDate, sevenDaysFromNow));
+    return (
+      (isSameDay(appDate, today) || isAfter(appDate, today)) && 
+      (isBefore(appDate, sevenDaysFromNow) || isSameDay(appDate, sevenDaysFromNow))
+    );
   });
 
-  // Get rest of the month appointments - fixed to correctly filter after 7 days until end of month
+  // Get rest of the month appointments - corrigido para pegar após 7 dias até fim do mês
   const restOfMonthAppointments = appointments.filter(app => {
     const appDate = startOfDay(new Date(app.date));
-    return isAfter(appDate, sevenDaysFromNow) && 
-           (isBefore(appDate, endOfCurrentMonth) || isSameDay(appDate, endOfCurrentMonth));
+    return (
+      isAfter(appDate, sevenDaysFromNow) && 
+      (isBefore(appDate, endOfCurrentMonth) || isSameDay(appDate, endOfCurrentMonth))
+    );
   });
 
   // Get appointments for selected date

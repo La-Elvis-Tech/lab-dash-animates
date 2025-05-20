@@ -21,62 +21,64 @@ interface AppointmentsTableProps {
 
 const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, getStatusColor }) => {
   return (
-    <ScrollArea className="h-[400px] rounded-md">
-      <div className="w-full overflow-auto" style={{ minWidth: '800px' }}>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Paciente</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead>Horário</TableHead>
-              <TableHead>Médico</TableHead>
-              <TableHead>Unidade</TableHead>
-              <TableHead>Custo (R$)</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {appointments.length > 0 ? (
-              appointments.map((appointment) => (
-                <TableRow key={appointment.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
-                  <TableCell>{appointment.id}</TableCell>
-                  <TableCell>{appointment.patient}</TableCell>
-                  <TableCell>{appointment.type}</TableCell>
-                  <TableCell>{format(appointment.date, "dd/MM/yyyy")}</TableCell>
-                  <TableCell className="flex items-center">
-                    <Clock className="h-3 w-3 mr-1" />
-                    {format(appointment.date, "HH:mm")}
-                  </TableCell>
-                  <TableCell>{appointment.doctor}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <MapPin className="h-3 w-3 mr-1" />
-                      {appointment.unit}
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {appointment.cost.toFixed(2)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={getStatusColor(appointment.status)}>
-                      {appointment.status}
-                    </Badge>
+    <div className="relative overflow-auto">
+      <ScrollArea className="h-[400px] w-full">
+        <div className="min-w-[800px] w-full">
+          <Table>
+            <TableHeader className="sticky top-0 bg-white dark:bg-gray-800 z-10">
+              <TableRow>
+                <TableHead className="whitespace-nowrap">ID</TableHead>
+                <TableHead className="whitespace-nowrap">Paciente</TableHead>
+                <TableHead className="whitespace-nowrap">Tipo</TableHead>
+                <TableHead className="whitespace-nowrap">Data</TableHead>
+                <TableHead className="whitespace-nowrap">Horário</TableHead>
+                <TableHead className="whitespace-nowrap">Médico</TableHead>
+                <TableHead className="whitespace-nowrap">Unidade</TableHead>
+                <TableHead className="whitespace-nowrap">Custo (R$)</TableHead>
+                <TableHead className="whitespace-nowrap">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {appointments.length > 0 ? (
+                appointments.map((appointment) => (
+                  <TableRow key={appointment.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <TableCell className="font-medium">{appointment.id}</TableCell>
+                    <TableCell>{appointment.patient}</TableCell>
+                    <TableCell>{appointment.type}</TableCell>
+                    <TableCell>{format(appointment.date, "dd/MM/yyyy")}</TableCell>
+                    <TableCell className="flex items-center">
+                      <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+                      {format(appointment.date, "HH:mm")}
+                    </TableCell>
+                    <TableCell>{appointment.doctor}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                        {appointment.unit}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {appointment.cost.toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={getStatusColor(appointment.status)}>
+                        {appointment.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-6 text-gray-500 dark:text-gray-400">
+                    Nenhum agendamento encontrado para este período.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center py-6 text-gray-500 dark:text-gray-400">
-                  Nenhum agendamento encontrado para este período.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </ScrollArea>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 

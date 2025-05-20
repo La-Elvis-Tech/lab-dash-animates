@@ -31,45 +31,47 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
     if (path === '/') {
       setActiveItem('dashboard');
     } else {
-      setActiveItem(path.substring(1));
+      const pathPart = path.split('/')[1]; // Pega apenas a primeira parte do path
+      setActiveItem(pathPart || 'dashboard');
     }
   }, [location]);
 
   useEffect(() => {
+    if (!contentRef.current) return;
+    
     const ctx = gsap.context(() => {
+      // Primeiro definimos a largura diretamente
+      contentRef.current!.style.width = isCollapsed ? '80px' : '260px';
+      
       if (isCollapsed) {
-        gsap.to(contentRef.current, {
-          width: '80px',
-          duration: 0.3,
-          ease: 'power2.out'
-        });
+        // Esconde textos quando colapsa
         gsap.to('.item-text', {
           opacity: 0,
           display: 'none',
-          duration: 0.2
+          duration: 0.2,
+          ease: 'power2.out'
         });
         gsap.to('.sidebar-logo-text', {
           opacity: 0,
           display: 'none',
-          duration: 0.2
+          duration: 0.2,
+          ease: 'power2.out'
         });
       } else {
-        gsap.to(contentRef.current, {
-          width: '260px',
-          duration: 0.3,
-          ease: 'power2.out'
-        });
+        // Mostra textos quando expande
         gsap.to('.item-text', {
           opacity: 1,
           display: 'block',
           duration: 0.3,
-          delay: 0.1
+          delay: 0.1,
+          ease: 'power2.out'
         });
         gsap.to('.sidebar-logo-text', {
           opacity: 1,
           display: 'block',
           duration: 0.3,
-          delay: 0.1
+          delay: 0.1,
+          ease: 'power2.out'
         });
       }
     }, contentRef);
@@ -89,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   return (
     <div 
       ref={contentRef} 
-      className="sidebar-content h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all"
+      className="sidebar-content h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all overflow-hidden"
       style={{ width: isCollapsed ? '80px' : '260px' }}
     >
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
@@ -116,15 +118,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
                 : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
             }`}
           >
-            <item.icon size={22} />
+            <div className="flex items-center justify-center">
+              <item.icon size={22} />
+            </div>
             <span className="item-text ml-3">{item.name}</span>
           </Link>
         ))}
       </div>
       
       <div className="p-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center p-2">
-          <div className="w-10 h-10 bg-lab-blue rounded-full flex items-center justify-center">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-lab-blue rounded-full flex items-center justify-center flex-shrink-0">
             <User className="text-white" size={18} />
           </div>
           <div className="item-text ml-3">
@@ -133,21 +137,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
           </div>
         </div>
         
-        {isCollapsed ? (
-          <button 
-            onClick={toggleSidebar} 
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
-          >
+        <button 
+          onClick={toggleSidebar} 
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-300 flex items-center justify-center"
+        >
+          {isCollapsed ? (
             <ChevronRight size={20} />
-          </button>
-        ) : (
-          <button 
-            onClick={toggleSidebar} 
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-300"
-          >
+          ) : (
             <ChevronLeft size={20} />
-          </button>
-        )}
+          )}
+        </button>
       </div>
     </div>
   );

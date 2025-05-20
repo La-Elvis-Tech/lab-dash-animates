@@ -15,11 +15,22 @@ const Layout = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768);
-      if (window.innerWidth < 768) {
-        setIsSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(true);
+      const isNowMobile = window.innerWidth < 768;
+      
+      // Só atualiza o estado se houver mudança para evitar re-renders desnecessários
+      if (isMobileView !== isNowMobile) {
+        setIsMobileView(isNowMobile);
+        
+        if (isNowMobile) {
+          setIsSidebarOpen(false);
+        } else {
+          setIsSidebarOpen(true);
+          
+          // Reinicia a posição do X quando alterna para desktop
+          if (sidebarRef.current) {
+            gsap.set(sidebarRef.current, { x: '0%' });
+          }
+        }
       }
     };
 
@@ -32,46 +43,38 @@ const Layout = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isMobileView]);
 
   useEffect(() => {
+    if (!mainContentRef.current || !sidebarRef.current) return;
+    
     const ctx = gsap.context(() => {
+      // Ajuste de padding no conteúdo principal
       gsap.to(mainContentRef.current, {
         paddingLeft: isMobileView ? '0px' : (isCollapsed ? '80px' : '260px'),
         duration: 0.3,
         ease: 'power2.out'
       });
 
+      // Animação para dispositivos móveis
       if (isMobileView) {
-        if (isSidebarOpen) {
-          gsap.to('.sidebar-mobile-overlay', {
-            opacity: 0.5,
-            display: 'block',
-            duration: 0.3
-          });
-          gsap.to(sidebarRef.current, {
-            x: '0%',
-            duration: 0.3,
-            ease: 'power2.out'
-          });
-        } else {
-          gsap.to('.sidebar-mobile-overlay', {
-            opacity: 0,
-            display: 'none',
-            duration: 0.3
-          });
-          gsap.to(sidebarRef.current, {
-            x: '-100%',
-            duration: 0.3,
-            ease: 'power2.out'
-          });
-        }
-      } else {
+        // Overlay (fundo escuro)
+        gsap.to('.sidebar-mobile-overlay', {
+          opacity: isSidebarOpen ? 0.5 : 0,
+          display: isSidebarOpen ? 'block' : 'none',
+          duration: 0.3
+        });
+        
+        // Sidebar animação
         gsap.to(sidebarRef.current, {
-          x: '0%',
+          x: isSidebarOpen ? '0%' : '-100%',
           duration: 0.3,
           ease: 'power2.out'
         });
+      } else {
+        // Garante posição correta no desktop
+        gsap.set(sidebarRef.current, { x: '0%' });
+        gsap.set('.sidebar-mobile-overlay', { display: 'none', opacity: 0 });
       }
     });
 
@@ -89,17 +92,15 @@ const Layout = () => {
   return (
     <div className="flex h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-indigo-950 dark:to-purple-950 transition-colors duration-300">
       {/* Mobile overlay */}
-      {isMobileView && (
-        <div 
-          className="sidebar-mobile-overlay fixed inset-0 bg-black opacity-0 hidden z-20"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+      <div 
+        className="sidebar-mobile-overlay fixed inset-0 bg-black opacity-0 hidden z-20"
+        onClick={() => setIsSidebarOpen(false)}
+      />
       
       {/* Sidebar */}
       <div 
         ref={sidebarRef}
-        className={`fixed left-0 top-0 z-30 h-full ${isMobileView ? 'transform' : ''}`}
+        className="fixed left-0 top-0 z-30 h-full"
         style={{ transform: isMobileView && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)' }}
       >
         <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
