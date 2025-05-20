@@ -134,10 +134,14 @@ const Orders: React.FC = () => {
     return isBefore(new Date(app.date), today);
   }).sort((a, b) => b.date.getTime() - a.date.getTime());
 
-  // Get next 7 days appointments
-  const next7DaysAppointments = filterAppointmentsByPeriod(appointments, today, sevenDaysFromNow);
+  // Get next 7 days appointments - fixed to correctly filter the next 7 days
+  const next7DaysAppointments = appointments.filter(app => {
+    const appDate = startOfDay(new Date(app.date));
+    return (isAfter(appDate, today) || isSameDay(appDate, today)) && 
+           (isBefore(appDate, sevenDaysFromNow) || isSameDay(appDate, sevenDaysFromNow));
+  });
 
-  // Get rest of the month appointments
+  // Get rest of the month appointments - fixed to correctly filter after 7 days until end of month
   const restOfMonthAppointments = appointments.filter(app => {
     const appDate = startOfDay(new Date(app.date));
     return isAfter(appDate, sevenDaysFromNow) && 
