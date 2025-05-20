@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import DashboardChart from '@/components/DashboardChart';
+import DashboardChart, { CHART_COLORS } from '@/components/DashboardChart';
 
 // Mock data for appointments (same as in Orders.tsx)
 const mockAppointments = [
@@ -192,21 +192,23 @@ const Reports = () => {
   const totalMonthlyExpenses = monthlyExpensesByUnit.reduce((sum, unit) => sum + unit.value, 0);
 
   return (
-    <div ref={pageRef}>
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Relatórios</h1>
-      <p className="text-gray-500 dark:text-gray-400 mt-1 mb-6">Análise de despesas e consumo</p>
+    <div ref={pageRef} className="space-y-6">
+      <div className="bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/40 dark:to-indigo-900/40 p-6 rounded-lg">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Relatórios</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Análise de despesas e consumo</p>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card className="md:col-span-2 dark:bg-gray-800 dark:text-gray-100 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10">
+        <Card className="md:col-span-2 dark:bg-gray-800/50 dark:text-gray-100 overflow-hidden bg-gradient-to-br from-white to-purple-50/30 dark:from-gray-800/80 dark:to-purple-900/20">
+          <CardHeader className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 dark:from-purple-500/5 dark:to-indigo-500/5">
             <CardTitle className="text-xl">Análise de Despesas</CardTitle>
-            <CardDescription>
+            <CardDescription className="dark:text-gray-300">
               Visualização detalhada das despesas por período
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-6">
+              <TabsList className="mb-6 bg-gradient-to-r from-purple-100/80 to-indigo-100/80 dark:from-purple-900/30 dark:to-indigo-900/30">
                 <TabsTrigger value="weekly">Semanal</TabsTrigger>
                 <TabsTrigger value="monthly">Mensal por Unidade</TabsTrigger>
                 <TabsTrigger value="byType">Por Tipo de Exame</TabsTrigger>
@@ -267,7 +269,7 @@ const Reports = () => {
               <TabsContent value="byType" className="mt-0">
                 <div className="space-y-6">
                   <DashboardChart
-                    type="pie"
+                    type="progress"
                     data={expensesByExamType}
                     title="Despesas por Tipo de Exame"
                     description="Distribuição de gastos por categoria de exame"
@@ -278,10 +280,10 @@ const Reports = () => {
           </CardContent>
         </Card>
 
-        <Card className="dark:bg-gray-800 dark:text-gray-100">
-          <CardHeader className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+        <Card className="dark:bg-gray-800/50 dark:text-gray-100 bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-800/80 dark:to-blue-900/20">
+          <CardHeader className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 dark:from-blue-500/5 dark:to-cyan-500/5">
             <CardTitle className="text-xl">Resumo Financeiro</CardTitle>
-            <CardDescription>
+            <CardDescription className="dark:text-gray-300">
               Visão geral das despesas recentes
             </CardDescription>
           </CardHeader>
@@ -297,8 +299,8 @@ const Reports = () => {
                     .map((app) => (
                       <div 
                         key={app.id} 
-                        className="border-l-4 border-gradient-to-r from-purple-600 to-indigo-600 pl-3 py-2 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-r-md"
-                        style={{ borderImageSource: 'linear-gradient(to bottom, #8B5CF6, #6366F1)' }}
+                        className="border-l-4 pl-3 py-2 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800 dark:to-gray-900/80 rounded-r-md"
+                        style={{ borderImageSource: 'linear-gradient(to bottom, #8B5CF6, #6366F1)', borderImageSlice: 1 }}
                       >
                         <div className="flex justify-between">
                           <span className="font-medium">{app.patient}</span>
@@ -308,7 +310,7 @@ const Reports = () => {
                           <span>{format(app.date, "dd/MM/yyyy")} · {app.type}</span>
                         </div>
                         <div className="flex items-center mt-1">
-                          <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 text-blue-800 dark:text-blue-200 border-0">
+                          <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-800 dark:text-blue-200 border-0">
                             {app.unit}
                           </Badge>
                         </div>
@@ -322,7 +324,7 @@ const Reports = () => {
                         <div className="flex items-center">
                           <div 
                             className="w-3 h-3 rounded-full mr-2" 
-                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                            style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
                           />
                           <span className="text-sm truncate max-w-[160px]">{type.name}</span>
                         </div>
@@ -337,10 +339,10 @@ const Reports = () => {
         </Card>
       </div>
 
-      <Card className="dark:bg-gray-800 dark:text-gray-100">
-        <CardHeader className="bg-gradient-to-r from-green-500/10 to-teal-500/10">
+      <Card className="dark:bg-gray-800/50 dark:text-gray-100 bg-gradient-to-br from-white to-green-50/30 dark:from-gray-800/80 dark:to-green-900/20">
+        <CardHeader className="bg-gradient-to-r from-green-500/10 to-teal-500/10 dark:from-green-500/5 dark:to-teal-500/5">
           <CardTitle className="text-xl">Tendências de Despesas</CardTitle>
-          <CardDescription>
+          <CardDescription className="dark:text-gray-300">
             Análise de tendências de gastos ao longo do tempo
           </CardDescription>
         </CardHeader>

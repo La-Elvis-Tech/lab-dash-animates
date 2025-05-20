@@ -87,7 +87,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="flex h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-indigo-950 dark:to-purple-950 transition-colors duration-300">
       {/* Mobile overlay */}
       {isMobileView && (
         <div 
@@ -108,14 +108,14 @@ const Layout = () => {
       {/* Main Content */}
       <div 
         ref={mainContentRef} 
-        className="flex-1 overflow-auto bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-900 dark:to-gray-800 dark:text-gray-100 transition-colors duration-300"
+        className="flex-1 overflow-auto bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 dark:from-gray-900 dark:via-indigo-900/20 dark:to-purple-900/20 dark:text-gray-100 transition-colors duration-300"
         style={{ 
           paddingLeft: isMobileView ? '0px' : (isCollapsed ? '80px' : '260px')
         }}
       >
         {/* Mobile Header */}
         {isMobileView && (
-          <div className="bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-4 flex items-center justify-between shadow-sm">
+          <div className="bg-gradient-to-r from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/30 p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center">
               <button 
                 onClick={() => setIsSidebarOpen(true)} 
