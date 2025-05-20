@@ -1,8 +1,9 @@
+
 import React, { useRef, useEffect } from 'react';
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { gsap } from 'gsap';
 
-const COLORS = ['#080E49', '#1D2472', '#1D2AD7', '#919AF2', '#8B5CF6', '#C8CCF9'];
+const COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981', '#6366F1', '#EC4899', '#F59E0B'];
 
 const DashboardChart = ({ type, data, title, description }) => {
   const chartRef = useRef(null);
@@ -26,30 +27,8 @@ const DashboardChart = ({ type, data, title, description }) => {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
-              <XAxis dataKey="name" tick={{ fill: 'text-gray-700 dark: text-gray-200' }} />
-              <YAxis tick={{ fill: 'text-gray-700 dark: text-gray-200' }} />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'rgb(31 41 55)',
-                  borderColor: 'rgb(55 65 81)',
-                  borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)'
-                }}
-                itemStyle={{ color: 'text-gray-700 dark: text-gray-200' }}
-              />
-              <Legend />
-              <Bar dataKey="value" fill="#080E49" />
-              {data[0]?.value2 && <Bar dataKey="value2" fill="#1D2472" />}
-            </BarChart>
-          </ResponsiveContainer>
-        );
-      case 'line':
-        return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
-              <CartesianGrid /* strokeDasharray="3 6"*/ stroke="currentColor" strokeOpacity={0.3} />
-              <XAxis dataKey="name" tick={{ color: 'text-gray-700 dark:text-white' }} />
-              <YAxis tick={{ color: 'text-gray-700 dark:text-white' }} />
+              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
+              <YAxis tick={{ fill: 'currentColor' }} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
@@ -60,8 +39,42 @@ const DashboardChart = ({ type, data, title, description }) => {
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
               <Legend />
-              <Line type="monotone" dataKey="value" stroke="#3a45a7" strokeWidth={3} />
-              {data[0]?.value2 && <Line type="monotone" dataKey="value2" stroke="#3a45a7" strokeWidth={2} />}
+              <Bar dataKey="value" fill="url(#barGradient)" />
+              {data[0]?.value2 && <Bar dataKey="value2" fill="#1D2472" />}
+              <defs>
+                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#D946EF" stopOpacity={0.6}/>
+                </linearGradient>
+              </defs>
+            </BarChart>
+          </ResponsiveContainer>
+        );
+      case 'line':
+        return (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data}>
+              <CartesianGrid stroke="currentColor" strokeOpacity={0.3} />
+              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
+              <YAxis tick={{ fill: 'currentColor' }} />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'rgb(31 41 55)',
+                  borderColor: 'rgb(55 65 81)',
+                  borderRadius: '0.5rem',
+                  color: 'rgb(243 244 246)'
+                }}
+                itemStyle={{ color: 'rgb(243 244 246)' }}
+              />
+              <Legend />
+              <Line type="monotone" dataKey="value" stroke="url(#lineGradient)" strokeWidth={3} dot={{ fill: '#8B5CF6' }} activeDot={{ r: 6 }} />
+              {data[0]?.value2 && <Line type="monotone" dataKey="value2" stroke="#0EA5E9" strokeWidth={2} dot={{ fill: '#0EA5E9' }} />}
+              <defs>
+                <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#8B5CF6"/>
+                  <stop offset="100%" stopColor="#D946EF"/>
+                </linearGradient>
+              </defs>
             </LineChart>
           </ResponsiveContainer>
         );
@@ -82,8 +95,14 @@ const DashboardChart = ({ type, data, title, description }) => {
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
               <Legend />
-              <Area type="monotone" dataKey="value" stroke="#080E49" fill="rgba(59, 130, 246, 0.2)" />
-              {data[0]?.value2 && <Area type="monotone" dataKey="value2" stroke="#1D2472" fill="#1D2472" />}
+              <defs>
+                <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <Area type="monotone" dataKey="value" stroke="#8B5CF6" fillOpacity={1} fill="url(#areaGradient)" />
+              {data[0]?.value2 && <Area type="monotone" dataKey="value2" stroke="#0EA5E9" fill="#0EA5E9" fillOpacity={0.3} />}
             </AreaChart>
           </ResponsiveContainer>
         );
@@ -128,11 +147,11 @@ const DashboardChart = ({ type, data, title, description }) => {
   return (
     <div 
       ref={chartRef}
-      className="bg-white p-6 rounded-xl shadow-lg transition-colors duration-300 dark:bg-neutral-900 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
+      className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-xl shadow-lg transition-colors duration-300 dark:border-neutral-800 dark:border-2 dark:border-opacity-20"
     >
       <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">{title}</h3>
-        <p className="text-sm text-gray-800 dark: text-gray-300">{description}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
       </div>
       {renderChart()}
     </div>
