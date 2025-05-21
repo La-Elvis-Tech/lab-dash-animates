@@ -3,8 +3,7 @@ import { gsap } from 'gsap';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
-import { Search, Filter, ChevronDown, Plus, Calendar, Package, Database, Clock } from 'lucide-react';
+import { Search, Plus, Calendar, Package, Database, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   Popover,
@@ -120,14 +119,14 @@ const inventoryItems = [
 ];
 
 const Inventory = () => {
-const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [filteredItems, setFilteredItems] = useState(inventoryItems);
   const containerRef = useRef(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Filtragem (mesma lógica)
+    // Filtering logic
     let filtered = inventoryItems;
     
     if (searchQuery) {
@@ -141,7 +140,6 @@ const [searchQuery, setSearchQuery] = useState('');
     }
     
     setFilteredItems(filtered);
-
 
     // Animation when filter changes
     const ctx = gsap.context(() => {
@@ -202,19 +200,12 @@ const [searchQuery, setSearchQuery] = useState('');
   const getStatusColor = (status) => {
     switch (status) {
       case 'low':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
       case 'ok':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
     }
-  };
-
-  const handleViewStock = (itemId) => {
-    toast({
-      title: "Detalhes do estoque",
-      description: "Informações detalhadas sobre o item.",
-    });
   };
 
   // Mock data for stock details
@@ -233,34 +224,35 @@ const [searchQuery, setSearchQuery] = useState('');
     <div ref={containerRef} className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Inventário</h1>
-        <p className="text-gray-500 mt-1">Gerencie os itens de laboratório</p>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Gerencie os itens de laboratório</p>
       </div>
 
-      {/* Filters */}
+      {/* Filters - Improved for mobile */}
       <Card className="inventory-filters">
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1 text-gray-400" size={18} />
+          <div className="flex flex-col gap-4">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <Input
                 placeholder="Buscar item..."
-                className="pl-10"
+                className="pl-10 w-full"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             
-            <div className="flex gap-2">
-              <div className="z-10 relative">
-                <div className="flex">
+            <div className="flex flex-col sm:flex-row gap-3 justify-between">
+              {/* Category filter - scrollable on mobile */}
+              <div className="overflow-x-auto pb-1 -mx-1">
+                <div className="flex space-x-1 px-1 min-w-max">
                   {categories.map((category) => (
                     <button
                       key={category.id}
-                      className={`px-4 py-2 text-sm font-medium ${
+                      className={`px-3 py-2 text-sm font-medium whitespace-nowrap ${
                         selectedCategory === category.id
-                          ? 'bg-lab-blue text-white'
-                          : 'bg-white text-gray-700 hover:bg-gray-100 dark: text-gray-400' 
-                      } border border-gray-200 first:rounded-l-lg last:rounded-r-lg -ml-px first:ml-0 transition-colors dark:bg-gray-800 dark:border-gray-700`}
+                          ? 'bg-lab-blue text-white dark:bg-lab-blue/80'
+                          : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' 
+                      } rounded-md border border-gray-200 dark:border-gray-700 transition-colors`}
                       onClick={() => handleCategoryChange(category.id)}
                     >
                       {category.name}
@@ -269,82 +261,86 @@ const [searchQuery, setSearchQuery] = useState('');
                 </div>
               </div>
               
-              <Button className="flex items-center gap-2">
+              <Button className="flex items-center gap-2 whitespace-nowrap">
                 <Plus size={16} />
-                Novo Item
+                <span className="hidden sm:inline">Novo Item</span>
+                <span className="sm:hidden">Novo</span>
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Items List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 item-list">
+      {/* Items List - Responsive grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 item-list">
         {filteredItems.map((item) => {
           const stockDetails = getStockDetails(item.id);
           
           return (
-            <Card key={item.id} className="inventory-item overflow-hidden">
+            <Card key={item.id} className="inventory-item overflow-hidden h-full">
               <div 
                 className={`h-1 ${
                   item.status === 'low' ? 'bg-red-500' : 'bg-green-500'
                 }`}
               />
-              <CardContent className="p-5">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-lg">{item.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
+              <CardContent className="p-4 flex flex-col h-full">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="mr-2">
+                    <h3 className="font-medium text-lg line-clamp-2">{item.name}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {categories.find(c => c.id === item.category)?.name}
                     </p>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)}`}>
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)} whitespace-nowrap`}>
                     {item.stock} {item.unit}
                   </span>
                 </div>
                 
-                <div className="mt-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Localização:</span>
-                    <span className="font-medium">{item.location}</span>
+                <div className="mt-2 text-sm space-y-2 flex-grow">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500 dark:text-gray-400">Localização:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">{item.location}</span>
                   </div>
                   
                   {item.expiryDate && (
-                    <div className="flex justify-between text-sm mt-2">
-                      <span className="text-gray-500">Validade:</span>
-                      <span className="font-medium">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 dark:text-gray-400">Validade:</span>
+                      <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
                         {new Date(item.expiryDate).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
                   )}
                   
-                  <div className="flex justify-between text-sm mt-2">
-                    <span className="text-gray-500">Último uso:</span>
-                    <span className="font-medium">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500 dark:text-gray-400">Último uso:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
                       {new Date(item.lastUsed).toLocaleDateString('pt-BR')}
                     </span>
                   </div>
 
-                  {item.size && (<div className="flex justify-between text-sm mt-2">
-                    <span className="text-gray-500">Tamanho:</span>
-                    <span className="font-medium">
-                      {item.size ? item.size : 'N/A'}
-                    </span>
-                  </div>)}
+                  {item.size && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500 dark:text-gray-400">Tamanho:</span>
+                      <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
+                        {item.size}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <div className="mt-5 flex">
+
+                <div className="mt-4">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button 
-                        className="flex-1 bg-neutral-200 dark:bg-neutral-800 hover:bg-blue-400 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white flex items-center justify-center duration-500 transition-colors ease-in-out"
+                        className="w-full bg-neutral-200 hover:bg-blue-400 dark:bg-neutral-800 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white transition-colors"
                       >
                         Ver Estoque
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80 p-0">
-                      <div className="p-4 border-b border-gray-200">
+                    <PopoverContent className="w-72 p-0 sm:w-80">
+                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                         <h4 className="font-medium text-base mb-1">{item.name}</h4>
-                        <p className="text-sm text-gray-500">Detalhes do estoque</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Detalhes do estoque</p>
                       </div>
                       <div className="p-4 space-y-3">
                         <div className="flex items-center justify-between">
@@ -402,7 +398,7 @@ const [searchQuery, setSearchQuery] = useState('');
 
       {filteredItems.length === 0 && (
         <div className="text-center py-10">
-          <p className="text-gray-500">Nenhum item encontrado com os filtros aplicados.</p>
+          <p className="text-gray-500 dark:text-gray-400">Nenhum item encontrado com os filtros aplicados.</p>
         </div>
       )}
     </div>

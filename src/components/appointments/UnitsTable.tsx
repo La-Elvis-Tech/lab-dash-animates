@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Building } from 'lucide-react';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent } from '@/components/ui/card';
 import { UnitSummary } from '@/types/appointment';
 
 interface UnitsTableProps {
@@ -11,49 +10,64 @@ interface UnitsTableProps {
 
 const UnitsTable: React.FC<UnitsTableProps> = ({ units }) => {
   return (
-    <div className="relative overflow-auto">
-      <ScrollArea className="h-[400px] w-full">
-        <div className="min-w-[600px] w-full">
+    <Card className="border-none shadow-none bg-transparent">
+      <CardContent className="p-0">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
-            <TableHeader className="sticky top-0 bg-white dark:bg-gray-800 z-10">
+            <TableHeader>
               <TableRow>
-                <TableHead className="whitespace-nowrap">Unidade</TableHead>
-                <TableHead className="whitespace-nowrap text-right">Total Agendamentos</TableHead>
-                <TableHead className="whitespace-nowrap text-right">Confirmados</TableHead>
-                <TableHead className="whitespace-nowrap text-right">Agendados</TableHead>
-                <TableHead className="whitespace-nowrap text-right">Concluídos</TableHead>
-                <TableHead className="whitespace-nowrap text-right">Cancelados</TableHead>
+                <TableHead className="w-[180px]">Unidade</TableHead>
+                <TableHead className="text-center">Total</TableHead>
+                <TableHead className="text-center">Confirmados</TableHead>
+                <TableHead className="text-center">Agendados</TableHead>
+                <TableHead className="text-center">Concluídos</TableHead>
+                <TableHead className="text-center">Cancelados</TableHead>
+                <TableHead className="text-right">Taxa de Ocupação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {units.length > 0 ? (
-                units.map((unit, index) => (
-                  <TableRow key={index} className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Building className="h-4 w-4 mr-2 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
-                        <span className="font-medium">{unit.name}</span>
-                      </div>
+              {units.map((unit) => {
+                // Calculate occupancy rate
+                const occupancyRate = unit.capacity > 0 
+                  ? Math.round((unit.appointments.length / unit.capacity) * 100) 
+                  : 0;
+                
+                // Count appointment statuses
+                const total = unit.appointments.length;
+                const confirmed = unit.appointments.filter(a => a.status === 'confirmed').length;
+                const scheduled = unit.appointments.filter(a => a.status === 'scheduled').length;
+                const completed = unit.appointments.filter(a => a.status === 'completed').length;
+                const canceled = unit.appointments.filter(a => a.status === 'canceled').length;
+                
+                return (
+                  <TableRow key={unit.id}>
+                    <TableCell className="font-medium">{unit.name}</TableCell>
+                    <TableCell className="text-center">{total}</TableCell>
+                    <TableCell className="text-center">{confirmed}</TableCell>
+                    <TableCell className="text-center">{scheduled}</TableCell>
+                    <TableCell className="text-center">{completed}</TableCell>
+                    <TableCell className="text-center">{canceled}</TableCell>
+                    <TableCell className="text-right">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          occupancyRate > 80
+                            ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
+                            : occupancyRate > 50
+                            ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300'
+                            : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
+                        }`}
+                      >
+                        {occupancyRate}%
+                      </span>
                     </TableCell>
-                    <TableCell className="text-right font-semibold">{unit.total}</TableCell>
-                    <TableCell className="text-right">{unit.confirmed}</TableCell>
-                    <TableCell className="text-right">{unit.scheduled}</TableCell>
-                    <TableCell className="text-right">{unit.completed}</TableCell>
-                    <TableCell className="text-right">{unit.canceled}</TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-6 text-gray-500 dark:text-gray-400">
-                    Nenhuma unidade encontrada.
-                  </TableCell>
-                </TableRow>
-              )}
+                );
+              })}
             </TableBody>
           </Table>
         </div>
-      </ScrollArea>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

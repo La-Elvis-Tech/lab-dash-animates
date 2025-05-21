@@ -89,83 +89,83 @@ const Dashboard: React.FC = () => {
         <p className="text-gray-500 dark:text-gray-400 mt-1">Visão geral do consumo de itens laboratoriais</p>
       </div>
 
-      {/* Key metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Key metrics - Improved responsive grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card className="dashboard-card bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total de Itens</p>
-                <h3 className="text-2xl font-bold mt-1 text-gray-700 dark:text-white">1,284</h3>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Total de Itens</p>
+                <h3 className="text-xl sm:text-2xl font-bold mt-1 text-gray-700 dark:text-white">1,284</h3>
                 <p className="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
                   <TrendingUp size={14} className="mr-1" />
                   +2.5% este mês
                 </p>
               </div>
-              <div className="bg-lab-lightBlue dark:bg-blue-900 p-3 rounded-full">
-                <Package className="text-lab-blue dark:text-blue-300" size={24} />
+              <div className="bg-lab-lightBlue dark:bg-blue-900 p-2 sm:p-3 rounded-full">
+                <Package className="text-lab-blue dark:text-blue-300" size={20} />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="dashboard-card bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Consumo Mensal</p>
-                <h3 className="text-2xl font-bold mt-1  text-gray-700 dark:text-white">187</h3>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Consumo Mensal</p>
+                <h3 className="text-xl sm:text-2xl font-bold mt-1 text-gray-700 dark:text-white">187</h3>
                 <p className="text-xs text-red-600 dark:text-red-400 flex items-center mt-1">
                   <TrendingDown size={14} className="mr-1" />
                   -1.8% este mês
                 </p>
               </div>
-              <div className="bg-lab-lightBlue dark:bg-blue-900 p-3 rounded-full">
-                <Activity className="text-lab-blue dark:text-blue-300" size={24} />
+              <div className="bg-lab-lightBlue dark:bg-blue-900 p-2 sm:p-3 rounded-full">
+                <Activity className="text-lab-blue dark:text-blue-300" size={20} />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="dashboard-card bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Reagentes</p>
-                <h3 className="text-2xl font-bold mt-1 text-gray-700 dark:text-white">362</h3>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Reagentes</p>
+                <h3 className="text-xl sm:text-2xl font-bold mt-1 text-gray-700 dark:text-white">362</h3>
                 <p className="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
                   <TrendingUp size={14} className="mr-1" />
                   +5.2% este mês
                 </p>
               </div>
-              <div className="bg-lab-lightBlue dark:bg-blue-900 p-3 rounded-full">
-                <Beaker className="text-lab-blue dark:text-blue-300" size={24} />
+              <div className="bg-lab-lightBlue dark:bg-blue-900 p-2 sm:p-3 rounded-full">
+                <Beaker className="text-lab-blue dark:text-blue-300" size={20} />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="dashboard-card bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
-          <CardContent className="pt-6">
+          <CardContent className="pt-5 p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Em Alerta</p>
-                <h3 className="text-2xl font-bold mt-1 text-gray-700 dark:text-white">12</h3>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">Em Alerta</p>
+                <h3 className="text-xl sm:text-2xl font-bold mt-1 text-gray-700 dark:text-white">12</h3>
                 <p className="text-xs text-yellow-600 dark:text-yellow-400 flex items-center mt-1">
                   <AlertCircle size={14} className="mr-1" />
                   Requer atenção
                 </p>
               </div>
-              <div className="bg-red-100 dark:bg-red-900 p-3 rounded-full">
-                <AlertCircle className="text-red-600 dark:text-red-300" size={24} />
+              <div className="bg-red-100 dark:bg-red-900 p-2 sm:p-3 rounded-full">
+                <AlertCircle className="text-red-600 dark:text-red-300" size={20} />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts - Improved responsive layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         <div className="dashboard-chart">
           <DashboardChart 
             type="line" 
@@ -184,45 +184,47 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Items running low */}
+      {/* Items running low - Improved responsive table */}
       <div className="dashboard-chart">
         <Card className="bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-20 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Itens em Baixo Estoque</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-white">Itens em Baixo Estoque</h2>
               <Link to="/inventory" className="text-sm text-lab-blue dark:text-blue-300 hover:underline">
                 Ver Todos
               </Link>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left text-sm text-gray-700 dark:text-gray-400 border-b dark:border-gray-700">
-                    <th className="pb-2 font-bold">Nome do Item</th>
-                    <th className="pb-2 font-bold">Estoque Atual</th>
-                    <th className="pb-2 font-bold">Estoque Mínimo</th>
-                    <th className="pb-2 font-bold">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {itemsNearDepletion.map((item) => (
-                    <tr key={item.id} className="border-b dark:border-gray-700 last:border-0">
-                      <td className="py-3 text-sm font-medium dark:text-gray-300 text-gray-800">{item.name}</td>
-                      <td className="py-3 text-sm dark:text-gray-300 text-gray-800">
-                        {item.currentStock} {item.unit}
-                      </td>
-                      <td className="py-3 text-sm dark:text-gray-300 text-gray-800">
-                        {item.minStock} {item.unit}
-                      </td>
-                      <td className="py-3 text-sm">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300">
-                          Crítico
-                        </span>
-                      </td>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead>
+                    <tr className="text-left text-xs sm:text-sm text-gray-700 dark:text-gray-400">
+                      <th scope="col" className="py-3 font-semibold">Nome do Item</th>
+                      <th scope="col" className="py-3 font-semibold text-right">Estoque Atual</th>
+                      <th scope="col" className="py-3 font-semibold text-right">Estoque Mínimo</th>
+                      <th scope="col" className="py-3 font-semibold text-center">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {itemsNearDepletion.map((item) => (
+                      <tr key={item.id}>
+                        <td className="py-3 text-xs sm:text-sm font-medium dark:text-gray-300 text-gray-800">{item.name}</td>
+                        <td className="py-3 text-xs sm:text-sm dark:text-gray-300 text-gray-800 text-right">
+                          {item.currentStock} {item.unit}
+                        </td>
+                        <td className="py-3 text-xs sm:text-sm dark:text-gray-300 text-gray-800 text-right">
+                          {item.minStock} {item.unit}
+                        </td>
+                        <td className="py-3 text-center">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300">
+                            Crítico
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </Card>

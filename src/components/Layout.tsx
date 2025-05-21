@@ -12,12 +12,13 @@ const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const animationInProgress = useRef(false);
 
   useEffect(() => {
     const handleResize = () => {
       const isNowMobile = window.innerWidth < 768;
       
-      // Só atualiza o estado se houver mudança para evitar re-renders desnecessários
+      // Only update state if there's a change to avoid unnecessary re-renders
       if (isMobileView !== isNowMobile) {
         setIsMobileView(isNowMobile);
         
@@ -26,7 +27,7 @@ const Layout = () => {
         } else {
           setIsSidebarOpen(true);
           
-          // Reinicia a posição do X quando alterna para desktop
+          // Reset X position when switching to desktop
           if (sidebarRef.current) {
             gsap.set(sidebarRef.current, { x: '0%' });
           }
@@ -46,42 +47,52 @@ const Layout = () => {
   }, [isMobileView]);
 
   useEffect(() => {
-    if (!mainContentRef.current || !sidebarRef.current) return;
+    if (!mainContentRef.current || !sidebarRef.current || animationInProgress.current) return;
+    
+    animationInProgress.current = true;
     
     const ctx = gsap.context(() => {
-      // Ajuste de padding no conteúdo principal
+      // Set main content padding
       gsap.to(mainContentRef.current, {
         paddingLeft: isMobileView ? '0px' : (isCollapsed ? '80px' : '260px'),
         duration: 0.3,
-        ease: 'power2.out'
+        ease: 'power2.out',
+        onComplete: () => {
+          animationInProgress.current = false;
+        }
       });
 
-      // Animação para dispositivos móveis
+      // Mobile animation
       if (isMobileView) {
-        // Overlay (fundo escuro)
+        // Overlay (dark background)
         gsap.to('.sidebar-mobile-overlay', {
           opacity: isSidebarOpen ? 0.5 : 0,
           display: isSidebarOpen ? 'block' : 'none',
           duration: 0.3
         });
         
-        // Sidebar animação
+        // Sidebar animation
         gsap.to(sidebarRef.current, {
           x: isSidebarOpen ? '0%' : '-100%',
           duration: 0.3,
           ease: 'power2.out'
         });
       } else {
-        // Garante posição correta no desktop
+        // Ensure correct position in desktop mode
         gsap.set(sidebarRef.current, { x: '0%' });
         gsap.set('.sidebar-mobile-overlay', { display: 'none', opacity: 0 });
       }
-    });
+    }, mainContentRef);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      animationInProgress.current = false;
+    };
   }, [isCollapsed, isMobileView, isSidebarOpen]);
 
   const toggleSidebar = () => {
+    if (animationInProgress.current) return;
+    
     if (isMobileView) {
       setIsSidebarOpen(!isSidebarOpen);
     } else {
@@ -91,22 +102,26 @@ const Layout = () => {
 
   return (
     <div className="flex h-screen transition-colors duration-300">
-      {/* Mobile overlay */}
+      {/* Mobile overlay with improved touch handling */}
       <div 
         className="sidebar-mobile-overlay fixed inset-0 bg-black opacity-0 hidden z-20"
         onClick={() => setIsSidebarOpen(false)}
+        style={{ touchAction: 'none' }}
       />
       
-      {/* Sidebar */}
+      {/* Sidebar with fixed positioning to prevent layout shifting */}
       <div 
         ref={sidebarRef}
         className="fixed left-0 top-0 z-30 h-full"
-        style={{ transform: isMobileView && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)' }}
+        style={{ 
+          transform: isMobileView && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)',
+          transition: animationInProgress.current ? 'none' : 'transform 0.3s ease-in-out'
+        }}
       >
         <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
       </div>
       
-      {/* Main Content */}
+      {/* Main Content with smooth transitions */}
       <div 
         ref={mainContentRef} 
         className="flex-1 overflow-auto bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:via-indigo-100/25 transition-all duration-300"
@@ -121,6 +136,7 @@ const Layout = () => {
               <button 
                 onClick={() => setIsSidebarOpen(true)} 
                 className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+                aria-label="Open sidebar"
               >
                 <Menu size={24} className="dark:text-gray-300" />
               </button>
@@ -130,8 +146,8 @@ const Layout = () => {
           </div>
         )}
 
-        {/* Page Content */}
-        <div className="p-6">
+        {/* Page Content with responsive padding */}
+        <div className="p-4 sm:p-6">
           <Outlet />
         </div>
       </div>
