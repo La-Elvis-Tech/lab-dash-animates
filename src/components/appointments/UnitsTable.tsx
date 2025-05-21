@@ -16,13 +16,13 @@ const UnitsTable: React.FC<UnitsTableProps> = ({ units }) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[180px]">Unidade</TableHead>
-                <TableHead className="text-center">Total</TableHead>
-                <TableHead className="text-center">Confirmados</TableHead>
-                <TableHead className="text-center">Agendados</TableHead>
-                <TableHead className="text-center">Concluídos</TableHead>
-                <TableHead className="text-center">Cancelados</TableHead>
-                <TableHead className="text-right">Taxa de Ocupação</TableHead>
+                <TableHead className="w-[180px] text-xs md:text-sm">Unidade</TableHead>
+                <TableHead className="text-center text-xs md:text-sm">Total</TableHead>
+                <TableHead className="text-center text-xs md:text-sm">Confirmados</TableHead>
+                <TableHead className="text-center text-xs md:text-sm">Agendados</TableHead>
+                <TableHead className="text-center text-xs md:text-sm">Concluídos</TableHead>
+                <TableHead className="text-center text-xs md:text-sm">Cancelados</TableHead>
+                <TableHead className="text-right text-xs md:text-sm">Taxa de Ocupação</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -40,15 +40,15 @@ const UnitsTable: React.FC<UnitsTableProps> = ({ units }) => {
                 
                 return (
                   <TableRow key={unit.name}>
-                    <TableCell className="font-medium">{unit.name}</TableCell>
-                    <TableCell className="text-center">{total}</TableCell>
-                    <TableCell className="text-center">{confirmed}</TableCell>
-                    <TableCell className="text-center">{scheduled}</TableCell>
-                    <TableCell className="text-center">{completed}</TableCell>
-                    <TableCell className="text-center">{canceled}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">{unit.name}</TableCell>
+                    <TableCell className="text-center text-xs md:text-sm py-2 md:py-3">{total}</TableCell>
+                    <TableCell className="text-center text-xs md:text-sm py-2 md:py-3">{confirmed}</TableCell>
+                    <TableCell className="text-center text-xs md:text-sm py-2 md:py-3">{scheduled}</TableCell>
+                    <TableCell className="text-center text-xs md:text-sm py-2 md:py-3">{completed}</TableCell>
+                    <TableCell className="text-center text-xs md:text-sm py-2 md:py-3">{canceled}</TableCell>
+                    <TableCell className="text-right text-xs md:text-sm py-2 md:py-3">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        className={`px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[10px] md:text-xs font-medium ${
                           occupancyRate > 80
                             ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300'
                             : occupancyRate > 50

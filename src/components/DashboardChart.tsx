@@ -27,29 +27,29 @@ const DashboardChart = ({ type, data, title, description }) => {
 
   const renderProgressBars = () => {
     return (
-      <div className="space-y-6 py-4">
+      <div className="space-y-3 sm:space-y-6 py-2 sm:py-4">
         {data.map((item, index) => {
           const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
           return (
-            <div key={index} className="space-y-2">
+            <div key={index} className="space-y-1 sm:space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div 
-                    className="w-3 h-3 rounded-full mr-2" 
+                    className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2" 
                     style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
                   />
-                  <span className="text-sm font-medium">{item.name}</span>
+                  <span className="text-xs sm:text-sm font-medium">{item.name}</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <span className="text-sm font-bold">R$ {item.value.toFixed(2)}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full font-medium">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <span className="text-xs sm:text-sm font-bold">R$ {item.value.toFixed(2)}</span>
+                  <span className="text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full font-medium">
                     {percentage}%
                   </span>
                 </div>
               </div>
               <Progress 
                 value={percentage} 
-                className="h-2.5"
+                className="h-1.5 sm:h-2.5"
                 style={{
                   background: 'linear-gradient(to right, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2))',
                 }}
@@ -65,21 +65,23 @@ const DashboardChart = ({ type, data, title, description }) => {
     switch (type) {
       case 'bar':
         return (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data}>
+          <ResponsiveContainer width="100%" height={250} minHeight={150}>
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
-              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
-              <YAxis tick={{ fill: 'currentColor' }} />
+              <XAxis dataKey="name" tick={{ fill: 'currentColor', fontSize: '10px' }} />
+              <YAxis tick={{ fill: 'currentColor', fontSize: '10px' }} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
                   borderColor: 'rgb(55 65 81)',
                   borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)'
+                  color: 'rgb(243 244 246)',
+                  fontSize: '12px',
+                  padding: '8px'
                 }}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: '10px' }} />
               <Bar dataKey="value" fill="url(#barGradient)" />
               {data[0]?.value2 && <Bar dataKey="value2" fill="#1D2472" />}
               <defs>
@@ -93,22 +95,39 @@ const DashboardChart = ({ type, data, title, description }) => {
         );
       case 'line':
         return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
+          <ResponsiveContainer width="100%" height={250} minHeight={150}>
+            <LineChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.3} />
-              <XAxis dataKey="name" tick={{ fill: '#8B5CF6' }} />
-              <YAxis tick={{ fill: '#8B5CF6' }} />
+              <XAxis dataKey="name" tick={{ fill: '#8B5CF6', fontSize: '10px' }} />
+              <YAxis tick={{ fill: '#8B5CF6', fontSize: '10px' }} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
                   borderColor: 'rgb(55 65 81)',
                   borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)'
+                  color: 'rgb(243 244 246)',
+                  fontSize: '12px',
+                  padding: '8px'
                 }}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
-              <Line type="monotone" dataKey="value" stroke="url(#lineGradient)" strokeWidth={3} dot={{ fill: '#8B5CF6' }} activeDot={{ r: 6 }} />
-              {data[0]?.value2 && <Line type="monotone" dataKey="value2" stroke="#0EA5E9" strokeWidth={2} dot={{ fill: '#0EA5E9' }} />}
+              <Line 
+                type="monotone" 
+                dataKey="value" 
+                stroke="url(#lineGradient)" 
+                strokeWidth={2} 
+                dot={{ fill: '#8B5CF6', r: 3 }} 
+                activeDot={{ r: 5 }} 
+              />
+              {data[0]?.value2 && 
+                <Line 
+                  type="monotone" 
+                  dataKey="value2" 
+                  stroke="#0EA5E9" 
+                  strokeWidth={2} 
+                  dot={{ fill: '#0EA5E9', r: 3 }} 
+                />
+              }
               <defs>
                 <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
                   <stop offset="0%" stopColor="#8B5CF6"/>
@@ -120,21 +139,23 @@ const DashboardChart = ({ type, data, title, description }) => {
         );
       case 'area':
         return (
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={data}>
+          <ResponsiveContainer width="100%" height={250} minHeight={150}>
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
-              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
-              <YAxis tick={{ fill: 'currentColor' }} />
+              <XAxis dataKey="name" tick={{ fill: 'currentColor', fontSize: '10px' }} />
+              <YAxis tick={{ fill: 'currentColor', fontSize: '10px' }} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
                   borderColor: 'rgb(55 65 81)',
                   borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)'
+                  color: 'rgb(243 244 246)',
+                  fontSize: '12px',
+                  padding: '8px'
                 }}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: '10px' }} />
               <defs>
                 <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.8}/>
@@ -148,22 +169,22 @@ const DashboardChart = ({ type, data, title, description }) => {
         );
       case 'pie':
         return (
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+          <ResponsiveContainer width="100%" height={250} minHeight={150}>
+            <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 20 }}>
               <Pie
                 data={data}
                 cx="50%"
-                cy="80%"
-                innerRadius={60}
+                cy="50%"
+                innerRadius={30}
+                outerRadius={60}
                 paddingAngle={8}
                 startAngle={180}
                 endAngle={0}
                 labelLine={false}
                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={90}
                 strokeOpacity={0.1}
                 stroke="transparent"
-                strokeWidth={4}
+                strokeWidth={2}
                 dataKey="value"
               >
                 {data.map((entry, index) => (
@@ -175,11 +196,18 @@ const DashboardChart = ({ type, data, title, description }) => {
                   backgroundColor: 'rgb(31 41 55)',
                   borderColor: 'rgb(55 65 81)',
                   borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)'
+                  color: 'rgb(243 244 246)',
+                  fontSize: '12px',
+                  padding: '8px'
                 }}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
-              <Legend />
+              <Legend 
+                layout="horizontal" 
+                verticalAlign="bottom" 
+                align="center"
+                wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
+              />
             </PieChart>
           </ResponsiveContainer>
         );
@@ -193,11 +221,11 @@ const DashboardChart = ({ type, data, title, description }) => {
   return (
     <div 
       ref={chartRef}
-      className="bg-white p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80  border-opacity-80  border-opacity-30 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
+      className="bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
     >
-      <div className="mb-6">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">{title}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
+      <div className="mb-3 sm:mb-6">
+        <h3 className="text-sm sm:text-base md:text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
+        <p className="text-xs text-gray-600 dark:text-gray-300">{description}</p>
       </div>
       {renderChart()}
     </div>

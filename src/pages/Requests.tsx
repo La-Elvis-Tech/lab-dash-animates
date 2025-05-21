@@ -12,7 +12,7 @@ import {
   TableCell 
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Search, Filter, Building, Database } from "lucide-react";
+import { Calendar as CalendarIcon, Search, Building, Database } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -182,13 +182,13 @@ const Requests: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Últimos Exames</h1>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Últimos Exames</h1>
       </div>
       
       <Card className="overflow-hidden dark:bg-gray-800 dark:text-gray-100">
-        <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
-          <CardTitle className="text-xl">
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+        <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700 p-4">
+          <CardTitle className="text-base md:text-xl">
+            <div className="space-y-4">
               {/* Search input */}
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -207,11 +207,12 @@ const Requests: React.FC = () => {
                     <Button
                       variant="outline"
                       className={cn(
-                        "justify-start text-left font-normal",
+                        "justify-start text-left font-normal text-xs md:text-sm h-9",
                         !selectedDate && "text-muted-foreground"
                       )}
+                      size="sm"
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="mr-1 h-3 w-3 md:h-4 md:w-4" />
                       {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Filtrar por data"}
                     </Button>
                   </PopoverTrigger>
@@ -226,9 +227,9 @@ const Requests: React.FC = () => {
                   </PopoverContent>
                 </Popover>
                 
-                {/* Type filter */}
+                {/* Type filter - responsive */}
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm">
                     <SelectValue placeholder="Tipo de exame" />
                   </SelectTrigger>
                   <SelectContent>
@@ -242,9 +243,9 @@ const Requests: React.FC = () => {
                   </SelectContent>
                 </Select>
                 
-                {/* Unit filter */}
+                {/* Unit filter - responsive */}
                 <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm">
                     <SelectValue placeholder="Unidade" />
                   </SelectTrigger>
                   <SelectContent>
@@ -258,9 +259,9 @@ const Requests: React.FC = () => {
                   </SelectContent>
                 </Select>
                 
-                {/* Laboratory filter */}
+                {/* Laboratory filter - responsive */}
                 <Select value={selectedLaboratory} onValueChange={setSelectedLaboratory}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm">
                     <SelectValue placeholder="Laboratório" />
                   </SelectTrigger>
                   <SelectContent>
@@ -274,11 +275,12 @@ const Requests: React.FC = () => {
                   </SelectContent>
                 </Select>
                 
-                {/* Reset filters button */}
+                {/* Reset filters button - responsive */}
                 <Button 
                   variant="outline" 
                   onClick={resetFilters}
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap text-xs md:text-sm h-9"
+                  size="sm"
                 >
                   Limpar filtros
                 </Button>
@@ -287,63 +289,62 @@ const Requests: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-0 pt-0">
-          <div className="p-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
+          <div className="p-3 md:p-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
-              <span className="text-sm text-gray-500 dark:text-gray-300">
+              <span className="text-xs md:text-sm text-gray-500 dark:text-gray-300">
                 Exames encontrados: <strong>{filteredExams.length}</strong>
               </span>
             </div>
             <div>
-              <span className="text-sm font-medium">
+              <span className="text-xs md:text-sm font-medium">
                 Total de despesas: <strong className="text-green-600 dark:text-green-400">R$ {totalCost.toFixed(2)}</strong>
               </span>
             </div>
           </div>
           
-          <ScrollArea className="h-[500px]">
-            <div className="w-full min-w-[1000px]">
+          <ScrollArea className="h-[400px] md:h-[500px]">
+            <div className="w-full min-w-[700px] md:min-w-[1000px]">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Paciente</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Médico</TableHead>
-                    <TableHead>Laboratório</TableHead>
-                    <TableHead>Unidade</TableHead>
-                    <TableHead>Custo (R$)</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Resultado</TableHead>
+                    <TableHead className="text-xs md:text-sm">ID</TableHead>
+                    <TableHead className="text-xs md:text-sm">Paciente</TableHead>
+                    <TableHead className="text-xs md:text-sm">Tipo</TableHead>
+                    <TableHead className="text-xs md:text-sm">Data</TableHead>
+                    <TableHead className="text-xs md:text-sm">Médico</TableHead>
+                    <TableHead className="text-xs md:text-sm">Laboratório</TableHead>
+                    <TableHead className="text-xs md:text-sm">Unidade</TableHead>
+                    <TableHead className="text-xs md:text-sm">Custo (R$)</TableHead>
+                    <TableHead className="text-xs md:text-sm">Status</TableHead>
+                    <TableHead className="text-xs md:text-sm">Resultado</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredExams.length > 0 ? (
                     filteredExams.map((exam) => (
                       <TableRow key={exam.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <TableCell>{exam.id}</TableCell>
-                        <TableCell>{exam.patient}</TableCell>
-                        <TableCell>{exam.type}</TableCell>
-                        <TableCell>{format(exam.date, "dd/MM/yyyy")}</TableCell>
-                        <TableCell>{exam.doctor}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.id}</TableCell>
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.patient}</TableCell>
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.type}</TableCell>
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{format(exam.date, "dd/MM/yyyy")}</TableCell>
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.doctor}</TableCell>
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">
                           <div className="flex items-center">
-                            
                             <Database className="h-3 w-3 mr-1" />
                             {exam.laboratory}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">
                           <div className="flex items-center">
                             <Building className="h-3 w-3 mr-1" />
                             {exam.unit}
                           </div>
                         </TableCell>
-                        <TableCell className="font-medium">
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4 font-medium">
                           {exam.cost.toFixed(2)}
                         </TableCell>
-                        <TableCell>
-                          <Badge className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">
+                          <Badge className={`px-1.5 py-0.5 text-[10px] md:px-2 md:py-1 md:text-xs rounded-full font-medium ${
                             exam.status === 'Concluído' 
                               ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
                               : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
@@ -351,7 +352,7 @@ const Requests: React.FC = () => {
                             {exam.status}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-xs md:text-sm py-2 md:py-4">
                           <span className={`${
                             exam.result === 'Alterado' 
                               ? 'text-red-600 dark:text-red-400' 
@@ -366,7 +367,7 @@ const Requests: React.FC = () => {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={10} className="text-center py-6 text-gray-500 dark:text-gray-400">
+                      <TableCell colSpan={10} className="text-center py-6 text-xs md:text-sm text-gray-500 dark:text-gray-400">
                         Nenhum exame encontrado com os filtros selecionados.
                       </TableCell>
                     </TableRow>
