@@ -52,7 +52,6 @@ const DashboardChart = ({ type, data, title, description }) => {
                 className="h-2.5"
                 style={{
                   background: 'linear-gradient(to right, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2))',
-                  '--progress-background': CHART_COLORS[index % CHART_COLORS.length]
                 }}
               />
             </div>
@@ -97,8 +96,8 @@ const DashboardChart = ({ type, data, title, description }) => {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.3} />
-              <XAxis dataKey="name" tick={{ fill: 'currentColor' }} />
-              <YAxis tick={{ fill: 'currentColor' }} />
+              <XAxis dataKey="name" tick={{ fill: '#8B5CF6' }} />
+              <YAxis tick={{ fill: '#8B5CF6' }} />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
@@ -162,6 +161,9 @@ const DashboardChart = ({ type, data, title, description }) => {
                 labelLine={false}
                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 outerRadius={90}
+                strokeOpacity={0.1}
+                stroke="transparent"
+                strokeWidth={4}
                 dataKey="value"
               >
                 {data.map((entry, index) => (

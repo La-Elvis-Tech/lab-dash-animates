@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-import Inventory from "./pages/Inventory";
+import Inventory from "./pages/Inventory.tsx";
 import Requests from "./pages/Requests.tsx";
 import Orders from "./pages/Orders.tsx";
 import Reports from "./pages/Reports.tsx";

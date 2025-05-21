@@ -14,7 +14,7 @@ export function ThemeToggle() {
       {theme === "light" ? (
         <Moon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all text-gray-700 dark:text-gray-300" />
       ) : (
-        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:text-gray-300" />
       )}
       <span className="sr-only">
         {theme === "light" ? "Switch to dark theme" : "Switch to light theme"}

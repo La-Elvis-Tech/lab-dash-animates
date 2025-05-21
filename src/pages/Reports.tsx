@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import DashboardChart, { CHART_COLORS } from '@/components/DashboardChart.jsx';
+import DashboardChart, { CHART_COLORS } from '@/components/DashboardChart.js';
 
 // Mock data for appointments (same as in Orders.tsx)
 

@@ -109,7 +109,7 @@ const Layout = () => {
       {/* Main Content */}
       <div 
         ref={mainContentRef} 
-        className="flex-1 overflow-auto bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:from-gray-400 dark:to-gray-900 transition-colors duration-300"
+        className="flex-1 overflow-auto bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:via-indigo-100/25 transition-all duration-300"
         style={{ 
           paddingLeft: isMobileView ? '0px' : (isCollapsed ? '80px' : '260px')
         }}

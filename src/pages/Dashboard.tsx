@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import DashboardChart from '@/components/DashboardChart';
+import DashboardChart from '@/components/DashboardChart.tsx';
 import { Card, CardContent } from '../components/ui/card';
 import { Activity, TrendingUp, TrendingDown, AlertCircle, Package, Beaker } from 'lucide-react';
 import { Link } from 'react-router-dom';
