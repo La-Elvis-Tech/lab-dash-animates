@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { addDays, format, startOfDay } from 'date-fns';
@@ -196,54 +195,58 @@ const Reports = () => {
 
   return (
     <div ref={pageRef} className="space-y-6">
-      <div className="p-6 rounded-lg">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Relatórios</h1>
+      <div className="rounded-lg mb-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">Relatórios</h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">Análise de despesas e consumo</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card className="md:col-span-2 dark:bg-gray-800/50 dark:text-gray-100 overflow-hidden">
-          <CardHeader className="">
-            <CardTitle className="text-xl">Análise de Despesas</CardTitle>
+      <div className="grid grid-cols-1 gap-4 md:gap-6 mb-6">
+        <Card className="dark:bg-gray-800/50 dark:text-gray-100 overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">Análise de Despesas</CardTitle>
             <CardDescription className="dark:text-gray-300">
               Visualização detalhada das despesas por período
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent className="p-3 sm:p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-6 dark:">
-                <TabsTrigger value="weekly">Semanal</TabsTrigger>
-                <TabsTrigger value="monthly">Mensal por Unidade</TabsTrigger>
-                <TabsTrigger value="byType">Por Tipo de Exame</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto -mx-3 px-3 pb-2">
+                <TabsList className="mb-4 sm:mb-6 w-full sm:w-auto">
+                  <TabsTrigger value="weekly" className="text-xs sm:text-sm">Semanal</TabsTrigger>
+                  <TabsTrigger value="monthly" className="text-xs sm:text-sm">Mensal por Unidade</TabsTrigger>
+                  <TabsTrigger value="byType" className="text-xs sm:text-sm">Por Tipo de Exame</TabsTrigger>
+                </TabsList>
+              </div>
               
               <TabsContent value="weekly" className="mt-0">
-                <div className="space-y-6">
-                  <DashboardChart
-                    type="bar"
-                    data={weeklyExpenses}
-                    title="Despesas Semanais"
-                    description="Gastos previstos para os próximos 7 dias"
-                  />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="w-full overflow-hidden">
+                    <DashboardChart
+                      type="bar"
+                      data={weeklyExpenses}
+                      title="Despesas Semanais"
+                      description="Gastos previstos para os próximos 7 dias"
+                    />
+                  </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <div className="p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total de despesas previstas</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-4">
+                    <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Total de despesas previstas</p>
+                      <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                         R$ {totalWeeklyExpenses.toFixed(2)}
                       </p>
                     </div>
                     
-                    <div className="p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Média diária</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Média diária</p>
+                      <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                         R$ {(totalWeeklyExpenses / 7).toFixed(2)}
                       </p>
                     </div>
                     
-                    <div className="p-4 rounded-lg">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">N° de agendamentos</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">N° de agendamentos</p>
+                      <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                         {mockAppointments.length}
                       </p>
                     </div>
@@ -252,17 +255,19 @@ const Reports = () => {
               </TabsContent>
               
               <TabsContent value="monthly" className="mt-0">
-                <div className="space-y-6">
-                  <DashboardChart
-                    type="bar"
-                    data={monthlyExpensesByUnit}
-                    title="Despesas por Unidade"
-                    description="Gastos mensais distribuídos por unidade"
-                  />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="w-full overflow-hidden">
+                    <DashboardChart
+                      type="bar"
+                      data={monthlyExpensesByUnit}
+                      title="Despesas por Unidade"
+                      description="Gastos mensais distribuídos por unidade"
+                    />
+                  </div>
                   
-                  <div className=" p-4 rounded-lg">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total de despesas mensais</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Total de despesas mensais</p>
+                    <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                       R$ {totalMonthlyExpenses.toFixed(2)}
                     </p>
                   </div>
@@ -270,13 +275,15 @@ const Reports = () => {
               </TabsContent>
               
               <TabsContent value="byType" className="mt-0">
-                <div className="space-y-6">
-                  <DashboardChart
-                    type="progress"
-                    data={expensesByExamType}
-                    title="Despesas por Tipo de Exame"
-                    description="Distribuição de gastos por categoria de exame"
-                  />
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="w-full overflow-hidden">
+                    <DashboardChart
+                      type="progress"
+                      data={expensesByExamType}
+                      title="Despesas por Tipo de Exame"
+                      description="Distribuição de gastos por categoria de exame"
+                    />
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
@@ -284,17 +291,18 @@ const Reports = () => {
         </Card>
 
         <Card className="dark:bg-gray-800/50 dark:text-gray-100">
-          <CardHeader className="">
-            <CardTitle className="text-xl">Resumo Financeiro</CardTitle>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-lg sm:text-xl">Resumo Financeiro</CardTitle>
             <CardDescription className="dark:text-gray-300">
               Visão geral das despesas recentes
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-6">
             <div className="space-y-4 mt-2">
-              <ScrollArea className="h-[600px] overflow-auto">
+              <ScrollArea className="h-[400px] sm:h-[500px] overflow-auto">
                 <div className="space-y-4">
-                  <h4 className="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">PRÓXIMOS AGENDAMENTOS</h4>
+                  <h4 className="font-medium text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2">PRÓXIMOS AGENDAMENTOS</h4>
+                  <div className="space-y-3">
                   {mockAppointments
                     .filter(app => new Date(app.date) >= today)
                     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -302,36 +310,37 @@ const Reports = () => {
                     .map((app) => (
                       <div 
                         key={app.id} 
-                        className="border-l-4 pl-3 py-2 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800 dark:to-gray-900/80 rounded-r-md"
+                        className="border-l-4 pl-2 sm:pl-3 py-2 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800 dark:to-gray-900/80 rounded-r-md"
                         style={{ borderImageSource: 'linear-gradient(to bottom, #8B5CF6, #6366F1)', borderImageSlice: 1 }}
                       >
-                        <div className="flex justify-between">
-                          <span className="font-medium">{app.patient}</span>
-                          <span className="text-blue-600 dark:text-blue-400">R$ {app.cost.toFixed(2)}</span>
+                        <div className="flex flex-col sm:flex-row sm:justify-between">
+                          <span className="font-medium text-sm sm:text-base">{app.patient}</span>
+                          <span className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm mt-1 sm:mt-0">R$ {app.cost.toFixed(2)}</span>
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           <span>{format(app.date, "dd/MM/yyyy")} · {app.type}</span>
                         </div>
                         <div className="flex items-center mt-1">
-                          <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-800 dark:text-blue-200 border-0">
+                          <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-800 dark:text-blue-200 border-0 px-2 py-1">
                             {app.unit}
                           </Badge>
                         </div>
                       </div>
                     ))}
+                  </div>
 
-                  <h4 className="font-medium text-sm text-gray-500 dark:text-gray-400 mt-6 mb-2">DESPESAS POR TIPO</h4>
+                  <h4 className="font-medium text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-6 mb-2">DESPESAS POR TIPO</h4>
                   <div className="space-y-2">
                     {expensesByExamType.sort((a, b) => b.value - a.value).map((type, index) => (
                       <div key={index} className="flex justify-between items-center py-2">
                         <div className="flex items-center">
                           <div 
-                            className="w-3 h-3 rounded-full mr-2" 
+                            className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2" 
                             style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
                           />
-                          <span className="text-sm truncate max-w-[160px]">{type.name}</span>
+                          <span className="text-xs sm:text-sm truncate max-w-[100px] sm:max-w-[160px]">{type.name}</span>
                         </div>
-                        <span className="font-medium">R$ {type.value.toFixed(2)}</span>
+                        <span className="font-medium text-xs sm:text-sm">R$ {type.value.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -343,19 +352,21 @@ const Reports = () => {
       </div>
 
       <Card className="dark:bg-gray-800/50 dark:text-gray-100 bg-gradient-to-br from-white to-green-50/30 dark:from-gray-800/80 dark:to-green-900/20">
-        <CardHeader className="bg-gradient-to-r from-green-500/10 to-teal-500/10 dark:from-green-500/5 dark:to-teal-500/5">
-          <CardTitle className="text-xl">Tendências de Despesas</CardTitle>
+        <CardHeader className="p-4 sm:p-6 bg-gradient-to-r from-green-500/10 to-teal-500/10 dark:from-green-500/5 dark:to-teal-500/5">
+          <CardTitle className="text-lg sm:text-xl">Tendências de Despesas</CardTitle>
           <CardDescription className="dark:text-gray-300">
             Análise de tendências de gastos ao longo do tempo
           </CardDescription>
         </CardHeader>
-        <CardContent className="pt-6">
-          <DashboardChart
-            type="line"
-            data={weeklyExpenses}
-            title="Projeção Semanal"
-            description="Previsão de gastos para os próximos dias"
-          />
+        <CardContent className="p-3 sm:p-6">
+          <div className="w-full overflow-hidden">
+            <DashboardChart
+              type="line"
+              data={weeklyExpenses}
+              title="Projeção Semanal"
+              description="Previsão de gastos para os próximos dias"
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -27,11 +27,6 @@ const UnitsTable: React.FC<UnitsTableProps> = ({ units }) => {
             </TableHeader>
             <TableBody>
               {units.map((unit) => {
-                // Calculate occupancy rate
-                const occupancyRate = unit.capacity > 0 
-                  ? Math.round((unit.appointments.length / unit.capacity) * 100) 
-                  : 0;
-                
                 // Count appointment statuses
                 const total = unit.appointments.length;
                 const confirmed = unit.appointments.filter(a => a.status === 'confirmed').length;
@@ -39,8 +34,12 @@ const UnitsTable: React.FC<UnitsTableProps> = ({ units }) => {
                 const completed = unit.appointments.filter(a => a.status === 'completed').length;
                 const canceled = unit.appointments.filter(a => a.status === 'canceled').length;
                 
+                // Calculate occupancy rate - assume max capacity is 30 if not specified
+                const maxCapacity = 30; // Default value
+                const occupancyRate = Math.round((total / maxCapacity) * 100);
+                
                 return (
-                  <TableRow key={unit.id}>
+                  <TableRow key={unit.name}>
                     <TableCell className="font-medium">{unit.name}</TableCell>
                     <TableCell className="text-center">{total}</TableCell>
                     <TableCell className="text-center">{confirmed}</TableCell>
