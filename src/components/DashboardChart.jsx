@@ -155,18 +155,14 @@ const DashboardChart = ({ type, data, title, description }) => {
                 data={data}
                 cx="50%"
                 cy="80%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={120}
-                fill="#ffffff"
-                dataKey="value"
-                stroke="#ffffff84"
-                strokeWidth={1}
-                strokeOpacity={0.1}
                 innerRadius={60}
                 paddingAngle={8}
                 startAngle={180}
                 endAngle={0}
+                labelLine={false}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                outerRadius={90}
+                dataKey="value"
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
