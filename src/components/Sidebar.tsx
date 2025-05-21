@@ -103,7 +103,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
             La Elvis Tech
           </h1>
         </div>
-        {!isCollapsed && <ThemeToggle />}
       </div>
 
       <div className="flex-1 overflow-y-auto py-4 space-y-2 px-2">
@@ -118,7 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
                 : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
             }`}
           >
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center px-2">
               <item.icon size={22} />
             </div>
             <span className="item-text ml-3">{item.name}</span>
@@ -135,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
             <ChevronLeft size={20} />
           )}
         </button>
-      
+
       <div className="p-4 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <div className="w-10 h-10 bg-lab-blue rounded-full flex items-center justify-center flex-shrink-0">

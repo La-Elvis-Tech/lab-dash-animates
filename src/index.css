@@ -102,7 +102,7 @@
   
   /* Custom scrollbar styling */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 8px; 
     height: 8px;
   }
   
@@ -121,3 +121,4 @@
     font-family: "Manrope", sans-serif;
   }
 }
+

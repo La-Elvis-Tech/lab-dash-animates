@@ -201,7 +201,7 @@ const DashboardChart = ({ type, data, title, description }) => {
               <Pie
                 data={data}
                 cx="50%"
-                cy="50%"
+                cy="80%"
                 innerRadius={40}
                 outerRadius={80}
                 paddingAngle={8}

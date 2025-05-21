@@ -232,7 +232,7 @@ const Inventory = () => {
         <CardContent className="p-4">
           <div className="flex flex-col gap-4">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1 text-gray-400" size={18} />
               <Input
                 placeholder="Buscar item..."
                 className="pl-10 w-full"

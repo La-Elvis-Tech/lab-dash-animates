@@ -8,13 +8,13 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="flex items-center justify-center p-2 rounded-md transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+      className="flex items-center justify-center p-2 rounded-md transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 "
       aria-label="Toggle theme"
     >
       {theme === "light" ? (
-        <Moon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all text-gray-700 dark:text-gray-300" />
+        <Moon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all text-gray-700 dark:text-gray-300 my-2 mx-3 " />
       ) : (
-        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:text-gray-300" />
+        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:text-gray-300 my-2 mx-3 " />
       )}
       <span className="sr-only">
         {theme === "light" ? "Switch to dark theme" : "Switch to light theme"}
