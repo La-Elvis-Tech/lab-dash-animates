@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import { gsap } from 'gsap';
 import Sidebar from './Sidebar.tsx';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useIsMobile } from '../hooks/use-mobile';
 
@@ -14,6 +14,7 @@ const Layout = () => {
   const mainContentRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const mobileHeaderRef = useRef<HTMLDivElement>(null);
   const animationInProgress = useRef(false);
 
   // Close sidebar when switching to mobile view
@@ -51,7 +52,7 @@ const Layout = () => {
           duration: 0.3
         });
         
-        // Sidebar animation for mobile
+        // Sidebar animation for mobile (slide from the left)
         gsap.to(sidebarRef.current, {
           x: isSidebarOpen ? '0%' : '-100%',
           duration: 0.3,
@@ -87,13 +88,16 @@ const Layout = () => {
     <div className="flex h-screen w-full transition-colors duration-300 relative bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:via-indigo-100/25">
       {/* Fixed mobile header */}
       {isMobile && (
-        <div className="fixed top-0 left-0 right-0 z-20 bg-white dark:bg-gray-900 shadow-sm">
+        <div 
+          ref={mobileHeaderRef}
+          className="fixed top-0 left-0 right-0 z-20 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:border-gray-700"
+        >
           <div className="flex items-center justify-between px-4 h-14">
             <div className="flex items-center">
               <button 
                 onClick={() => setIsSidebarOpen(true)} 
-                className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-                aria-label="Open sidebar"
+                className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label="Open menu"
               >
                 <Menu size={24} className="text-gray-700 dark:text-gray-300" />
               </button>
@@ -107,20 +111,39 @@ const Layout = () => {
       {/* Overlay for mobile sidebar */}
       <div 
         ref={overlayRef}
-        className="fixed inset-0 bg-black opacity-0 invisible z-20"
+        className="fixed inset-0 bg-black opacity-0 invisible z-40"
         onClick={() => setIsSidebarOpen(false)}
       />
       
-      {/* Sidebar */}
-      <div 
-        ref={sidebarRef}
-        className="fixed left-0 top-0 z-30 h-full"
-        style={{ 
-          transform: isMobile && !isSidebarOpen ? 'translateX(-100%)' : 'translateX(0)'
-        }}
-      >
-        <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
-      </div>
+      {/* Mobile Sidebar (as overlay) */}
+      {isMobile ? (
+        <div 
+          ref={sidebarRef}
+          className="fixed left-0 top-0 h-full z-50 w-[270px] transform -translate-x-full transition-transform duration-300 ease-in-out"
+        >
+          <div className="relative h-full">
+            <Sidebar isCollapsed={false} toggleSidebar={toggleSidebar} />
+            <button
+              className="absolute top-4 right-4 p-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              onClick={() => setIsSidebarOpen(false)}
+              aria-label="Close menu"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Desktop Sidebar */
+        <div 
+          ref={sidebarRef}
+          className="fixed left-0 top-0 z-30 h-full"
+          style={{ 
+            transform: 'translateX(0)'
+          }}
+        >
+          <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
+        </div>
+      )}
       
       {/* Main Content */}
       <div 

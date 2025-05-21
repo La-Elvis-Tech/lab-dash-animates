@@ -65,11 +65,20 @@ const DashboardChart = ({ type, data, title, description }) => {
     switch (type) {
       case 'bar':
         return (
-          <ResponsiveContainer width="100%" height={250} minHeight={150}>
-            <BarChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 5 }}>
+          <ResponsiveContainer width="100%" height={300} minHeight={200}>
+            <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
-              <XAxis dataKey="name" tick={{ fill: 'currentColor', fontSize: '10px' }} />
-              <YAxis tick={{ fill: 'currentColor', fontSize: '10px' }} />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+              />
+              <YAxis 
+                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+              />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
@@ -81,7 +90,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 }}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
-              <Legend wrapperStyle={{ fontSize: '10px' }} />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
               <Bar dataKey="value" fill="url(#barGradient)" />
               {data[0]?.value2 && <Bar dataKey="value2" fill="#1D2472" />}
               <defs>
@@ -95,11 +104,20 @@ const DashboardChart = ({ type, data, title, description }) => {
         );
       case 'line':
         return (
-          <ResponsiveContainer width="100%" height={250} minHeight={150}>
-            <LineChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.3} />
-              <XAxis dataKey="name" tick={{ fill: '#8B5CF6', fontSize: '10px' }} />
-              <YAxis tick={{ fill: '#8B5CF6', fontSize: '10px' }} />
+          <ResponsiveContainer width="100%" height={300} minHeight={200}>
+            <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+              />
+              <YAxis 
+                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+              />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
@@ -116,8 +134,8 @@ const DashboardChart = ({ type, data, title, description }) => {
                 dataKey="value" 
                 stroke="url(#lineGradient)" 
                 strokeWidth={2} 
-                dot={{ fill: '#8B5CF6', r: 3 }} 
-                activeDot={{ r: 5 }} 
+                dot={{ fill: '#8B5CF6', r: 4 }} 
+                activeDot={{ r: 6 }} 
               />
               {data[0]?.value2 && 
                 <Line 
@@ -125,7 +143,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                   dataKey="value2" 
                   stroke="#0EA5E9" 
                   strokeWidth={2} 
-                  dot={{ fill: '#0EA5E9', r: 3 }} 
+                  dot={{ fill: '#0EA5E9', r: 4 }} 
                 />
               }
               <defs>
@@ -139,11 +157,20 @@ const DashboardChart = ({ type, data, title, description }) => {
         );
       case 'area':
         return (
-          <ResponsiveContainer width="100%" height={250} minHeight={150}>
-            <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 5 }}>
+          <ResponsiveContainer width="100%" height={300} minHeight={200}>
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
-              <XAxis dataKey="name" tick={{ fill: 'currentColor', fontSize: '10px' }} />
-              <YAxis tick={{ fill: 'currentColor', fontSize: '10px' }} />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+              />
+              <YAxis 
+                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+              />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'rgb(31 41 55)',
@@ -155,7 +182,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 }}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
-              <Legend wrapperStyle={{ fontSize: '10px' }} />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
               <defs>
                 <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.8}/>
@@ -169,14 +196,14 @@ const DashboardChart = ({ type, data, title, description }) => {
         );
       case 'pie':
         return (
-          <ResponsiveContainer width="100%" height={250} minHeight={150}>
+          <ResponsiveContainer width="100%" height={300} minHeight={200}>
             <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 20 }}>
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={30}
-                outerRadius={60}
+                innerRadius={40}
+                outerRadius={80}
                 paddingAngle={8}
                 startAngle={180}
                 endAngle={0}
@@ -206,7 +233,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 layout="horizontal" 
                 verticalAlign="bottom" 
                 align="center"
-                wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
+                wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -224,8 +251,8 @@ const DashboardChart = ({ type, data, title, description }) => {
       className="bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
     >
       <div className="mb-3 sm:mb-6">
-        <h3 className="text-sm sm:text-base md:text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
-        <p className="text-xs text-gray-600 dark:text-gray-300">{description}</p>
+        <h3 className="text-sm sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{description}</p>
       </div>
       {renderChart()}
     </div>
