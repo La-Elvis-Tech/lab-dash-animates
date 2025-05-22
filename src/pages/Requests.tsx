@@ -182,7 +182,7 @@ const Requests: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Últimos Exames</h1>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Exames</h1>
       </div>
       
       <Card className="overflow-hidden dark:bg-gray-800 dark:text-gray-100">
@@ -191,12 +191,12 @@ const Requests: React.FC = () => {
             <div className="space-y-4">
               {/* Search input */}
               <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-3 h-4 w-4 " />
                 <Input
                   placeholder="Buscar por paciente, médico, tipo de exame..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 w-full border rounded-md bg-white dark:bg-neutral-800/80 font-normal"
                 />
               </div>
               
@@ -229,7 +229,7 @@ const Requests: React.FC = () => {
                 
                 {/* Type filter - responsive */}
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white">
                     <SelectValue placeholder="Tipo de exame" />
                   </SelectTrigger>
                   <SelectContent>
@@ -245,7 +245,7 @@ const Requests: React.FC = () => {
                 
                 {/* Unit filter - responsive */}
                 <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white">
                     <SelectValue placeholder="Unidade" />
                   </SelectTrigger>
                   <SelectContent>
@@ -261,7 +261,7 @@ const Requests: React.FC = () => {
                 
                 {/* Laboratory filter - responsive */}
                 <Select value={selectedLaboratory} onValueChange={setSelectedLaboratory}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white">
                     <SelectValue placeholder="Laboratório" />
                   </SelectTrigger>
                   <SelectContent>

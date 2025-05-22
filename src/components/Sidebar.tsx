@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   const navItems = [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, path: '/' },
     { id: 'inventory', name: 'Inventário', icon: Beaker, path: '/inventory' },
-    { id: 'requests', name: 'Últimos Exames', icon: ClipboardList, path: '/requests' },
+    { id: 'requests', name: 'Exames', icon: ClipboardList, path: '/requests' },
     { id: 'orders', name: 'Agendamentos', icon: Calendar, path: '/orders' },
     { id: 'reports', name: 'Relatórios', icon: BarChart3, path: '/reports' },
     { id: 'settings', name: 'Configurações', icon: Settings, path: '/settings' }

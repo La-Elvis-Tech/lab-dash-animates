@@ -66,6 +66,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
               cornerRadius={strokeWidth / 2}
               fill={railColor}
             />
+            
 
             {/* Arco colorido usando fillColor (com degradê opcional) */}
             <defs>
@@ -79,18 +80,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
               cornerRadius={strokeWidth / 2}
               fill="url(#gradGauge)"
             />
+            
 
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "rgb(31 41 55)",
-                borderColor: "rgb(55 65 81)",
-                borderRadius: "0.5rem",
-                color: "rgb(243 244 246)",
-                fontSize: "12px",
-                padding: "8px",
-              }}
-              itemStyle={{ color: "rgb(243 244 246)" }}
-            />
           </RadialBarChart>
         </ResponsiveContainer>
       </div>
