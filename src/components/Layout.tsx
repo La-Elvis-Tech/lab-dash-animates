@@ -41,7 +41,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen w-full transition-colors duration-300 relative bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:via-indigo-100/25">
+    <div className="flex h-screen w-full transition-colors duration-300 relative bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:from-gray-900 dark:via-indigo-200/25 dark:to-black/25">
       {/* Mobile Header */}
       {isMobile && (
         <div 
