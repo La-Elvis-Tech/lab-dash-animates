@@ -105,7 +105,7 @@ const DashboardChart = ({ type, data, title, description }) => {
         );
       case 'line':
         return (
-          <ResponsiveContainer width="100%" height={300} minHeight={200}>
+          <ResponsiveContainer width="100%" height={300} minHeight={200} minWidth={300}>
             <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
