@@ -91,7 +91,7 @@ const Dashboard: React.FC = () => {
 
       {/* Key metrics - Improved responsive grid with better breakpoints */}
       <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="dashboard-card bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-80 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-80 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-80 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -145,7 +145,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-80 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -165,7 +165,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Charts - Improved responsive layout with better breakpoints */}
-      <Card className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 bg-opacity border-0">
+      <Card className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 border-0">
         <CardContent className="dashboard-chart p-0">
           <DashboardChart 
             type="line" 
@@ -186,7 +186,7 @@ const Dashboard: React.FC = () => {
 
       {/* Items running low - Improved responsive table */}
       <div className="dashboard-chart">
-        <Card className="bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-20 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20">
+        <Card className="bg-white bg-opacity-80 border-neutral-300/60 border-opacity-20 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <div className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between mb-3 md:mb-4">
               <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">Itens em Baixo Estoque</h2>
