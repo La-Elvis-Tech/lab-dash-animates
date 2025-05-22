@@ -229,13 +229,13 @@ const Inventory = () => {
 
       {/* Filters - Improved for mobile */}
       <Card className="inventory-filters">
-        <CardContent className="p-4">
-          <div className="flex flex-col gap-4">
+        <CardContent className="p-4 border rounded-md bg-neutral-100/80 dark:bg-neutral-900/80">
+          <div className="flex flex-col gap-4 ">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1 text-gray-400" size={18} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1 text-gray-400 " size={18} />
               <Input
                 placeholder="Buscar item..."
-                className="pl-10 w-full"
+                className="pl-10 w-full border rounded-md bg-white dark:bg-neutral-800/80"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -251,7 +251,7 @@ const Inventory = () => {
                       className={`px-3 py-2 text-sm font-medium whitespace-nowrap ${
                         selectedCategory === category.id
                           ? 'bg-lab-blue text-white dark:bg-lab-blue/80'
-                          : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700' 
+                          : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-800/80 dark:text-gray-300 dark:hover:bg-gray-700' 
                       } rounded-md border border-gray-200 dark:border-gray-700 transition-colors`}
                       onClick={() => handleCategoryChange(category.id)}
                     >
@@ -261,7 +261,7 @@ const Inventory = () => {
                 </div>
               </div>
               
-              <Button className="flex items-center gap-2 whitespace-nowrap">
+              <Button className="flex items-center gap-2 whitespace-nowrap bg-neutral-950/90 dark:bg-gray-100/90">
                 <Plus size={16} />
                 <span className="hidden sm:inline">Novo Item</span>
                 <span className="sm:hidden">Novo</span>
@@ -277,7 +277,7 @@ const Inventory = () => {
           const stockDetails = getStockDetails(item.id);
           
           return (
-            <Card key={item.id} className="inventory-item overflow-hidden h-full">
+            <Card key={item.id} className="inventory-item overflow-hidden h-full bg-white dark:bg-neutral-900/50">
               <div 
                 className={`h-1 ${
                   item.status === 'low' ? 'bg-red-500' : 'bg-green-500'
@@ -332,7 +332,7 @@ const Inventory = () => {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button 
-                        className="w-full bg-neutral-200 hover:bg-blue-400 dark:bg-neutral-800 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white transition-colors"
+                        className="w-full bg-neutral-200 hover:bg-blue-400 dark:bg-neutral-950/60 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white transition-colors"
                       >
                         Ver Estoque
                       </Button>

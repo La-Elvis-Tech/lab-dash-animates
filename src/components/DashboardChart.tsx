@@ -1,6 +1,11 @@
 
 import React, { useRef, useEffect } from 'react';
-import { ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, RadialBar,
+  PolarAngleAxis,
+    RadarChart,
+    PolarGrid,
+  PolarAngleAxis as RadarAngleAxis,
+  Radar,} from 'recharts';
 import { gsap } from 'gsap';
 import { Progress } from '@/components/ui/progress';
 import GaugeChart from '@/components/ui/GaugeChart';
@@ -107,16 +112,16 @@ const DashboardChart = ({ type, data, title, description }) => {
       case 'line':
         return (
           <ResponsiveContainer width="100%" height={300} minHeight={200} minWidth={300}>
-            <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+            <LineChart data={data} margin={{ top: 10, right: 30, left:-30, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="name" 
-                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                tick={{ fill: 'currentColor', fontSize: '14px' }}
                 stroke="currentColor"
                 strokeOpacity={0.3}
               />
               <YAxis 
-                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                tick={{ fill: 'currentColor', fontSize: '14px' }}
                 stroke="currentColor"
                 strokeOpacity={0.3}
               />
@@ -135,8 +140,8 @@ const DashboardChart = ({ type, data, title, description }) => {
                 type="monotone" 
                 dataKey="value" 
                 stroke="url(#lineGradient)" 
-                strokeWidth={2} 
-                dot={{ fill: '#8B5CF6', r: 4 }} 
+                strokeWidth={3} 
+                dot={{ fill: '#1a0bf7ab', r: 4 }} 
                 activeDot={{ r: 6 }} 
               />
               {data[0]?.value2 && 
@@ -145,13 +150,13 @@ const DashboardChart = ({ type, data, title, description }) => {
                   dataKey="value2" 
                   stroke="#0EA5E9" 
                   strokeWidth={2} 
-                  dot={{ fill: '#0EA5E9', r: 4 }} 
+                  dot={{ fill: '#1a0bf7ab', r: 4 }} 
                 />
               }
               <defs>
                 <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#8B5CF6"/>
-                  <stop offset="100%" stopColor="#D946EF"/>
+                  <stop offset="0%" stopColor="#1a0bf7ab"/>
+                  <stop offset="100%" stopColor="#1a0bf7ab"/>
                 </linearGradient>
               </defs>
             </LineChart>
@@ -187,8 +192,8 @@ const DashboardChart = ({ type, data, title, description }) => {
               <Legend wrapperStyle={{ fontSize: '12px' }} />
               <defs>
                 <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.9}/>
-                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.1}/>
+                  <stop offset="0%" stopColor="#1a0bf7ab" stopOpacity={0.9}/>
+                  <stop offset="95%" stopColor="#1a0bf7ab" stopOpacity={0.1}/>
                 </linearGradient>
               </defs>
               <Area type="monotone" dataKey="value" stroke="#ffffff" fillOpacity={1} fill="url(#areaGradient)" strokeWidth={2} strokeOpacity={0.4} />
@@ -196,6 +201,51 @@ const DashboardChart = ({ type, data, title, description }) => {
             </AreaChart>
           </ResponsiveContainer>
         );
+      case 'radar':
+        return (
+          <ResponsiveContainer width="100%" height={300} minHeight={200}>
+            <RadarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+              <PolarGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
+              <RadarAngleAxis
+                dataKey="name"
+                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+              />
+              <YAxis
+                tick={false}
+                axisLine={false}
+                tickLine={false}
+                domain={[0, 'dataMax']}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgb(31 41 55)',
+                  borderColor: 'rgb(55 65 81)',
+                  borderRadius: '0.5rem',
+                  color: 'rgb(243 244 246)',
+                  fontSize: '12px',
+                  padding: '8px',
+                }}
+                itemStyle={{ color: 'rgb(243 244 246)' }}
+              />
+              <Radar
+                name={title}
+                dataKey="value"
+                stroke="url(#radarGradient)"
+                fill="url(#radarGradient)"
+                fillOpacity={0.6}
+              />
+              <defs>
+                <linearGradient id="radarGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#8B5CF6" />
+                  <stop offset="100%" stopColor="#D946EF" />
+                </linearGradient>
+              </defs>
+              <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+            </RadarChart>
+          </ResponsiveContainer>
+        )
       case 'pie':
         return (
           <ResponsiveContainer width="100%" height={300} minHeight={200}>
@@ -252,7 +302,7 @@ const DashboardChart = ({ type, data, title, description }) => {
   return (
     <div 
       ref={chartRef}
-      className="bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 dark:bg-neutral-900/50"
+      className="bg-white bg-opacity-90 p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 dark:bg-neutral-900/50"
     >
       <div className="mb-3 sm:mb-6">
         <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>

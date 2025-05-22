@@ -222,7 +222,7 @@ const Reports = () => {
                 <div className="space-y-4 sm:space-y-6">
                   <div className="w-full overflow-hidden">
                     <DashboardChart
-                      type="area"
+                      type="bar"
                       data={weeklyExpenses}
                       title="Despesas Semanais"
                       description="Gastos previstos para os próximos 7 dias"
@@ -361,7 +361,7 @@ const Reports = () => {
         <CardContent className="p-3 sm:p-6">
           <div className="w-full overflow-hidden">
             <DashboardChart
-              type="line"
+              type="area"
               data={weeklyExpenses}
               title="Projeção Semanal"
               description="Previsão de gastos para os próximos dias"

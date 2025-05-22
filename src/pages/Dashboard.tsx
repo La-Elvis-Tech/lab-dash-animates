@@ -130,7 +130,7 @@ const Dashboard: React.FC = () => {
 
       {/* Key metrics - Improved responsive grid with better breakpoints */}
       <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="dashboard-card bg-white bg-opacity-80 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -152,7 +152,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-80 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -174,7 +174,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-80 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -196,7 +196,7 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-80 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+        <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
             <div className="flex items-center justify-between">
               <div>
@@ -221,30 +221,32 @@ const Dashboard: React.FC = () => {
 
       {/* Charts - Improved responsive layout with better breakpoints */}
       <Card className="grid grid-cols-1 md:grid-cols-1 gap-4 md:gap-6 bg-opacity border-0">
+        <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/60">
+            <h1 className="p-6 text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">Estoque Geral</h1>
+          <CardContent className="grid grid-cols-1 xl:grid-cols-4 md:grid-cols-2 gap-4 md:gap-6">
+            {inventoryPercent.map((item) => (
+              <div key={item.name} className="dashboard-chart flex flex-col justify-center items-center my-4 p-8 rounded-md">
+                <p className="pb-6">{item.name}</p>
+                <GaugeChart title={item.name} value={item.value} size={200} />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
         <Card className="bg-opacity">
           <CardContent className="dashboard-chart p-0">
             <DashboardChart
-              type="area"
+              type="line"
               data={consumptionData}
               title="Consumo de Itens"
               description="Itens consumidos nos últimos 7 meses"
             />
           </CardContent>
         </Card>
-        <Card className="bg-opacity">
-          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-            {inventoryPercent.map((item) => (
-              <div key={item.name} className="dashboard-chart flex justify-center">
-                <GaugeChart title={item.name} value={item.value} size={200} />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
       </Card>
 
       {/* Items running low - Improved responsive table */}
       <div className="dashboard-chart">
-        <Card className="bg-white bg-opacity-80 border-neutral-300/60 border-opacity-20 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+        <Card className="bg-white bg-opacity-90 border-neutral-300/60 border-opacity-20 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <div className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between mb-3 md:mb-4">
               <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
