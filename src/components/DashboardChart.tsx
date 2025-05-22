@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from 'react';
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { gsap } from 'gsap';
 import { Progress } from '@/components/ui/progress';
+import GaugeChart from '@/components/ui/GaugeChart';
 
 // Define a consistent color palette for all charts
 // eslint-disable-next-line react-refresh/only-export-components
@@ -96,8 +97,8 @@ const DashboardChart = ({ type, data, title, description }) => {
               {data[0]?.value2 && <Bar dataKey="value2" fill="#1D2472" />}
               <defs>
                 <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.8}/>
-                  <stop offset="100%" stopColor="#D946EF" stopOpacity={0.6}/>
+                  <stop offset="0%" stopColor="#6842c2" stopOpacity={0.9}/>
+                  <stop offset="100%" stopColor="#8B5CF6" stopOpacity={0.3}/>
                 </linearGradient>
               </defs>
             </BarChart>
@@ -159,7 +160,7 @@ const DashboardChart = ({ type, data, title, description }) => {
       case 'area':
         return (
           <ResponsiveContainer width="100%" height={300} minHeight={200}>
-            <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="name" 
@@ -186,11 +187,11 @@ const DashboardChart = ({ type, data, title, description }) => {
               <Legend wrapperStyle={{ fontSize: '12px' }} />
               <defs>
                 <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.9}/>
+                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.1}/>
                 </linearGradient>
               </defs>
-              <Area type="monotone" dataKey="value" stroke="#8B5CF6" fillOpacity={1} fill="url(#areaGradient)" />
+              <Area type="monotone" dataKey="value" stroke="#ffffff" fillOpacity={1} fill="url(#areaGradient)" strokeWidth={2} strokeOpacity={0.4} />
               {data[0]?.value2 && <Area type="monotone" dataKey="value2" stroke="#0EA5E9" fill="#0EA5E9" fillOpacity={0.3} />}
             </AreaChart>
           </ResponsiveContainer>
@@ -241,6 +242,8 @@ const DashboardChart = ({ type, data, title, description }) => {
         );
       case 'progress':
         return renderProgressBars();
+      case 'gauge':
+        return <GaugeChart value={data[0].value} size={200} title={title} />;
       default:
         return null;
     }
@@ -249,11 +252,11 @@ const DashboardChart = ({ type, data, title, description }) => {
   return (
     <div 
       ref={chartRef}
-      className="bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white  border-opacity-80 dark:bg-neutral-900/50"
+      className="bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 dark:bg-neutral-900/50"
     >
       <div className="mb-3 sm:mb-6">
-        <h3 className="text-sm sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">{description}</p>
+        <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">{description}</p>
       </div>
       {renderChart()}
     </div>

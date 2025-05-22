@@ -222,29 +222,29 @@ const Reports = () => {
                 <div className="space-y-4 sm:space-y-6">
                   <div className="w-full overflow-hidden">
                     <DashboardChart
-                      type="bar"
+                      type="area"
                       data={weeklyExpenses}
                       title="Despesas Semanais"
                       description="Gastos previstos para os próximos 7 dias"
                     />
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-4">
-                    <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-4 ">
+                    <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
                       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Total de despesas previstas</p>
                       <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                         R$ {totalWeeklyExpenses.toFixed(2)}
                       </p>
                     </div>
-                    
-                    <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
+
+                    <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
                       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">Média diária</p>
                       <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                         R$ {(totalWeeklyExpenses / 7).toFixed(2)}
                       </p>
                     </div>
                     
-                    <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
+                    <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
                       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">N° de agendamentos</p>
                       <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                         {mockAppointments.length}
