@@ -166,7 +166,7 @@ const Dashboard: React.FC = () => {
 
       {/* Charts - Improved responsive layout with better breakpoints */}
       <Card className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 bg-opacity border-0">
-        <CardContent className="dashboard-chart">
+        <CardContent className="dashboard-chart p-0">
           <DashboardChart 
             type="line" 
             data={consumptionData} 
@@ -174,7 +174,7 @@ const Dashboard: React.FC = () => {
             description="Itens consumidos nos últimos 7 meses" 
           />
         </CardContent>
-        <CardContent className="dashboard-chart">
+        <CardContent className="dashboard-chart p-0">
           <DashboardChart 
             type="pie" 
             data={inventoryData} 
