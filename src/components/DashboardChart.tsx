@@ -249,7 +249,7 @@ const DashboardChart = ({ type, data, title, description }) => {
   return (
     <div 
       ref={chartRef}
-      className="bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white bg-opacity-80 border-2 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-200 dark:border-2 dark:border-opacity-20"
+      className="bg-white p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 bg-white  border-opacity-80 dark:bg-neutral-900/50"
     >
       <div className="mb-3 sm:mb-6">
         <h3 className="text-sm sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>

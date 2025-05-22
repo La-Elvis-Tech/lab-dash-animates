@@ -165,7 +165,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Charts - Improved responsive layout with better breakpoints */}
-      <Card className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 border-0">
+      <Card className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 bg-opacity border-0">
         <CardContent className="dashboard-chart p-0">
           <DashboardChart 
             type="line" 
