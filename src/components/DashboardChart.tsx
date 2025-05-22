@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { Progress } from '@/components/ui/progress';
 
 // Define a consistent color palette for all charts
+// eslint-disable-next-line react-refresh/only-export-components
 export const CHART_COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981', '#6366F1', '#EC4899', '#F59E0B'];
 
 const DashboardChart = ({ type, data, title, description }) => {
@@ -65,8 +66,8 @@ const DashboardChart = ({ type, data, title, description }) => {
     switch (type) {
       case 'bar':
         return (
-          <ResponsiveContainer width="100%" height={300} minHeight={200}>
-            <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+          <ResponsiveContainer width="100%" height={400} minHeight={200}>
+            <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }} >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="name" 
@@ -91,7 +92,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
               <Legend wrapperStyle={{ fontSize: '12px' }} />
-              <Bar dataKey="value" fill="url(#barGradient)" />
+              <Bar dataKey="value" fill="url(#barGradient)" radius={[10, 10, 0, 0]} />
               {data[0]?.value2 && <Bar dataKey="value2" fill="#1D2472" />}
               <defs>
                 <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
@@ -105,7 +106,7 @@ const DashboardChart = ({ type, data, title, description }) => {
       case 'line':
         return (
           <ResponsiveContainer width="100%" height={300} minHeight={200}>
-            <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+            <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="name" 
@@ -158,7 +159,7 @@ const DashboardChart = ({ type, data, title, description }) => {
       case 'area':
         return (
           <ResponsiveContainer width="100%" height={300} minHeight={200}>
-            <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+            <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="name" 

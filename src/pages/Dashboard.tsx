@@ -165,24 +165,24 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Charts - Improved responsive layout with better breakpoints */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-        <div className="dashboard-chart">
+      <Card className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 bg-opacity border-0">
+        <CardContent className="dashboard-chart">
           <DashboardChart 
             type="line" 
             data={consumptionData} 
             title="Consumo de Itens" 
             description="Itens consumidos nos últimos 7 meses" 
           />
-        </div>
-        <div className="dashboard-chart">
+        </CardContent>
+        <CardContent className="dashboard-chart">
           <DashboardChart 
             type="pie" 
             data={inventoryData} 
             title="Distribuição de Inventário" 
             description="Distribuição dos itens por categoria" 
           />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Items running low - Improved responsive table */}
       <div className="dashboard-chart">

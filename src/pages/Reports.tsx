@@ -351,8 +351,8 @@ const Reports = () => {
         </Card>
       </div>
 
-      <Card className="dark:bg-gray-800/50 dark:text-gray-100 bg-gradient-to-br from-white to-green-50/30 dark:from-gray-800/80 dark:to-green-900/20">
-        <CardHeader className="p-4 sm:p-6 bg-gradient-to-r from-green-500/10 to-teal-500/10 dark:from-green-500/5 dark:to-teal-500/5">
+      <Card className="dark:bg-gray-800/50 dark:text-gray-100">
+        <CardHeader className="p-4 sm:p-6 ">
           <CardTitle className="text-lg sm:text-xl">Tendências de Despesas</CardTitle>
           <CardDescription className="dark:text-gray-300">
             Análise de tendências de gastos ao longo do tempo
