@@ -132,21 +132,21 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
         <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-2">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
                   Total de Itens
                 </p>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-gray-700 dark:text-white">
+                <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
                   1,284
                 </h3>
-                <p className="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
+                <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
                   <TrendingUp size={12} className="mr-1" />
                   +2.5% este mês
                 </p>
               </div>
-              <div className="bg-lab-lightBlue dark:bg-blue-900 p-2 sm:p-3 rounded-full">
-                <Package className="text-lab-blue dark:text-blue-300 h-4 w-4 sm:h-5 sm:w-5" />
+              <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
+                <Package className="text-lab-blue dark:text-blue-300 h-7 w-7 sm:h-6 sm:w-6" />
               </div>
             </div>
           </CardContent>
@@ -154,21 +154,21 @@ const Dashboard: React.FC = () => {
 
         <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-2">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
                   Consumo Mensal
                 </p>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-gray-700 dark:text-white">
+                <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
                   187
                 </h3>
-                <p className="text-xs text-red-600 dark:text-red-400 flex items-center mt-1">
+                <p className="text-sm text-red-600 dark:text-red-400 flex items-center mt-1">
                   <TrendingDown size={12} className="mr-1" />
                   -1.8% este mês
                 </p>
               </div>
-              <div className="bg-lab-lightBlue dark:bg-blue-900 p-2 sm:p-3 rounded-full">
-                <Activity className="text-lab-blue dark:text-blue-300 h-4 w-4 sm:h-5 sm:w-5" />
+              <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
+                <Activity className="text-lab-blue dark:text-blue-300  h-7 w-7 sm:h-6 sm:w-6" />
               </div>
             </div>
           </CardContent>
@@ -176,21 +176,21 @@ const Dashboard: React.FC = () => {
 
         <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-2">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
                   Reagentes
                 </p>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-gray-700 dark:text-white">
+                <h3 className="text-2xl md:text-3xl md:text-2xl font-bold mt-1 text-gray-700 dark:text-white">
                   362
                 </h3>
-                <p className="text-xs text-green-600 dark:text-green-400 flex items-center mt-1">
+                <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
                   <TrendingUp size={12} className="mr-1" />
                   +5.2% este mês
                 </p>
               </div>
-              <div className="bg-lab-lightBlue dark:bg-blue-900 p-2 sm:p-3 rounded-full">
-                <Beaker className="text-lab-blue dark:text-blue-300 h-4 w-4 sm:h-5 sm:w-5" />
+              <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
+                <Beaker className="text-lab-blue dark:text-blue-300  h-7 w-7 sm:h-6 sm:w-6" />
               </div>
             </div>
           </CardContent>
@@ -198,21 +198,21 @@ const Dashboard: React.FC = () => {
 
         <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-2">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
                   Em Alerta
                 </p>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-gray-700 dark:text-white">
+                <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
                   12
                 </h3>
-                <p className="text-xs text-yellow-600 dark:text-yellow-400 flex items-center mt-1">
+                <p className="text-sm text-yellow-600 dark:text-yellow-400 flex items-center mt-1">
                   <AlertCircle size={12} className="mr-1" />
                   Requer atenção
                 </p>
               </div>
-              <div className="bg-red-100 dark:bg-red-900 p-2 sm:p-3 rounded-full">
-                <AlertCircle className="text-red-600 dark:text-red-300 h-4 w-4 sm:h-5 sm:w-5" />
+              <div className="bg-red-100 dark:bg-red-900/70 p-2 sm:p-3 rounded-full">
+                <AlertCircle className="text-red-600   h-7 w-7 sm:h-6 sm:w-6" />
               </div>
             </div>
           </CardContent>
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
               </h2>
               <Link
                 to="/inventory"
-                className="text-sm text-lab-blue dark:text-blue-300 hover:underline"
+                className="text-xs sm:text-sm px-3 text-lab-blue dark:text-blue-300 hover:underline"
               >
                 Ver Todos
               </Link>
@@ -299,7 +299,7 @@ const Dashboard: React.FC = () => {
                         <td className="py-2 sm:py-3 text-xs sm:text-sm dark:text-gray-300 text-gray-800 text-right">
                           {item.minStock} {item.unit}
                         </td>
-                        <td className="py-2 sm:py-3 text-center">
+                        <td className="py-2 sm:py-3 px-2 text-center">
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300">
                             Crítico
                           </span>

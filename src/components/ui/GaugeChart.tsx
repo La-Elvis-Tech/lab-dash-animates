@@ -22,8 +22,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
   size = 200,
   strokeWidth = 60,
   title = "Percent",
-  railColor = "#0000001f",
-  fillColor = "#1a0bf7ab",
+  railColor = "#66666634",
 }) => {
   const data = [{ name: title, value }];
 
@@ -37,8 +36,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
         relative 
         flex items-center justify-center 
         rounded-full shadow-lg
-        bg-white dark:bg-neutral-900/50
-        text-blue-400 dark:text-blue-500
+        bg-white dark:bg-neutral-900/30
       "
       style={{ width: size, height: size }}
     >
@@ -71,8 +69,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
             {/* Arco colorido usando fillColor (com degradê opcional) */}
             <defs>
               <linearGradient id="gradGauge" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor={fillColor} stopOpacity={1} />
-                <stop offset="100%" stopColor={fillColor} stopOpacity={0.5} />
+                <stop offset="0%" stopColor="#c6c3f1eb" stopOpacity={1} />
+                <stop offset="100%" stopColor="#1b0bf7f4" stopOpacity={0.5} />
               </linearGradient>
             </defs>
             <RadialBar
