@@ -1,94 +1,108 @@
-
+// src/components/ui/GaugeChart.tsx
 import React from "react";
 import {
   RadialBarChart,
   RadialBar,
   PolarAngleAxis,
-  Legend,
-  Tooltip,
   ResponsiveContainer,
+  Tooltip,
 } from "recharts";
 
 interface GaugeChartProps {
   value: number;
   size?: number;
+  strokeWidth?: number;
   title?: string;
+  railColor?: string;  // cor do trilho (fundo)
+  fillColor?: string;  // cor do arco preenchido
 }
 
 const GaugeChart: React.FC<GaugeChartProps> = ({
   value,
-  size = 250,
+  size = 200,
+  strokeWidth = 60,
   title = "Percent",
+  railColor = "#0000001f",
+  fillColor = "#1a0bf7ab",
 }) => {
   const data = [{ name: title, value }];
 
+  // converte strokeWidth para % de raio interno
+  const outerRadius = 125;
+  const innerRadius = outerRadius - (strokeWidth / size) * 110;
+
   return (
-    <div style={{ position: "relative", width: size, height: size }}>
-    <ResponsiveContainer width="100%" >
-      <RadialBarChart
-        width={size}
-        height={size}
-        cx="50%"
-        cy="50%"
-        innerRadius="90%"
-        outerRadius="120%"
-        barSize={15}
-        data={data}
-        startAngle={90}
-        endAngle={-270}
-      >
-        <PolarAngleAxis
-          type="number"
-          domain={[0, 100]}
-          angleAxisId={0}
-          tick={false}
-        />
-        {/* trilho de fundo */}
-        <RadialBar
-          background
-          dataKey="value"
-          cornerRadius={15}
-          fill="#e0e0e0"
-        />
-        {/* barra com degradê */}
-        <defs>
-          <linearGradient id="gradGauge" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#b6bff1" stopOpacity={1} />
-            <stop offset="100%" stopColor="#3d30f3" stopOpacity={1} />
-          </linearGradient>
-        </defs>
-        <RadialBar dataKey="value" cornerRadius={15} fill="url(#gradGauge)" />
+    <div
+      className="
+        relative 
+        flex items-center justify-center 
+        rounded-full shadow-lg
+        bg-white dark:bg-neutral-900/50
+        text-blue-400 dark:text-blue-500
+      "
+      style={{ width: size, height: size }}
+    >
+      <div className="absolute inset-0 rounded-full overflow-hidden">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadialBarChart
+            cx="50%" cy="50%"
+            innerRadius={`${innerRadius}%`}
+            outerRadius={`${outerRadius}%`}
+            barSize={strokeWidth}
+            data={data}
+            startAngle={90}
+            endAngle={-270}
+          >
+            <PolarAngleAxis
+              type="number"
+              domain={[0, 100]}
+              angleAxisId={0}
+              tick={false}
+            />
 
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "rgb(31 41 55)",
-            borderColor: "rgb(55 65 81)",
-            borderRadius: "0.5rem",
-            color: "rgb(243 244 246)",
-            fontSize: "12px",
-            padding: "8px",
-          }}
-          itemStyle={{ color: "rgb(243 244 246)" }}
-        />
-      </RadialBarChart>
-    </ResponsiveContainer>
+            {/* Trilho de fundo usando railColor */}
+            <RadialBar
+              dataKey={() => 100}
+              cornerRadius={strokeWidth / 2}
+              fill={railColor}
+            />
 
-      {/* círculo de fundo */}
-      {/* texto central */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -60%)",
-          textAlign: "center",
-          pointerEvents: "none",
-        }}
-      >
-        <div className="text-sm text-gray-500 dark:text-gray-400">{title}</div>
-        <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            {/* Arco colorido usando fillColor (com degradê opcional) */}
+            <defs>
+              <linearGradient id="gradGauge" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor={fillColor} stopOpacity={1} />
+                <stop offset="100%" stopColor={fillColor} stopOpacity={0.5} />
+              </linearGradient>
+            </defs>
+            <RadialBar
+              dataKey="value"
+              cornerRadius={strokeWidth / 2}
+              fill="url(#gradGauge)"
+            />
+
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "rgb(31 41 55)",
+                borderColor: "rgb(55 65 81)",
+                borderRadius: "0.5rem",
+                color: "rgb(243 244 246)",
+                fontSize: "12px",
+                padding: "8px",
+              }}
+              itemStyle={{ color: "rgb(243 244 246)" }}
+            />
+          </RadialBarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Texto central */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {title}
+        </span>
+        <span className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           {value}%
-        </div>
+        </span>
       </div>
     </div>
   );
