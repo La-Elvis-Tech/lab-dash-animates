@@ -185,7 +185,7 @@ const Requests: React.FC = () => {
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Exames</h1>
       </div>
       
-      <Card className="overflow-hidden dark:bg-gray-800 dark:text-gray-100">
+      <Card className="overflow-hidden dark:bg-gray-900 dark:text-gray-100">
         <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700 p-4">
           <CardTitle className="text-base md:text-xl">
             <div className="space-y-4">
@@ -196,18 +196,18 @@ const Requests: React.FC = () => {
                   placeholder="Buscar por paciente, médico, tipo de exame..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-full border rounded-md bg-white dark:bg-neutral-800/80 font-normal"
+                  className="pl-10 w-full border rounded-md bg-white dark:bg-gray-900/80 font-normal"
                 />
               </div>
               
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {/* Date filter */}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "justify-start text-left font-normal text-xs md:text-sm h-9",
+                        "justify-start text-left font-normal text-xs md:text-sm h-9 text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900",
                         !selectedDate && "text-muted-foreground"
                       )}
                       size="sm"
@@ -229,7 +229,7 @@ const Requests: React.FC = () => {
                 
                 {/* Type filter - responsive */}
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
                     <SelectValue placeholder="Tipo de exame" />
                   </SelectTrigger>
                   <SelectContent>
@@ -245,7 +245,7 @@ const Requests: React.FC = () => {
                 
                 {/* Unit filter - responsive */}
                 <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
                     <SelectValue placeholder="Unidade" />
                   </SelectTrigger>
                   <SelectContent>
@@ -261,7 +261,7 @@ const Requests: React.FC = () => {
                 
                 {/* Laboratory filter - responsive */}
                 <Select value={selectedLaboratory} onValueChange={setSelectedLaboratory}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
                     <SelectValue placeholder="Laboratório" />
                   </SelectTrigger>
                   <SelectContent>
@@ -279,7 +279,7 @@ const Requests: React.FC = () => {
                 <Button 
                   variant="outline" 
                   onClick={resetFilters}
-                  className="whitespace-nowrap text-xs md:text-sm h-9"
+                  className="whitespace-nowrap text-xs md:text-sm h-9 bg-gray-300/50 dark:bg-gray-900"
                   size="sm"
                 >
                   Limpar filtros
@@ -289,7 +289,7 @@ const Requests: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-0 pt-0">
-          <div className="p-3 md:p-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div className="p-3 md:py-4 px-6 bg-gray-200 dark:bg-gray-950/30 border-b border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
               <span className="text-xs md:text-sm text-gray-500 dark:text-gray-300">
                 Exames encontrados: <strong>{filteredExams.length}</strong>
@@ -302,7 +302,7 @@ const Requests: React.FC = () => {
             </div>
           </div>
           
-          <ScrollArea className="h-[400px] md:h-[500px]">
+          <ScrollArea className="h-[400px] md:h-[500px] bg-white dark:bg-gray-800">
             <div className="w-full min-w-[700px] md:min-w-[1000px]">
               <Table>
                 <TableHeader>

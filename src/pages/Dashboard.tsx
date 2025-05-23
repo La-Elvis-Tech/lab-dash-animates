@@ -220,9 +220,9 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Charts - Improved responsive layout with better breakpoints */}
-      <Card className="grid grid-cols-1 md:grid-cols-1 gap-4 md:gap-6 bg-opacity border-0">
-        <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/60">
-            <h1 className="px-6 pt-6 text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">Estoque Geral</h1>
+      <Card className=" grid grid-cols-1 md:grid-cols-1 gap-4 md:gap-6 bg-opacity border-0">
+        <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart">
+            <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">Estoque Geral</h1>
             <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">Itens disponíveis no estoque</p>
           <CardContent className="grid grid-cols-1 xl:grid-cols-4 md:grid-cols-2 gap-4 md:gap-6">
             {inventoryPercent.map((item) => (
