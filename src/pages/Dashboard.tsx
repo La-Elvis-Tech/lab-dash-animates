@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, } from "react";
 import { gsap } from "gsap";
 import DashboardChart from "@/components/DashboardChart.tsx";
 import GaugeChart from "@/components/ui/GaugeChart";
@@ -167,7 +167,7 @@ const Dashboard: React.FC = () => {
       </div>
       {/* Key metrics - Improved responsive grid with better breakpoints */}
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="w-full lg:w-[65%]">
+        <div className="w-full lg:w-[55%] xl:w-[70%]">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
             <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
               <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
@@ -220,7 +220,7 @@ const Dashboard: React.FC = () => {
                     <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
                       Reagentes
                     </p>
-                    <h3 className="text-2xl md:text-3xl md:text-2xl font-bold mt-1 text-gray-700 dark:text-white">
+                    <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
                       362
                     </h3>
                     <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
@@ -264,14 +264,36 @@ const Dashboard: React.FC = () => {
           <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
             Itens disponíveis no estoque
           </p>
-          <CardContent className="grid grid-cols-1 xl:grid-cols-4 md:grid-cols-2 gap-4 md:gap-6">
+          <CardContent className="dashboard-chart grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
             {inventoryPercent.map((item) => (
-              <div
-                key={item.name}
-                className="dashboard-chart flex flex-col justify-center items-center my-4 p-4 rounded-md"
-              >
-                <GaugeChart title={item.name} value={item.value} size={200} />
+              <div>
+                <div className="block sm:inline lg:hidden">
+                  <div
+                    key={item.name}
+                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
+                  >
+                    <GaugeChart title={item.name} value={item.value} size={180} />
+                  </div>
+                </div>
+                <div className="hidden lg:inline xl:hidden ">
+                  <div
+                    key={item.name}
+                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
+                  >
+                    <GaugeChart title={item.name} value={item.value} size={180} />
+                  </div>
+                </div>
+                <div className="hidden xl:inline">
+                  <div
+                    key={item.name}
+                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
+                  >
+                    <GaugeChart title={item.name} value={item.value} size={200} />
+                  </div>
+                </div>
               </div>
+              
+              
             ))}
           </CardContent>
         </Card>
@@ -279,7 +301,7 @@ const Dashboard: React.FC = () => {
 
         {/* Recent Activity */}
 
-        <div className=" max-h-auto w-full lg:w-[35%]">
+        <div className=" dashboard-chart max-h-auto w-full lg:w-[45%] xl:w-[30%]">
           <div className="bg-white bg-opacity-90 dark:bg-neutral-900/50 rounded-2xl shadow-lg p-6">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
@@ -291,16 +313,16 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Área scrollable */}
-            <div className="max-h-[536px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+            <div className=" dashboard-chart md:mah-h-[800px] xl:max-h-[520px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
               <div className="space-y-3">
                 {activities.map((activity, index) => (
                   <div
                     key={index}
-                    className="rounded-xl bg-gray-200/70 dark:bg-gray-800 overflow-hidden"
+                    className="rounded-xl bg-gray-100/70 dark:bg-gray-800 overflow-hidden"
                   >
                     <button
                       onClick={() => toggleAccordion(index)}
-                      className="w-full p-4 flex items-center justify-between gap-4 hover:bg-gray-300/80 dark:hover:bg-gray-600 transition-colors"
+                      className="w-full p-4 flex items-center justify-between gap-4 hover:bg-gray-200/60 dark:hover:bg-gray-600 transition-colors"
                     >
                       <div className="flex items-center gap-4">
                         <div className="p-2 bg-lab-lightBlue dark:bg-gray-600 rounded-lg text-blue-600 dark:text-blue-300">
@@ -334,7 +356,7 @@ const Dashboard: React.FC = () => {
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
-                          className="px-2 pt-4 bg-gray-100 dark:bg-neutral-900/40"
+                          className="px-2 pt-4 bg-gray-100/90 dark:bg-neutral-900/40"
                         >
                           <div className="pl-2 xl:pl-4 border-t pb-4 space-y-2 overflow-x-auto whitespace-nowrap">
                             {activity.description && (
