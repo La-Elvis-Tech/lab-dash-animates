@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import DashboardChart from "@/components/DashboardChart.tsx";
 import GaugeChart from "@/components/ui/GaugeChart";
@@ -11,8 +11,15 @@ import {
   AlertCircle,
   Package,
   Beaker,
+  CalendarCheck,
+  Stethoscope,
+  Pill,
+  ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { recentActivity } from "@/data/recentActivity";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ConsumptionData {
   name: string;
@@ -114,6 +121,37 @@ const Dashboard: React.FC = () => {
     },
   ];
 
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [activities] = useState(recentActivity);
+
+  const toggleAccordion = (index) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
+  const getIcon = (title) => {
+    switch (title) {
+      case "Agendamento":
+        return <CalendarCheck className="w-5 h-5" />;
+      case "Exame":
+        return <Stethoscope className="w-5 h-5" />;
+      case "Reposição":
+        return <Pill className="w-5 h-5" />;
+      default:
+        return <CalendarCheck className="w-5 h-5" />;
+    }
+  };
+  const formatDateLabel = (dateString) => {
+    const today = new Date();
+    const [day, month, year] = dateString.split("/");
+    const activityDate = new Date(`${year}-${month}-${day}`);
+
+    const diffTime = today - activityDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return "Hoje";
+    if (diffDays === 1) return "Ontem";
+    return activityDate.toLocaleDateString("pt-BR", { weekday: "long" });
+  };
   return (
     <div
       ref={dashboardRef}
@@ -127,111 +165,231 @@ const Dashboard: React.FC = () => {
           Visão geral do consumo de itens laboratoriais
         </p>
       </div>
-
       {/* Key metrics - Improved responsive grid with better breakpoints */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
-          <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-            <div className="flex items-center justify-between px-2">
-              <div>
-                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
-                  Total de Itens
-                </p>
-                <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
-                  1,284
-                </h3>
-                <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
-                  <TrendingUp size={12} className="mr-1" />
-                  +2.5% este mês
-                </p>
-              </div>
-              <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
-                <Package className="text-lab-blue dark:text-blue-300 h-7 w-7 sm:h-6 sm:w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="w-full lg:w-[65%]">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
+            <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+              <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
+                <div className="flex items-center justify-between px-2">
+                  <div>
+                    <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+                      Total de Itens
+                    </p>
+                    <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
+                      1,284
+                    </h3>
+                    <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
+                      <TrendingUp size={12} className="mr-1" />
+                      +2.5% este mês
+                    </p>
+                  </div>
+                  <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
+                    <Package className="text-lab-blue dark:text-blue-300 h-7 w-7 sm:h-6 sm:w-6" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
-          <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-            <div className="flex items-center justify-between px-2">
-              <div>
-                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
-                  Consumo Mensal
-                </p>
-                <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
-                  187
-                </h3>
-                <p className="text-sm text-red-600 dark:text-red-400 flex items-center mt-1">
-                  <TrendingDown size={12} className="mr-1" />
-                  -1.8% este mês
-                </p>
-              </div>
-              <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
-                <Activity className="text-lab-blue dark:text-blue-300  h-7 w-7 sm:h-6 sm:w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+              <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
+                <div className="flex items-center justify-between px-2">
+                  <div>
+                    <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+                      Consumo Mensal
+                    </p>
+                    <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
+                      187
+                    </h3>
+                    <p className="text-sm text-red-600 dark:text-red-400 flex items-center mt-1">
+                      <TrendingDown size={12} className="mr-1" />
+                      -1.8% este mês
+                    </p>
+                  </div>
+                  <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
+                    <Activity className="text-lab-blue dark:text-blue-300  h-7 w-7 sm:h-6 sm:w-6" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
-          <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-            <div className="flex items-center justify-between px-2">
-              <div>
-                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
-                  Reagentes
-                </p>
-                <h3 className="text-2xl md:text-3xl md:text-2xl font-bold mt-1 text-gray-700 dark:text-white">
-                  362
-                </h3>
-                <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
-                  <TrendingUp size={12} className="mr-1" />
-                  +5.2% este mês
-                </p>
-              </div>
-              <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
-                <Beaker className="text-lab-blue dark:text-blue-300  h-7 w-7 sm:h-6 sm:w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+              <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
+                <div className="flex items-center justify-between px-2">
+                  <div>
+                    <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+                      Reagentes
+                    </p>
+                    <h3 className="text-2xl md:text-3xl md:text-2xl font-bold mt-1 text-gray-700 dark:text-white">
+                      362
+                    </h3>
+                    <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
+                      <TrendingUp size={12} className="mr-1" />
+                      +5.2% este mês
+                    </p>
+                  </div>
+                  <div className="bg-lab-lightBlue dark:bg-gray-700 p-2 sm:p-3 rounded-full">
+                    <Beaker className="text-lab-blue dark:text-blue-300  h-7 w-7 sm:h-6 sm:w-6" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
-          <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-            <div className="flex items-center justify-between px-2">
-              <div>
-                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
-                  Em Alerta
-                </p>
-                <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
-                  12
-                </h3>
-                <p className="text-sm text-yellow-600 dark:text-yellow-400 flex items-center mt-1">
-                  <AlertCircle size={12} className="mr-1" />
-                  Requer atenção
-                </p>
-              </div>
-              <div className="bg-red-100 dark:bg-red-900/70 p-2 sm:p-3 rounded-full">
-                <AlertCircle className="text-red-600   h-7 w-7 sm:h-6 sm:w-6" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts - Improved responsive layout with better breakpoints */}
-      <Card className=" grid grid-cols-1 md:grid-cols-1 gap-4 md:gap-6 bg-opacity border-0">
-        <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart">
-            <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">Estoque Geral</h1>
-            <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">Itens disponíveis no estoque</p>
+            <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+              <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
+                <div className="flex items-center justify-between px-2">
+                  <div>
+                    <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+                      Em Alerta
+                    </p>
+                    <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
+                      12
+                    </h3>
+                    <p className="text-sm text-yellow-600 dark:text-yellow-400 flex items-center mt-1">
+                      <AlertCircle size={12} className="mr-1" />
+                      Requer atenção
+                    </p>
+                  </div>
+                  <div className="bg-red-100 dark:bg-red-900/70 p-2 sm:p-3 rounded-full">
+                    <AlertCircle className="text-red-600   h-7 w-7 sm:h-6 sm:w-6" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart">
+          <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
+            Estoque Geral
+          </h1>
+          <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            Itens disponíveis no estoque
+          </p>
           <CardContent className="grid grid-cols-1 xl:grid-cols-4 md:grid-cols-2 gap-4 md:gap-6">
             {inventoryPercent.map((item) => (
-              <div key={item.name} className="dashboard-chart flex flex-col justify-center items-center my-4 p-8 rounded-md">
+              <div
+                key={item.name}
+                className="dashboard-chart flex flex-col justify-center items-center my-4 p-4 rounded-md"
+              >
                 <GaugeChart title={item.name} value={item.value} size={200} />
               </div>
             ))}
           </CardContent>
         </Card>
+        </div>
+
+        {/* Recent Activity */}
+
+        <div className=" max-h-auto w-full lg:w-[35%]">
+          <div className="bg-white bg-opacity-90 dark:bg-neutral-900/50 rounded-2xl shadow-lg p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                Recentes
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 mt-1">
+                Atividades recentes
+              </p>
+            </div>
+
+            {/* Área scrollable */}
+            <div className="max-h-[536px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+              <div className="space-y-3">
+                {activities.map((activity, index) => (
+                  <div
+                    key={index}
+                    className="rounded-xl bg-gray-200/70 dark:bg-gray-800 overflow-hidden"
+                  >
+                    <button
+                      onClick={() => toggleAccordion(index)}
+                      className="w-full p-4 flex items-center justify-between gap-4 hover:bg-gray-300/80 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 bg-lab-lightBlue dark:bg-gray-600 rounded-lg text-blue-600 dark:text-blue-300">
+                          {getIcon(activity.title)}
+                        </div>
+
+                        <div className="text-left">
+                          <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                            {activity.title}
+                          </h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {formatDateLabel(activity.date)} • {activity.time}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Ícone com rotação */}
+                      <motion.div
+                        animate={{ rotate: expandedIndex === index ? 90 : 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-gray-500 dark:text-gray-400"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </motion.div>
+                    </button>
+
+                    <AnimatePresence>
+                      {expandedIndex === index && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="px-2 pt-4 bg-gray-100 dark:bg-neutral-900/40"
+                        >
+                          <div className="pl-2 xl:pl-4 border-t pb-4 space-y-2 overflow-x-auto whitespace-nowrap">
+                            {activity.description && (
+                              <div className="flex gap-2">
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  Descrição:
+                                </span>
+                                <span className="text-gray-700 dark:text-gray-200">
+                                  {activity.description}
+                                </span>
+                              </div>
+                            )}
+
+                            {activity.paciente && (
+                              <div className="flex gap-2">
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  Paciente:
+                                </span>
+                                <span className="text-gray-700 dark:text-gray-200">
+                                  {activity.paciente}
+                                </span>
+                              </div>
+                            )}
+
+                            {activity.responsavel && (
+                              <div className="flex gap-2">
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  Responsável:
+                                </span>
+                                <span className="text-gray-700 dark:text-gray-200">
+                                  {activity.responsavel}
+                                </span>
+                              </div>
+                            )}
+
+                            <div className="flex gap-2">
+                              <span className="text-gray-500 dark:text-gray-400">
+                                Dia:
+                              </span>
+                              <span className="text-gray-700 dark:text-gray-200">
+                                {activity.date}
+                              </span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Charts - Improved responsive layout with better breakpoints */}
         <Card className="bg-opacity">
           <CardContent className="dashboard-chart p-0">
             <DashboardChart
@@ -242,7 +400,6 @@ const Dashboard: React.FC = () => {
             />
           </CardContent>
         </Card>
-      </Card>
 
       {/* Items running low - Improved responsive table */}
       <div className="dashboard-chart">
