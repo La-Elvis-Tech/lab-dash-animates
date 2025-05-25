@@ -172,7 +172,7 @@ const Orders: React.FC = () => {
         </h1>
         <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 dark:from-gray-800 dark:to-gray-700 dark:hover:from-gray-700 dark:hover:to-gray-600">
+            <Button variant="outline" className="bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 dark:from-gray-800 dark:to-gray-700 dark:hover:from-gray-700 dark:hover:to-gray-600 dark:border-none">
               <CalendarIcon className="h-4 w-4 mr-2" />
               Calendário
             </Button>
@@ -189,7 +189,7 @@ const Orders: React.FC = () => {
       </div>
 
       <div>
-        <Card className="dark:bg-gray-800 dark:text-gray-100 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+        <Card className="dark:bg-gray-800 dark:text-gray-100 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 dark:border-none">
           <CardHeader>
             <CardTitle className="text-xl text-gray-900 dark:text-gray-100">
               Agendamentos Gerais

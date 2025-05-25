@@ -257,7 +257,7 @@ const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
           </div>
-          <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart">
+          <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart border-none">
           <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
             Estoque Geral
           </h1>
@@ -267,7 +267,7 @@ const Dashboard: React.FC = () => {
           <CardContent className="dashboard-chart grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
             {inventoryPercent.map((item) => (
               <div>
-                <div className="block sm:inline lg:hidden">
+                <div className="block sm:inline lg:hidden ">
                   <div
                     key={item.name}
                     className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
@@ -318,19 +318,19 @@ const Dashboard: React.FC = () => {
                 {activities.map((activity, index) => (
                   <div
                     key={index}
-                    className="rounded-xl bg-gray-100/70 dark:bg-gray-800 overflow-hidden"
+                    className="rounded-xl bg-gray-300/40 dark:bg-gray-800 overflow-hidden"
                   >
                     <button
                       onClick={() => toggleAccordion(index)}
-                      className="w-full p-4 flex items-center justify-between gap-4 hover:bg-gray-200/60 dark:hover:bg-gray-600 transition-colors"
+                      className="w-full p-4 flex items-center justify-between gap-4 hover:bg-gray-300/80 dark:hover:bg-gray-600 transition-colors"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="p-2 bg-lab-lightBlue dark:bg-gray-600 rounded-lg text-blue-600 dark:text-blue-300">
+                        <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-blue-600 dark:text-blue-300">
                           {getIcon(activity.title)}
                         </div>
 
                         <div className="text-left">
-                          <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                          <h3 className="font-semibold text-gray-800 dark:text-gray-300">
                             {activity.title}
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -358,7 +358,7 @@ const Dashboard: React.FC = () => {
                           transition={{ duration: 0.2, ease: "easeOut" }}
                           className="px-2 pt-4 bg-gray-100/90 dark:bg-neutral-900/40"
                         >
-                          <div className="pl-2 xl:pl-4 border-t pb-4 space-y-2 overflow-x-auto whitespace-nowrap">
+                          <div className="pl-2 xl:pl-4 pb-4 space-y-2 overflow-x-auto whitespace-nowrap">
                             {activity.description && (
                               <div className="flex gap-2">
                                 <span className="text-gray-500 dark:text-gray-400">

@@ -12,7 +12,7 @@ const UnitsTable: React.FC<UnitsTableProps> = ({ units }) => {
   return (
     <Card className="border-none shadow-none bg-transparent">
       <CardContent className="p-0">
-        <div className="rounded-md border overflow-x-auto">
+        <div className="rounded-md border overflow-x-auto dark:border-none">
           <Table>
             <TableHeader>
               <TableRow>
@@ -39,7 +39,7 @@ const UnitsTable: React.FC<UnitsTableProps> = ({ units }) => {
                 const occupancyRate = Math.round((total / maxCapacity) * 100);
                 
                 return (
-                  <TableRow key={unit.name}>
+                  <TableRow key={unit.name} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-none">
                     <TableCell className="font-medium text-xs md:text-sm py-2 md:py-3">{unit.name}</TableCell>
                     <TableCell className="text-center text-xs md:text-sm py-2 md:py-3">{total}</TableCell>
                     <TableCell className="text-center text-xs md:text-sm py-2 md:py-3">{confirmed}</TableCell>

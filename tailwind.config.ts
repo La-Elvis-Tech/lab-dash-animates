@@ -22,6 +22,9 @@ export default {
         '2xl': '1400px'
       }
     },
+    fontFamily: {
+          michroma: [ 'Michroma', 'sans-serif'],
+    },
     extend: {
       colors: {
         border: 'hsl(var(--border))',
@@ -55,7 +58,7 @@ export default {
         },
         card: {
           DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))'
+          foreground: 'hsl(var(--card-foreground))',
         },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
@@ -76,7 +79,7 @@ export default {
           red: '#EF4444',
           yellow: '#F59E0B',
           purple: '#8B5CF6'
-        }
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -14,6 +14,7 @@ import {
   User
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import Logo from '/logolaelvis.svg'
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -91,15 +92,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   return (
     <div 
       ref={contentRef} 
-      className="sidebar-content h-screen bg-white dark:bg-neutral-950/60 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all overflow-hidden"
+      className="sidebar-content h-screen bg-white dark:bg-neutral-950/60 flex flex-col transition-all overflow-hidden"
       style={{ width: isCollapsed ? '80px' : '260px' }}
     >
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
-          <div className="bg-lab-blue rounded-md p-2 flex items-center justify-center">
-            <Beaker className="text-white" size={22} />
+          <div className=" rounded-md p-2 flex items-center justify-center">
+            <img src={Logo} alt="Logo" className="w-10 h-10"  />
           </div>
-          <h1 className="sidebar-logo-text text-xl font-bold text-lab-blue ml-2 dark:text-white overflow-clip whitespace-nowrap">
+          <h1 className="font-michroma sidebar-logo-text text-lg font-bold text-lab-blue ml-2 dark:text-white overflow-clip whitespace-nowrap">
             La Elvis Tech
           </h1>
         </div>

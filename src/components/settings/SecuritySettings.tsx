@@ -108,7 +108,7 @@ const SecuritySettings = () => {
               <button 
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1 px-2 text-gray-500"
+                className="absolute right-3 top-3 px-2 text-gray-500"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -143,7 +143,7 @@ const SecuritySettings = () => {
         <CardFooter className="justify-end">
           <Button 
             onClick={handleChangePassword}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+            className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
           >
             Alterar Senha
           </Button>
@@ -211,7 +211,7 @@ const SecuritySettings = () => {
         <CardFooter className="justify-end border-t border-gray-100 dark:border-gray-700 pt-4">
           <Button 
             onClick={handleSaveSettings}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+            className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
           >
             Salvar Configurações
           </Button>

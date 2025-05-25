@@ -34,7 +34,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
 }) => {
   return (
     <Tabs defaultValue="next7days">
-      <TabsList className="mb-4 bg-gradient-to-r from-gray-100 to-white dark:from-gray-700 dark:to-gray-800">
+      <TabsList className="mb-4 bg-gradient-to-r from-gray-100 to-white dark:from-gray-700 dark:to-gray-800 dark:border-none">
         <TabsTrigger value="recent">Recentes</TabsTrigger>
         <TabsTrigger value="next7days">Próximos 7 dias</TabsTrigger>
         <TabsTrigger value="restOfMonth">Resto do mês</TabsTrigger>

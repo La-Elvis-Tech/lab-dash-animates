@@ -41,7 +41,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, get
             <TableBody>
               {appointments.length > 0 ? (
                 appointments.map((appointment) => (
-                  <TableRow key={appointment.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <TableRow key={appointment.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-none">
                     <TableCell className="font-medium">{appointment.id}</TableCell>
                     <TableCell>{appointment.patient}</TableCell>
                     <TableCell>{appointment.type}</TableCell>
@@ -61,7 +61,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({ appointments, get
                       {appointment.cost.toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={getStatusColor(appointment.status)}>
+                      <Badge className={getStatusColor(appointment.status)}>
                         {appointment.status}
                       </Badge>
                     </TableCell>

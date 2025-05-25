@@ -228,14 +228,14 @@ const Inventory = () => {
       </div>
 
       {/* Filters - Improved for mobile */}
-      <Card className="inventory-filters">
-        <CardContent className="p-4 border rounded-md bg-neutral-100/80 dark:bg-neutral-900/80">
+      <Card className="inventory-filters ">
+        <CardContent className="p-4 dark:border-none rounded-md bg-neutral-100/80 dark:bg-neutral-800/80 ">
           <div className="flex flex-col gap-4 ">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1 text-gray-400 " size={18} />
+              <Search className="absolute left-3 top-3 transform text-gray-400 " size={18} />
               <Input
                 placeholder="Buscar item..."
-                className="pl-10 w-full border rounded-md bg-white dark:bg-neutral-800/80"
+                className="pl-10 w-full dark:border-none rounded-md bg-white dark:bg-neutral-700/40"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -248,10 +248,10 @@ const Inventory = () => {
                   {categories.map((category) => (
                     <button
                       key={category.id}
-                      className={`px-3 py-2 text-sm font-medium whitespace-nowrap ${
+                      className={`px-3 py-2 text-sm font-medium whitespace-nowrap dark:border-none ${
                         selectedCategory === category.id
                           ? 'bg-lab-blue text-white dark:bg-lab-blue/80'
-                          : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-800/80 dark:text-gray-300 dark:hover:bg-gray-700' 
+                          : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-700/80 dark:text-gray-300 dark:hover:bg-gray-700' 
                       } rounded-md border border-gray-200 dark:border-gray-700 transition-colors`}
                       onClick={() => handleCategoryChange(category.id)}
                     >

@@ -185,7 +185,7 @@ const Requests: React.FC = () => {
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Exames</h1>
       </div>
       
-      <Card className="overflow-hidden dark:bg-gray-900 dark:text-gray-100">
+      <Card className="overflow-hidden dark:bg-gray-900 dark:text-gray-100 dark:border-none">
         <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700 p-4">
           <CardTitle className="text-base md:text-xl">
             <div className="space-y-4">
@@ -322,7 +322,7 @@ const Requests: React.FC = () => {
                 <TableBody>
                   {filteredExams.length > 0 ? (
                     filteredExams.map((exam) => (
-                      <TableRow key={exam.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <TableRow key={exam.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-none">
                         <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.id}</TableCell>
                         <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.patient}</TableCell>
                         <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.type}</TableCell>
