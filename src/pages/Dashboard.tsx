@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
         {
           opacity: 1,
           y: 0,
-          duration: 0.6,
+          duration: 0.4,
           stagger: 0.1,
           ease: "power2.out",
         }
@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          duration: 0.6 ,
           stagger: 0.15,
           ease: "power2.out",
           delay: 0.3,
@@ -172,6 +172,12 @@ const Dashboard: React.FC = () => {
       {/* Key metrics and charts section */}
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="w-full lg:w-[55%] xl:w-[70%]">
+           <div className="dashboard-chart">
+          <Chart3D 
+            data={inventoryData} 
+            title="Estoque 3D - Distribuição por Categoria"
+          />
+        </div>
           {/* Key metrics cards */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
             <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
@@ -262,43 +268,6 @@ const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
           </div>
-          
-          {/* Gauge charts section */}
-          <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart border-none">
-          <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
-            Estoque Geral
-          </h1>
-          <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-            Itens disponíveis no estoque
-          </p>
-          <CardContent className="dashboard-chart grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
-            {inventoryPercent.map((item) => (
-              <div key={item.name}>
-                <div className="block sm:inline lg:hidden ">
-                  <div
-                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
-                  >
-                    <GaugeChart title={item.name} value={item.value} size={180} />
-                  </div>
-                </div>
-                <div className="hidden lg:inline xl:hidden ">
-                  <div
-                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
-                  >
-                    <GaugeChart title={item.name} value={item.value} size={180} />
-                  </div>
-                </div>
-                <div className="hidden xl:inline">
-                  <div
-                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
-                  >
-                    <GaugeChart title={item.name} value={item.value} size={200} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
         </div>
 
         {/* Recent Activity - keep existing code */}
@@ -411,9 +380,46 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+          
+          {/* Gauge charts section */}
+          <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart border-none">
+          <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
+            Estoque Geral
+          </h1>
+          <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            Itens disponíveis no estoque
+          </p>
+          <CardContent className="dashboard-chart grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
+            {inventoryPercent.map((item) => (
+              <div key={item.name}>
+                <div className="block sm:inline lg:hidden ">
+                  <div
+                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
+                  >
+                    <GaugeChart title={item.name} value={item.value} size={180} />
+                  </div>
+                </div>
+                <div className="hidden lg:inline xl:hidden ">
+                  <div
+                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
+                  >
+                    <GaugeChart title={item.name} value={item.value} size={180} />
+                  </div>
+                </div>
+                <div className="hidden xl:inline">
+                  <div
+                    className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
+                  >
+                    <GaugeChart title={item.name} value={item.value} size={200} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       {/* Charts section with 3D chart */}
-      <div className="dashboard-chart grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-opacity">
+      <div className="dashboard-chart grid grid-cols-1 gap-6">
+        <Card className="bg-opacity border-none">
           <CardContent className="dashboard-chart p-0">
             <DashboardChart
               type="line"
@@ -423,13 +429,6 @@ const Dashboard: React.FC = () => {
             />
           </CardContent>
         </Card>
-
-        <div className="dashboard-chart">
-          <Chart3D 
-            data={inventoryData} 
-            title="Estoque 3D - Distribuição por Categoria"
-          />
-        </div>
       </div>
 
       {/* Items running low table - keep existing code */}
