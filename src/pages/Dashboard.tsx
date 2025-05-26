@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, } from "react";
 import { gsap } from "gsap";
 import DashboardChart from "@/components/DashboardChart.tsx";
 import GaugeChart from "@/components/ui/GaugeChart";
+import Chart3D from "@/components/Chart3D";
 import { inventoryPercent } from "@/data/InventoryPercent";
 import { Card, CardContent } from "../components/ui/card";
 import {
@@ -121,14 +122,14 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [activities] = useState(recentActivity);
 
-  const toggleAccordion = (index) => {
+  const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
-  const getIcon = (title) => {
+  const getIcon = (title: string) => {
     switch (title) {
       case "Agendamento":
         return <CalendarCheck className="w-5 h-5" />;
@@ -140,18 +141,20 @@ const Dashboard: React.FC = () => {
         return <CalendarCheck className="w-5 h-5" />;
     }
   };
-  const formatDateLabel = (dateString) => {
+  
+  const formatDateLabel = (dateString: string) => {
     const today = new Date();
     const [day, month, year] = dateString.split("/");
     const activityDate = new Date(`${year}-${month}-${day}`);
 
-    const diffTime = today - activityDate;
+    const diffTime = today.getTime() - activityDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) return "Hoje";
     if (diffDays === 1) return "Ontem";
     return activityDate.toLocaleDateString("pt-BR", { weekday: "long" });
   };
+
   return (
     <div
       ref={dashboardRef}
@@ -165,9 +168,11 @@ const Dashboard: React.FC = () => {
           Visão geral do consumo de itens laboratoriais
         </p>
       </div>
-      {/* Key metrics - Improved responsive grid with better breakpoints */}
+      
+      {/* Key metrics and charts section */}
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="w-full lg:w-[55%] xl:w-[70%]">
+          {/* Key metrics cards */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
             <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
               <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
@@ -257,6 +262,8 @@ const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+          
+          {/* Gauge charts section */}
           <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart border-none">
           <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
             Estoque Geral
@@ -266,10 +273,9 @@ const Dashboard: React.FC = () => {
           </p>
           <CardContent className="dashboard-chart grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
             {inventoryPercent.map((item) => (
-              <div>
+              <div key={item.name}>
                 <div className="block sm:inline lg:hidden ">
                   <div
-                    key={item.name}
                     className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
                   >
                     <GaugeChart title={item.name} value={item.value} size={180} />
@@ -277,7 +283,6 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div className="hidden lg:inline xl:hidden ">
                   <div
-                    key={item.name}
                     className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
                   >
                     <GaugeChart title={item.name} value={item.value} size={180} />
@@ -285,22 +290,18 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div className="hidden xl:inline">
                   <div
-                    key={item.name}
                     className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md"
                   >
                     <GaugeChart title={item.name} value={item.value} size={200} />
                   </div>
                 </div>
               </div>
-              
-              
             ))}
           </CardContent>
         </Card>
         </div>
 
-        {/* Recent Activity */}
-
+        {/* Recent Activity - keep existing code */}
         <div className=" dashboard-chart max-h-auto w-full lg:w-[45%] xl:w-[30%]">
           <div className="bg-white bg-opacity-90 dark:bg-neutral-900/50 rounded-2xl shadow-lg p-6">
             <div className="mb-6">
@@ -312,7 +313,6 @@ const Dashboard: React.FC = () => {
               </p>
             </div>
 
-            {/* Área scrollable */}
             <div className=" dashboard-chart md:mah-h-[800px] xl:max-h-[520px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
               <div className="space-y-3">
                 {activities.map((activity, index) => (
@@ -339,7 +339,6 @@ const Dashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Ícone com rotação */}
                       <motion.div
                         animate={{ rotate: expandedIndex === index ? 90 : 0 }}
                         transition={{ duration: 0.2 }}
@@ -411,7 +410,9 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* Charts - Improved responsive layout with better breakpoints */}
+
+      {/* Charts section with 3D chart */}
+      <div className="dashboard-chart grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-opacity">
           <CardContent className="dashboard-chart p-0">
             <DashboardChart
@@ -423,7 +424,15 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-      {/* Items running low - Improved responsive table */}
+        <div className="dashboard-chart">
+          <Chart3D 
+            data={inventoryData} 
+            title="Estoque 3D - Distribuição por Categoria"
+          />
+        </div>
+      </div>
+
+      {/* Items running low table - keep existing code */}
       <div className="dashboard-chart">
         <Card className="bg-white bg-opacity-90 border-neutral-300/60 border-opacity-20 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
           <div className="p-3 sm:p-4 md:p-6">
