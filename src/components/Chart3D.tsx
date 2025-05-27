@@ -78,7 +78,7 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
           {title}
         </h3>
       </div>
-      <div className="h-80 mb-8 bg-gray-200 dark:bg-gray-500/20 rounded-lg">
+      <div className="h-80 mb-8 bg-neutral-200  rounded-b-lg">
         <Canvas camera={{ position: [2, 2, 9], fov: 45 }}>
           <ambientLight intensity={0.8} />
           <directionalLight

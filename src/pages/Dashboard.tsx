@@ -197,7 +197,7 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20 ">
+              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-950/70 dark:border-neutral-700 dark:border-opacity-20 ">
                 <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-4">
                   <div className="flex items-center justify-between px-2">
                     <div>
@@ -216,7 +216,7 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20 ">
+              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-950/70 dark:border-neutral-700 dark:border-opacity-20 ">
                 <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
                   <div className="flex items-center justify-between px-2">
                     <div>
@@ -235,7 +235,7 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20 ">
+              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-950/70 dark:border-neutral-700 dark:border-opacity-20 ">
                 <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
                   <div className="flex items-center justify-between px-2">
                     <div>

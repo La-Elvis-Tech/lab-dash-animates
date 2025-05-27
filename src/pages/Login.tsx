@@ -34,32 +34,32 @@ export const Login = () => {
       <ThreeBackground />
 
       {/* Login Form Container */}
-      <div className="relative z-10 min-h-screen bg-gradient-to-br from-gray-500/90 to-indigo-100/90 flex items-center justify-center p-4 ">
-        <div className="max-w-md z-12  w-full bg-white rounded-2xl shadow-xl p-8 relative overflow-hidden transition-all duration-300 hover:shadow-2xl  ">
+      <div className="relative z-10 min-h-screen bg-gradient-to-br from-gray-100/40  flex items-center justify-center p-4 ">
+        <div className="max-w-md z-12  w-full bg-neutral-800/40 rounded-2xl shadow-xl p-8 relative overflow-hidden transition-all duration-300 hover:shadow-2xl  ">
           {/* Decorative elements */}
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-purple-400 "></div>
 
           <div className="relative z-10 opacity-95">
             <div className="mb-8 text-center space-y-2">
-              <h1 className="text-3xl font-bold bg-gradient-to-r via-indigo-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r via-indigo-200 bg-clip-text text-transparent">
                 Bem Vindo de Volta!
               </h1>
-              <p className="text-gray-500 text-sm">Faça login na sua conta</p>
+              <p className="text-gray-200 text-sm">Faça login na sua conta</p>
             </div>
 
-            <form onSubmit={onSubmit} className="space-y-6">
+            <form onSubmit={onSubmit} className="space-y-6 ">
               {/* Username */}
               <div className="group">
                 <label
                   htmlFor="username"
-                  className="block text-sm font-medium text-gray-600 mb-2 transition-all duration-300 group-focus-within:text-blue-600"
+                  className="block text-sm font-medium text-gray-200 mb-2 transition-all duration-300 group-focus-within:text-blue-400 pb-2"
                 >
                   Nome de Usuário
                 </label>
                 <div className="relative">
                   <input
                     id="username"
-                    className="text-gray-500 w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-400"
+                    className="bg-gray-100/80 text-gray-700 w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-500"
                     placeholder="joao@dasa2025.com"
                     value={u}
                     onChange={e => setU(e.target.value)}
@@ -72,7 +72,7 @@ export const Login = () => {
               <div className="group">
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-600 mb-2 transition-all duration-300 group-focus-within:text-blue-600"
+                  className="block text-sm font-medium text-gray-200 mb-2 transition-all duration-300 group-focus-within:text-blue-400 pb-2"
                 >
                   Senha
                 </label>
@@ -80,7 +80,7 @@ export const Login = () => {
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="text-gray-500 w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-400 pr-12"
+                    className="bg-gray-100/80 text-gray-700 w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-500 pr-12 mb-10"
                     placeholder="••••••••"
                     value={p}
                     onChange={e => setP(e.target.value)}
@@ -132,7 +132,7 @@ export const Login = () => {
 
               {/* Error Message */}
               {error && (
-                <div className="flex items-center justify-center gap-2 text-red-600 text-sm p-3 bg-red-50 rounded-lg animate-shake">
+                <div className="flex items-center justify-center gap-2 text-red-800 text-sm p-3 bg-red-50/70 rounded-lg animate-shake">
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -157,7 +157,7 @@ export const Login = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02]"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-800 text-white font-medium py-3 px-4 rounded-xl transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] ease-out shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -200,20 +200,8 @@ export const Login = () => {
                 className="text-blue-600 hover:text-blue-500 hover:underline transition-colors flex items-center justify-center gap-1"
               >
                 {/* ...icon */}
-                Forgot password?
+                Esqueceu a senha?
               </a>
-              <div className="border-t pt-4">
-                <p className="text-gray-400">Or continue with</p>
-                <div className="flex justify-center gap-4 mt-4">
-                  <button className="p-2 rounded-lg border hover:bg-gray-50 transition-colors">
-                    <img
-                      src="https://www.svgrepo.com/show/355037/google.svg"
-                      className="w-6 h-6"
-                      alt="Google"
-                    />
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
