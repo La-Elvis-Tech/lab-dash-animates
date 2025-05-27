@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Text } from "@react-three/drei";
-import { Mesh, MeshPhongMaterial } from "three";
+import { Mesh, MeshPhongMaterial, MeshStandardMaterial } from "three";
+import { Value } from "@radix-ui/react-select";
 
 interface Chart3DProps {
   data: Array<{ name: string; value: number }>;
@@ -13,39 +14,49 @@ const Bar3D: React.FC<{
   height: number;
   color: string;
   label: string;
-}> = ({ position, height, color, label }) => {
-  const meshRef = useRef<Mesh>(null);
+  value?: string | number;
+}> = ({ position, height, color, label, value }) => {
+  const isLeft = position[0] < 0;
+  const textOffsetX = isLeft ? -1 : 1;
+  const textRotationY = isLeft ? Math.PI/6 : -Math.PI/6;
 
   return (
     <group position={position}>
-      <mesh ref={meshRef} position={[0, height / 2, 0]}>
-        <boxGeometry args={[0.6, height, 0.6]} />
-        <meshPhongMaterial color={color} shininess={100} specular="#ffffff" />
+      <mesh position={[0, height/2, 0]}>
+        <boxGeometry args={[1, height, 1]} />
+        <meshStandardMaterial 
+          color={color}
+          metalness={0.2}
+          roughness={0.8}
+        />
       </mesh>
+
       <Text
-        position={[0, height + 0.5, 0]}
-        fontSize={0.3}
-        color="#2d3748"
-        anchorX="center"
-        anchorY="middle"
+        position={[textOffsetX, height + 0.3, -0.5]}
+        fontSize={0.25}
+        color="#000000"
+        anchorX={isLeft ? "right" : "left"}
+        anchorY="bottom"
+        rotation={[0, textRotationY, 0]}
       >
         {label}
       </Text>
       <Text
-        position={[0, -0.5, 0]}
+        position={[textOffsetX, height - 0.3, -0.3]}
         fontSize={0.25}
-        color="#4a5568"
-        anchorX="center"
-        anchorY="middle"
+        color="#000000"
+        anchorX={isLeft ? "right" : "left"}
+        anchorY="bottom"
+        rotation={[0, textRotationY, 0]}
       >
-        {height.toFixed(0)}
+        {value !== undefined ? value + "%" : "N/A"}
       </Text>
     </group>
   );
 };
 
 const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
-  const colors = ["#7C3AED", "#10B981", "#3B82F6", "#F59E0B"];
+  const colors = ["#3a46ed", "#2340a0", "#6599ee", "#3a96cc"];
   const maxValue = Math.max(...data.map((d) => d.value));
   const scale = 3 / maxValue;
 
@@ -54,26 +65,26 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
 
   // Posições nos quadrantes
   const quadrantPositions: [number, number, number][] = [
-    [-0.3, 0, 1], // Quadrante 1 (topo esquerda)
-    [0.3, 0, 1], // Quadrante 2 (topo direita)
-    [-0.3, 0, 1.6], // Quadrante 3 (baixo esquerda)
-    [0.3, 0, 1.6], // Quadrante 4 (baixo direita)
+    [-0.8, 0, 0], // Quadrante 1 (topo esquerda)
+    [0.3, 0, 0], // Quadrante 2 (topo direita)
+    [-0.8, 0, 1.1], // Quadrante 3 (baixo esquerda)
+    [0.3, 0, 1.1], // Quadrante 4 (baixo direita)
   ];
 
   return (
-    <div className="h-96 w-full bg-white dark:bg-gray-900 rounded-lg border">
-      <div className="p-4">
+    <div className="h-auto w-full bg-white dark:bg-neutral-950/80 rounded-lg border-none">
+      <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
           {title}
         </h3>
       </div>
-      <div className="h-80">
-        <Canvas camera={{ position: [-10, 12, -10], fov: 45 }}>
+      <div className="h-80 mb-8 bg-gray-200 dark:bg-gray-500/20 rounded-lg">
+        <Canvas camera={{ position: [2, 2, 9], fov: 45 }}>
           <ambientLight intensity={0.8} />
           <directionalLight
             position={[10, 10, 5]}
             intensity={1}
-            color="#ffffff"
+            color="#c5c5c5"
           />
 
           {sortedData.map((item, index) => (
@@ -83,20 +94,21 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
               height={item.value * scale}
               color={colors[index]}
               label={item.name}
+              value={item.value}
             />
           ))}
 
           {/* Linhas guia */}
-          <mesh position={[0, 0, 0]}>
-            <boxGeometry args={[4.5, 0.1, 4.5]} />
-            <meshPhongMaterial color="#e2e8f0" transparent opacity={0.3} />
+          <mesh position={[-0.2, 0, 0.4]}>
+            <boxGeometry args={[3.5, 0.1, 3.5]} />
+            <meshPhongMaterial color="#e2e8f0" transparent opacity={0.9} />
           </mesh>
 
           <OrbitControls
             enableZoom={true}
             enableRotate={true}
-            minDistance={8}
-            maxDistance={14}
+            minDistance={6}
+            maxDistance={10}
             enablePan={false}
             target={[0, 2, 0]}
             minPolarAngle={Math.PI/3}   // Ângulo mínimo de 30 graus (impede visão de cima)

@@ -26,7 +26,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-          <PageLoaderLogin  paths={["/reports", "/settings"]} delay={300} />  
+          <PageLoaderLogin  paths={['/']} delay={300} />  
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route element={<ProtectedRoute />}>
