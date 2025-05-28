@@ -172,13 +172,13 @@ const Dashboard: React.FC = () => {
       {/* Key metrics and charts section */}
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex w-full lg:w-[55%] xl:w-[70%]">
-          <div className="dashboard-chart mb-4 xl:w-[65%] 2xl:w-[45%] border-none">
+          <div className="dashboard-chart mb-4 xl:w-[35%] 2xl:w-[45%] border-none">
             <Chart3D
               data={inventoryData}
               title="Estoque 3D - Distribuição por Categoria"
             />
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
-              <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-950/70 dark:border-neutral-700 dark:border-opacity-20 ">
+              <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                 <CardContent className="pt-4 sm:pt-5 p-3 md:p-4 ">
                   <div className="flex items-center justify-between px-2 ">
                     <div>
@@ -197,7 +197,7 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-950/70 dark:border-neutral-700 dark:border-opacity-20 ">
+              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                 <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-4">
                   <div className="flex items-center justify-between px-2">
                     <div>
@@ -216,7 +216,7 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-950/70 dark:border-neutral-700 dark:border-opacity-20 ">
+              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                 <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
                   <div className="flex items-center justify-between px-2">
                     <div>
@@ -235,7 +235,7 @@ const Dashboard: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-950/70 dark:border-neutral-700 dark:border-opacity-20 ">
+              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                 <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
                   <div className="flex items-center justify-between px-2">
                     <div>

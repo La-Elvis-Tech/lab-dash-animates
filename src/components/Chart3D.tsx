@@ -1,9 +1,11 @@
 import React, { useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Text } from "@react-three/drei";
-import { Mesh, MeshPhongMaterial, MeshStandardMaterial } from "three";
-import { Value } from "@radix-ui/react-select";
-
+import { OrbitControls, Text, RoundedBox } from "@react-three/drei";
+import { useTheme } from "../hooks/use-theme";
+import { useEffect } from "react";
+import { Mesh, MeshStandardMaterial } from "three";
+import { RoundedBoxGeometry } from "three-stdlib";
+import { gsap } from "gsap";
 interface Chart3DProps {
   data: Array<{ name: string; value: number }>;
   title: string;
@@ -16,25 +18,54 @@ const Bar3D: React.FC<{
   label: string;
   value?: string | number;
 }> = ({ position, height, color, label, value }) => {
+  const { textColor } = useTheme();
   const isLeft = position[0] < 0;
   const textOffsetX = isLeft ? -1 : 1;
   const textRotationY = isLeft ? Math.PI/6 : -Math.PI/6;
+  const meshRef = useRef<Mesh>(null);
+
+  // Animação com GSAP
+  useEffect(() => {
+    if (!meshRef.current) return;
+
+    // Configuração inicial
+    meshRef.current.scale.set(1, 0, 1); // Começa "achatado"
+    meshRef.current.position.y = 0;
+
+    // Animação
+    gsap.to(meshRef.current.scale, {
+      y: 1,
+      duration: 2.2,
+      ease: "elastic.out(1, 0.9)",
+      delay: position[0] * 0.3 // Delay escalonado
+    });
+
+    gsap.to(meshRef.current.position, {
+      y: height / 2,
+      duration: 2,
+      ease: "power3.out",
+      delay: position[0] * 0.3
+    });
+
+  }, [height, position]);
 
   return (
     <group position={position}>
-      <mesh position={[0, height/2, 0]}>
-        <boxGeometry args={[1, height, 1]} />
+      <RoundedBox
+        ref={meshRef}
+        args={[1, height, 1]}
+        radius={0.06}
+      >
         <meshStandardMaterial 
           color={color}
-          metalness={0.2}
-          roughness={0.8}
+          metalness={0.4}
+          roughness={0.1}
         />
-      </mesh>
-
+      </RoundedBox>
       <Text
         position={[textOffsetX, height + 0.3, -0.5]}
         fontSize={0.25}
-        color="#000000"
+        color={textColor}
         anchorX={isLeft ? "right" : "left"}
         anchorY="bottom"
         rotation={[0, textRotationY, 0]}
@@ -44,7 +75,7 @@ const Bar3D: React.FC<{
       <Text
         position={[textOffsetX, height - 0.3, -0.3]}
         fontSize={0.25}
-        color="#000000"
+        color={textColor}
         anchorX={isLeft ? "right" : "left"}
         anchorY="bottom"
         rotation={[0, textRotationY, 0]}
@@ -56,7 +87,7 @@ const Bar3D: React.FC<{
 };
 
 const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
-  const colors = ["#3a46ed", "#2340a0", "#6599ee", "#3a96cc"];
+  const colors = ["#3a46ed", "#f5b083", "#5edd84", "#e76783"];
   const maxValue = Math.max(...data.map((d) => d.value));
   const scale = 3 / maxValue;
 
@@ -72,19 +103,19 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
   ];
 
   return (
-    <div className="h-auto w-full bg-white dark:bg-neutral-950/80 rounded-lg border-none">
+    <div className="h-auto w-full bg-white dark:bg-neutral-900/80 rounded-lg border-none">
       <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
           {title}
         </h3>
       </div>
-      <div className="h-80 mb-8 bg-neutral-200  rounded-b-lg">
+      <div className="h-80 mb-8 bg-neutral-200 dark:bg-neutral-800  rounded-b-lg">
         <Canvas camera={{ position: [2, 2, 9], fov: 45 }}>
           <ambientLight intensity={0.8} />
           <directionalLight
-            position={[10, 10, 5]}
+            position={[2, 5, 6]}
             intensity={1}
-            color="#c5c5c5"
+            color="#f7f7f7"
           />
 
           {sortedData.map((item, index) => (
@@ -101,11 +132,11 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
           {/* Linhas guia */}
           <mesh position={[-0.2, 0, 0.4]}>
             <boxGeometry args={[3.5, 0.1, 3.5]} />
-            <meshPhongMaterial color="#e2e8f0" transparent opacity={0.9} />
+            <meshPhongMaterial color="#ececec" opacity={0.7} />
           </mesh>
 
           <OrbitControls
-            enableZoom={true}
+            enableZoom={true} //ignorae o erro, nao existe
             enableRotate={true}
             minDistance={6}
             maxDistance={10}
