@@ -172,92 +172,131 @@ const Dashboard: React.FC = () => {
       {/* Key metrics and charts section */}
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex w-full lg:w-[55%] xl:w-[70%]">
-          <div className="dashboard-chart mb-4 xl:w-[35%] 2xl:w-[45%] border-none">
-            <Chart3D
-              data={inventoryData}
-              title="Estoque 3D - Distribuição por Categoria"
-            />
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
-              <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
-                <CardContent className="pt-4 sm:pt-5 p-3 md:p-4 ">
-                  <div className="flex items-center justify-between px-2 ">
-                    <div>
-                      <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
-                        Total de Itens
-                      </p>
-                      <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
-                        1,284
-                      </h3>
-                      <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
-                        <TrendingUp size={12} className="mr-1" />
-                        +2.5% este mês
-                      </p>
+          <div className="flex-row w-full">
+            <div className="dashboard-chart 2xl:w-[100%] border-none">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
+                <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                  <CardContent className="pt-4 sm:pt-5 p-3 md:p-4 ">
+                    <div className="flex items-center justify-between px-2 ">
+                      <div>
+                        <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+                          Total de Itens
+                        </p>
+                        <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
+                          1,284
+                        </h3>
+                        <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
+                          <TrendingUp size={12} className="mr-1" />
+                          +2.5% este mês
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
-                <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-4">
-                  <div className="flex items-center justify-between px-2">
-                    <div>
-                      <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
-                        Consumo Mensal
-                      </p>
-                      <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
-                        187
-                      </h3>
-                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center mt-1">
-                        <TrendingDown size={12} className="mr-1" />
-                        -1.8% este mês
-                      </p>
+                <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                  <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-4">
+                    <div className="flex items-center justify-between px-2">
+                      <div>
+                        <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+                          Consumo Mensal
+                        </p>
+                        <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
+                          187
+                        </h3>
+                        <p className="text-sm text-red-600 dark:text-red-400 flex items-center mt-1">
+                          <TrendingDown size={12} className="mr-1" />
+                          -1.8% este mês
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
-                <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-                  <div className="flex items-center justify-between px-2">
-                    <div>
-                      <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
-                        Reagentes
-                      </p>
-                      <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
-                        362
-                      </h3>
-                      <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
-                        <TrendingUp size={12} className="mr-1" />
-                        +5.2% este mês
-                      </p>
+                <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                  <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
+                    <div className="flex items-center justify-between px-2">
+                      <div>
+                        <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+                          Reagentes
+                        </p>
+                        <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
+                          362
+                        </h3>
+                        <p className="text-sm text-green-600 dark:text-green-400 flex items-center mt-1">
+                          <TrendingUp size={12} className="mr-1" />
+                          +5.2% este mês
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
-                <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
-                  <div className="flex items-center justify-between px-2">
-                    <div>
-                      <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
-                        Em Alerta
-                      </p>
-                      <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
-                        12
-                      </h3>
-                      <p className="text-sm text-yellow-600 dark:text-yellow-400 flex items-center mt-1">
-                        <AlertCircle size={12} className="mr-1" />
-                        Requer atenção
-                      </p>
+                <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                  <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
+                    <div className="flex items-center justify-between px-2">
+                      <div>
+                        <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+                          Em Alerta
+                        </p>
+                        <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
+                          12
+                        </h3>
+                        <p className="text-sm text-yellow-600 dark:text-yellow-400 flex items-center mt-1">
+                          <AlertCircle size={12} className="mr-1" />
+                          Requer atenção
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
+            {/* Key metrics cards */}
+            {/* Gauge charts section */}
+            <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart border-none">
+              <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
+                Estoque Geral
+              </h1>
+              <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                Itens disponíveis no estoque
+              </p>
+              <CardContent className="dashboard-chart grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
+                {inventoryPercent.map((item) => (
+                  <div key={item.name}>
+                    <div className="block sm:inline lg:hidden ">
+                      <div className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
+                        <GaugeChart
+                          title={item.name}
+                          value={item.value}
+                          size={180}
+                        />
+                      </div>
+                    </div>
+                    <div className="hidden lg:inline xl:hidden ">
+                      <div className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
+                        <GaugeChart
+                          title={item.name}
+                          value={item.value}
+                          size={180}
+                        />
+                      </div>
+                    </div>
+                    <div className="hidden xl:inline">
+                      <div className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
+                        <GaugeChart
+                          title={item.name}
+                          value={item.value}
+                          size={200}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </div>
-          {/* Key metrics cards */}
         </div>
-
         {/* Recent Activity - keep existing code */}
         <div className=" dashboard-chart max-h-auto w-full lg:w-[45%] xl:w-[30%]">
           <div className="bg-white bg-opacity-90 dark:bg-neutral-900/50 rounded-2xl shadow-lg p-6">
@@ -367,51 +406,27 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Gauge charts section */}
-      <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart border-none">
-        <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
-          Estoque Geral
-        </h1>
-        <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-          Itens disponíveis no estoque
-        </p>
-        <CardContent className="dashboard-chart grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
-          {inventoryPercent.map((item) => (
-            <div key={item.name}>
-              <div className="block sm:inline lg:hidden ">
-                <div className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
-                  <GaugeChart title={item.name} value={item.value} size={180} />
-                </div>
-              </div>
-              <div className="hidden lg:inline xl:hidden ">
-                <div className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
-                  <GaugeChart title={item.name} value={item.value} size={180} />
-                </div>
-              </div>
-              <div className="hidden xl:inline">
-                <div className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
-                  <GaugeChart title={item.name} value={item.value} size={200} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-      {/* Charts section with 3D chart */}
-      <div className="dashboard-chart grid grid-cols-1 gap-6">
-        <Card className="bg-opacity border-none">
-          <CardContent className="dashboard-chart p-0">
-            <DashboardChart
-              type="line"
-              data={consumptionData}
-              title="Consumo de Itens"
-              description="Itens consumidos nos últimos 7 meses"
-            />
-          </CardContent>
-        </Card>
+      <div className="dashboard-chart grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Charts section with 3D chart */}
+        <div className="dashboard-chart grid grid-cols-1 gap-6 col-span-2">
+          <Card className="bg-opacity border-none">
+            <CardContent className="dashboard-chart p-0">
+              <DashboardChart
+                type="line"
+                data={consumptionData}
+                title="Consumo de Itens"
+                description="Itens consumidos nos últimos 7 meses"
+              />
+            </CardContent>
+          </Card>
+        </div>
+        <div className="dashboard-chart col-span-1 h-auto">
+          <Chart3D
+            data={inventoryData}
+            title="Estoque 3D - Distribuição por Categoria"
+          />
+        </div>
       </div>
-
       {/* Items running low table - keep existing code */}
       <div className="dashboard-chart">
         <Card className="bg-white bg-opacity-90 border-neutral-300/60 border-opacity-20 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
