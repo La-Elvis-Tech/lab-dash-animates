@@ -136,7 +136,7 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
           </mesh>
 
           <OrbitControls
-            enableZoom={true} //ignorae o erro, nao existe
+            enableZoom={true} //ignora o erro, nao existe
             enableRotate={true}
             minDistance={6}
             maxDistance={10}

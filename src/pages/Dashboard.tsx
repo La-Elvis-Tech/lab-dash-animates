@@ -171,11 +171,11 @@ const Dashboard: React.FC = () => {
 
       {/* Key metrics and charts section */}
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex w-full lg:w-[55%] xl:w-[70%]">
+        <div className="flex w-full lg:w-[55%] xl:w-[65%]">
           <div className="flex-row w-full">
             <div className="dashboard-chart 2xl:w-[100%] border-none">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
-                <Card className="dashboard-card  bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 md:p-4 ">
                     <div className="flex items-center justify-between px-2 ">
                       <div>
@@ -194,7 +194,7 @@ const Dashboard: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-4">
                     <div className="flex items-center justify-between px-2">
                       <div>
@@ -213,7 +213,7 @@ const Dashboard: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
                     <div className="flex items-center justify-between px-2">
                       <div>
@@ -232,7 +232,7 @@ const Dashboard: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="dashboard-card bg-white bg-opacity-90 border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
                     <div className="flex items-center justify-between px-2">
                       <div>
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
             </div>
             {/* Key metrics cards */}
             {/* Gauge charts section */}
-            <Card className="bg-white bg-opacity-90 dark:bg-neutral-900/50 dashboard-chart border-none">
+            <Card className="bg-white dark:bg-neutral-900/70 dashboard-chart border-none">
               <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
                 Estoque Geral
               </h1>
@@ -298,8 +298,8 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         {/* Recent Activity - keep existing code */}
-        <div className=" dashboard-chart max-h-auto w-full lg:w-[45%] xl:w-[30%]">
-          <div className="bg-white bg-opacity-90 dark:bg-neutral-900/50 rounded-2xl shadow-lg p-6">
+        <div className=" dashboard-chart max-h-auto w-full lg:w-[45%] xl:w-[35%]">
+          <div className="bg-white dark:bg-neutral-900/70 rounded-2xl shadow-lg p-6">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                 Recentes
@@ -309,7 +309,7 @@ const Dashboard: React.FC = () => {
               </p>
             </div>
 
-            <div className=" dashboard-chart md:mah-h-[800px] xl:max-h-[520px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+            <div className=" dashboard-chart md:mah-h-[800px] xl:max-h-[510px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
               <div className="space-y-3">
                 {activities.map((activity, index) => (
                   <div
@@ -406,11 +406,11 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="dashboard-chart grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col lg:flex-row border-none shadow-none gap-6">
         {/* Charts section with 3D chart */}
-        <div className="dashboard-chart grid grid-cols-1 gap-6 col-span-2">
-          <Card className="bg-opacity border-none">
-            <CardContent className="dashboard-chart p-0">
+        <div className="flex w-full border-none">
+          <Card className="bg-opacity border-none w-full xl:w-[100%]">
+            <CardContent className="dashboard-chart p-0 ">
               <DashboardChart
                 type="line"
                 data={consumptionData}
@@ -420,7 +420,7 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-        <div className="dashboard-chart col-span-1 h-auto">
+        <div className="dashboard-chart h-auto flex w-full lg:w-[45%] xl:w-[35%]">
           <Chart3D
             data={inventoryData}
             title="Estoque 3D - Distribuição por Categoria"
