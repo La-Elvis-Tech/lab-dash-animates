@@ -171,7 +171,7 @@ const Dashboard: React.FC = () => {
 
       {/* Key metrics and charts section */}
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex w-full lg:w-[55%] xl:w-[65%]">
+        <div className="flex w-full xl:w-[55%] 2xl:w-[65%]">
           <div className="flex-row w-full">
             <div className="dashboard-chart 2xl:w-[100%] border-none">
               <div className="grid grid-cols-2 gap-3 sm:gap-4 pb-4">
@@ -264,7 +264,7 @@ const Dashboard: React.FC = () => {
               <CardContent className="dashboard-chart grid grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
                 {inventoryPercent.map((item) => (
                   <div key={item.name}>
-                    <div className="block sm:inline lg:hidden ">
+                    <div className="block sm:inline md:hidden ">
                       <div className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
                         <GaugeChart
                           title={item.name}
@@ -273,7 +273,7 @@ const Dashboard: React.FC = () => {
                         />
                       </div>
                     </div>
-                    <div className="hidden lg:inline xl:hidden ">
+                    <div className="hidden md:inline xl:hidden ">
                       <div className=" flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
                         <GaugeChart
                           title={item.name}
@@ -298,7 +298,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         {/* Recent Activity - keep existing code */}
-        <div className=" dashboard-chart max-h-auto w-full lg:w-[45%] xl:w-[35%]">
+        <div className=" dashboard-chart max-h-auto w-full xl:w-[45%] 2xl:w-[35%]">
           <div className="bg-white dark:bg-neutral-900/70 rounded-lg shadow-lg p-6">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
@@ -408,7 +408,7 @@ const Dashboard: React.FC = () => {
       </div>
       <div className=" flex flex-col lg:flex-row gap-6">
         {/* Charts section with 3D chart */}
-        <div className="dashboard-chart flex w-full border-none lg:w-[55%] xl:w-[65.5%]">
+        <div className="dashboard-chart flex w-full border-none">
           <Card className="dashboard h-auto border-none w-full xl:w-[100%] bg-white bg-opacity-0 shadow-none">
             <CardContent className="dashboard-chart p-0 ">
               <DashboardChart
@@ -420,19 +420,13 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-        <div className="dashboard-chart flex w-full lg:w-[45%] xl:w-[34.5%]">
-          <Chart3D
-            data={inventoryData}
-            title="Estoque 3D - Distribuição por Categoria"
-          />
-        </div>
       </div>
       {/* Items running low table - keep existing code */}
       <div className="dashboard-chart">
         <Card className="bg-white dark:bg-neutral-900/70">
           <div className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between mb-3 md:mb-4">
-              <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
+              <h2 className="p-2 text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
                 Itens em Baixo Estoque
               </h2>
               <Link
@@ -442,29 +436,32 @@ const Dashboard: React.FC = () => {
                 Ver Todos
               </Link>
             </div>
-            <div className="overflow-x-auto -mx-3 sm:-mx-4 md:mx-0">
-              <div className="inline-block min-w-full align-middle px-3 sm:px-4 md:px-0">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="p-2 overflow-x-auto">
+              <div className="p-0 lg:px-6 min-w-[500px] md:min-w-0">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-base">
                   <thead>
-                    <tr className="text-left text-xs sm:text-sm text-gray-700 dark:text-gray-400">
-                      <th scope="col" className="py-2 sm:py-3 font-semibold">
+                    <tr className="text-gray-700 dark:text-gray-400">
+                      <th
+                        scope="col"
+                        className="px-2 py-3 font-semibold text-left"
+                      >
                         Nome do Item
                       </th>
                       <th
                         scope="col"
-                        className="py-2 sm:py-3 font-semibold text-right"
+                        className="px-2 py-3 font-semibold text-right"
                       >
                         Estoque Atual
                       </th>
                       <th
                         scope="col"
-                        className="py-2 sm:py-3 font-semibold text-right"
+                        className="px-2 py-3 font-semibold text-right"
                       >
                         Estoque Mínimo
                       </th>
                       <th
                         scope="col"
-                        className="py-2 sm:py-3 font-semibold text-center"
+                        className="px-2 py-3 font-semibold text-right"
                       >
                         Status
                       </th>
@@ -473,17 +470,17 @@ const Dashboard: React.FC = () => {
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                     {itemsNearDepletion.map((item) => (
                       <tr key={item.id}>
-                        <td className="py-2 sm:py-3 text-xs sm:text-sm font-medium dark:text-gray-300 text-gray-800">
+                        <td className="text-sm px-2 py-3 font-medium dark:text-gray-300 text-gray-800 text-left">
                           {item.name}
                         </td>
-                        <td className="py-2 sm:py-3 text-xs sm:text-sm dark:text-gray-300 text-gray-800 text-right">
+                        <td className="text-sm px-2 py-3 dark:text-gray-300 text-gray-800 text-right">
                           {item.currentStock} {item.unit}
                         </td>
-                        <td className="py-2 sm:py-3 text-xs sm:text-sm dark:text-gray-300 text-gray-800 text-right">
+                        <td className="text-sm px-2 py-3 dark:text-gray-300 text-gray-800 text-right">
                           {item.minStock} {item.unit}
                         </td>
-                        <td className="py-2 sm:py-3 px-2 text-center">
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100">
+                        <td className="px-2 py-3 text-right">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100">
                             Crítico
                           </span>
                         </td>

@@ -141,7 +141,7 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
             minDistance={6}
             maxDistance={10}
             enablePan={false}
-            target={[0, 2, 0]}
+            target={[0, 2.2, 0]}
             minPolarAngle={Math.PI/3}   // Ângulo mínimo de 30 graus (impede visão de cima)
             maxPolarAngle={Math.PI/2.2} // Ângulo máximo de ~80 graus (impede visão de baixo)
             minAzimuthAngle={-Math.PI/4} // Rotação horizontal mínima

@@ -63,8 +63,8 @@ const Layout = () => {
                   <Sidebar isCollapsed={false} toggleSidebar={() => {}} />
                 </SheetContent>
               </Sheet>
-              <h1 className="text-lg font-semibold text-lab-blue dark:text-white ml-2">La Elvis Tech</h1>
             </div>
+              <h1 className="font-michroma text-lg font-semibold text-lab-blue dark:text-white ">La Elvis Tech</h1>
             <ThemeToggle />
           </div>
         </div>

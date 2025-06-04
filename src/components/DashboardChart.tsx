@@ -72,17 +72,17 @@ const DashboardChart = ({ type, data, title, description }) => {
     switch (type) {
       case 'bar':
         return (
-          <ResponsiveContainer width="100%" height={400} minHeight={200}>
-            <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 5 }} >
+          <ResponsiveContainer width="100%" height={400} minHeight={100}>
+            <BarChart data={data} margin={{  top: 10, right: 30, left:-30, bottom: 5 }} >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="name" 
-                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                tick={{ fill: 'currentColor', fontSize: '14px' }}
                 stroke="currentColor"
                 strokeOpacity={0.3}
               />
               <YAxis 
-                tick={{ fill: 'currentColor', fontSize: '12px' }}
+                tick={{ fill: 'currentColor', fontSize: '14px' }}
                 stroke="currentColor"
                 strokeOpacity={0.3}
               />
@@ -97,7 +97,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 }}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
+              <Legend wrapperStyle={{ fontSize: '14px' }} />
               <Bar dataKey="value" fill="url(#barGradient)" radius={[10, 10, 0, 0]} />
               {data[0]?.value2 && <Bar dataKey="value2" fill="#1D2472" />}
               <defs>
@@ -112,7 +112,7 @@ const DashboardChart = ({ type, data, title, description }) => {
       case 'line':
         return (
           <ResponsiveContainer width="100%" height={300} minHeight={200} minWidth={300}>
-            <LineChart data={data} margin={{ top: 10, right: 30, left:-30, bottom: 5 }}>
+            <LineChart data={data} margin={{ top: 10, right: 0, left:-30, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="name" 
@@ -304,9 +304,9 @@ const DashboardChart = ({ type, data, title, description }) => {
       ref={chartRef}
       className="bg-white bg-opacity-90 p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 dark:bg-neutral-900/70  "
     >
-      <div className="mb-3 sm:mb-6">
-        <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">{description}</p>
+      <div className="mb-3 sm:mb-6 p-3">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
+        <p className=" sm:text-base text-gray-600 dark:text-gray-300">{description}</p>
       </div>
       {renderChart()}
     </div>
