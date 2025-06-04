@@ -20,14 +20,14 @@ interface GaugeChartProps {
 const GaugeChart: React.FC<GaugeChartProps> = ({
   value,
   size = 200,
-  strokeWidth = 60,
+  strokeWidth = 50,
   title = "Percent",
   railColor = "#66666634",
 }) => {
   const data = [{ name: title, value }];
 
   // converte strokeWidth para % de raio interno
-  const outerRadius = 125;
+  const outerRadius = 121;
   const innerRadius = outerRadius - (strokeWidth / size) * 110;
 
   return (
@@ -69,13 +69,13 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
             {/* Arco colorido usando fillColor (com degradê opcional) */}
             <defs>
               <linearGradient id="gradGauge" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#c6c3f1eb" stopOpacity={1} />
-                <stop offset="100%" stopColor="#1b0bf7f4" stopOpacity={0.5} />
+                <stop offset="0%" stopColor="#1b0bf7f4" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="#c6c3f1eb" stopOpacity={1} />
               </linearGradient>
             </defs>
             <RadialBar
               dataKey="value"
-              cornerRadius={strokeWidth / 2}
+              cornerRadius={strokeWidth / 10}
               fill="url(#gradGauge)"
             />
             
@@ -86,10 +86,10 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
 
       {/* Texto central */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-        <span className="text-sm text-gray-500 dark:text-gray-400">
+        <span className="text-xs xl:text-base text-gray-500 dark:text-gray-400">
           {title}
         </span>
-        <span className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        <span className="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-100">
           {value}%
         </span>
       </div>

@@ -41,7 +41,7 @@ const Settings = () => {
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl overflow-hidden">
+      <div className="">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 mb-8 p-1 bg-gradient-to-r from-purple-100/80 to-indigo-100/80 dark:from-purple-900/30 dark:to-indigo-900/30">
             <TabsTrigger value="profile" className="flex items-center gap-2">

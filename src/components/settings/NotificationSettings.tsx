@@ -160,7 +160,7 @@ const NotificationSettings = () => {
       <CardFooter className="flex justify-end border-t border-gray-100 dark:border-gray-700 pt-4">
         <Button 
           onClick={handleSave}
-          className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+          className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
         >
           Salvar Configurações
         </Button>

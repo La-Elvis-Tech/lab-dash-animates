@@ -103,13 +103,13 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
   ];
 
   return (
-    <div className="h-auto w-full bg-white dark:bg-neutral-900/80 rounded-lg border-none">
+    <div className="h-auto w-full bg-white dark:bg-neutral-900/70 rounded-lg border-none">
       <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
           {title}
         </h3>
       </div>
-      <div className="h-80 mb-8 bg-white dark:bg-neutral-800  rounded-b-lg">
+      <div className="h-80 p-2 bg-white dark:bg-neutral-800/50 rounded-b-lg">
         <Canvas camera={{ position: [2, 2, 9], fov: 45 }}>
           <ambientLight intensity={0.8} />
           <directionalLight
@@ -129,7 +129,7 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
             />
           ))}
 
-          {/* Linhas guia */}
+          {/* Chão */}
           <mesh position={[-0.2, 0, 0.4]}>
             <boxGeometry args={[3.5, 0.1, 3.5]} />
             <meshPhongMaterial color="#ececec" opacity={0.7} />

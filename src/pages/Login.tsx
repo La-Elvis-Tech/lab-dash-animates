@@ -40,7 +40,7 @@ export const Login = () => {
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-purple-400 "></div>
 
           <div className="relative z-10 opacity-95">
-            <div className="mb-8 text-center space-y-2">
+            <div className="mb-8 text-center space-y-3">
               <h1 className="text-3xl font-bold bg-gradient-to-r via-indigo-200 bg-clip-text text-transparent">
                 Bem Vindo de Volta!
               </h1>
@@ -52,14 +52,14 @@ export const Login = () => {
               <div className="group">
                 <label
                   htmlFor="username"
-                  className="block text-sm font-medium text-gray-200 mb-2 transition-all duration-300 group-focus-within:text-blue-400 pb-2"
+                  className="block text-sm font-medium text-gray-200 mb-3 transition-all duration-300 group-focus-within:text-blue-400 pb-2"
                 >
                   Nome de Usuário
                 </label>
                 <div className="relative">
                   <input
                     id="username"
-                    className="bg-gray-100/80 text-gray-700 w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-500"
+                    className="bg-gray-100/80 text-gray-700 w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-500"
                     placeholder="joao@dasa2025.com"
                     value={u}
                     onChange={e => setU(e.target.value)}
@@ -72,7 +72,7 @@ export const Login = () => {
               <div className="group">
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-200 mb-2 transition-all duration-300 group-focus-within:text-blue-400 pb-2"
+                  className="block text-sm font-medium text-gray-200 mb-3 transition-all duration-300 group-focus-within:text-blue-400 pb-2"
                 >
                   Senha
                 </label>
@@ -80,7 +80,7 @@ export const Login = () => {
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    className="bg-gray-100/80 text-gray-700 w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-500 pr-12 mb-10"
+                    className="bg-gray-100/80 text-gray-700 w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-500 pr-12 mb-10"
                     placeholder="••••••••"
                     value={p}
                     onChange={e => setP(e.target.value)}
@@ -197,7 +197,7 @@ export const Login = () => {
             <div className="mt-8 text-center text-sm text-gray-500 space-y-4">
               <a
                 href="#forgot-password"
-                className="text-blue-600 hover:text-blue-500 hover:underline transition-colors flex items-center justify-center gap-1"
+                className="text-blue-200 hover:text-blue-500 hover:underline transition-colors flex items-center justify-center gap-1"
               >
                 {/* ...icon */}
                 Esqueceu a senha?

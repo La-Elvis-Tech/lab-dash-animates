@@ -174,7 +174,7 @@ const Dashboard: React.FC = () => {
         <div className="flex w-full lg:w-[55%] xl:w-[65%]">
           <div className="flex-row w-full">
             <div className="dashboard-chart 2xl:w-[100%] border-none">
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 pb-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 pb-4">
                 <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 md:p-4 ">
                     <div className="flex items-center justify-between px-2 ">
@@ -261,7 +261,7 @@ const Dashboard: React.FC = () => {
               <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
                 Itens disponíveis no estoque
               </p>
-              <CardContent className="dashboard-chart grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
+              <CardContent className="dashboard-chart grid grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3">
                 {inventoryPercent.map((item) => (
                   <div key={item.name}>
                     <div className="block sm:inline lg:hidden ">
@@ -269,7 +269,7 @@ const Dashboard: React.FC = () => {
                         <GaugeChart
                           title={item.name}
                           value={item.value}
-                          size={180}
+                          size={160}
                         />
                       </div>
                     </div>
@@ -299,7 +299,7 @@ const Dashboard: React.FC = () => {
         </div>
         {/* Recent Activity - keep existing code */}
         <div className=" dashboard-chart max-h-auto w-full lg:w-[45%] xl:w-[35%]">
-          <div className="bg-white dark:bg-neutral-900/70 rounded-2xl shadow-lg p-6">
+          <div className="bg-white dark:bg-neutral-900/70 rounded-lg shadow-lg p-6">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                 Recentes
@@ -314,19 +314,19 @@ const Dashboard: React.FC = () => {
                 {activities.map((activity, index) => (
                   <div
                     key={index}
-                    className="rounded-xl bg-gray-300/40 dark:bg-gray-800 overflow-hidden"
+                    className="rounded-xl bg-gray-300/40 dark:bg-neutral-800/30 overflow-hidden"
                   >
                     <button
                       onClick={() => toggleAccordion(index)}
-                      className="w-full p-4 flex items-center justify-between gap-4 hover:bg-gray-300/80 dark:hover:bg-gray-600 transition-colors"
+                      className="w-full p-4 flex items-center justify-between gap-4 hover:bg-gray-300/80 dark:hover:bg-gray-800 transition-colors"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-blue-600 dark:text-blue-300">
+                        <div className="p-2 bg-gray-50 dark:bg-neutral-700 rounded-lg text-blue-600 dark:text-blue-300">
                           {getIcon(activity.title)}
                         </div>
 
                         <div className="text-left">
-                          <h3 className="font-semibold text-gray-800 dark:text-gray-300">
+                          <h3 className="font-semibold text-gray-800 dark:text-neutral-300">
                             {activity.title}
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -406,13 +406,13 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row border-none shadow-none gap-6">
+      <div className=" flex flex-col lg:flex-row gap-6">
         {/* Charts section with 3D chart */}
-        <div className="flex w-full border-none">
-          <Card className="bg-opacity border-none w-full xl:w-[100%]">
+        <div className="dashboard-chart flex w-full border-none lg:w-[55%] xl:w-[65.5%]">
+          <Card className="dashboard h-auto border-none w-full xl:w-[100%] bg-white bg-opacity-0 shadow-none">
             <CardContent className="dashboard-chart p-0 ">
               <DashboardChart
-                type="line"
+                type="bar"
                 data={consumptionData}
                 title="Consumo de Itens"
                 description="Itens consumidos nos últimos 7 meses"
@@ -420,7 +420,7 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-        <div className="dashboard-chart h-auto flex w-full lg:w-[45%] xl:w-[35%]">
+        <div className="dashboard-chart flex w-full lg:w-[45%] xl:w-[34.5%]">
           <Chart3D
             data={inventoryData}
             title="Estoque 3D - Distribuição por Categoria"
@@ -429,7 +429,7 @@ const Dashboard: React.FC = () => {
       </div>
       {/* Items running low table - keep existing code */}
       <div className="dashboard-chart">
-        <Card className="bg-white bg-opacity-90 border-neutral-300/60 border-opacity-20 dark:bg-neutral-900/50 dark:border-neutral-700 dark:border-opacity-20">
+        <Card className="bg-white dark:bg-neutral-900/70">
           <div className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between mb-3 md:mb-4">
               <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
@@ -483,7 +483,7 @@ const Dashboard: React.FC = () => {
                           {item.minStock} {item.unit}
                         </td>
                         <td className="py-2 sm:py-3 px-2 text-center">
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-300">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100">
                             Crítico
                           </span>
                         </td>

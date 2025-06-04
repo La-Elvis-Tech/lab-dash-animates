@@ -178,7 +178,7 @@ const LaboratoryProfile = () => {
           {!isEditing ? (
             <Button 
               onClick={() => setIsEditing(true)}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+              className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
             >
               Editar Perfil
             </Button>
@@ -187,7 +187,7 @@ const LaboratoryProfile = () => {
               <Button variant="outline" onClick={handleCancel}>Cancelar</Button>
               <Button 
                 onClick={handleSave}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
               >
                 Salvar Alterações
               </Button>
