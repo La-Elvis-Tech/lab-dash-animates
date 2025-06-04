@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +11,23 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Mock data
 const categories = [
@@ -122,6 +140,16 @@ const Inventory = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [filteredItems, setFilteredItems] = useState(inventoryItems);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newItem, setNewItem] = useState({
+    name: '',
+    category: '',
+    stock: '',
+    unit: '',
+    location: '',
+    size: '',
+    expiryDate: '',
+  });
   const containerRef = useRef(null);
   const { toast } = useToast();
 
@@ -208,16 +236,52 @@ const Inventory = () => {
     }
   };
 
-  // Mock data for stock details
-  const getStockDetails = (itemId) => {
-    // This would normally come from an API
+  // Improved stock details calculation
+  const getStockDetails = (item) => {
+    const totalStock = item.stock;
+    const reserved = Math.floor(totalStock * 0.15); // 15% reserved
+    const available = totalStock - reserved;
+    const usedThisMonth = Math.floor(totalStock * 0.25); // 25% used this month
+    
     return {
-      available: 15,
-      reserved: 3,
-      usedThisMonth: 8,
+      available,
+      reserved,
+      usedThisMonth,
       lastReplenishment: '2024-05-01',
-      batchExpiry: '2025-12-30'
+      batchExpiry: item.expiryDate || '2025-12-30'
     };
+  };
+
+  const handleAddItem = () => {
+    if (!newItem.name || !newItem.category || !newItem.stock || !newItem.unit || !newItem.location) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Here you would normally send to your API
+    console.log('Adding new item:', newItem);
+    
+    toast({
+      title: "Item adicionado",
+      description: `${newItem.name} foi adicionado ao inventário com sucesso.`,
+    });
+
+    // Reset form
+    setNewItem({
+      name: '',
+      category: '',
+      stock: '',
+      unit: '',
+      location: '',
+      size: '',
+      expiryDate: '',
+    });
+    
+    setIsDialogOpen(false);
   };
 
   return (
@@ -228,27 +292,27 @@ const Inventory = () => {
       </div>
 
       {/* Filters - Improved for mobile */}
-      <Card className="inventory-filters ">
-        <CardContent className="p-4 dark:border-none rounded-md bg-neutral-100/80 dark:bg-neutral-800/80 ">
-          <div className="flex flex-col gap-4 ">
+      <Card className="inventory-filters">
+        <CardContent className="p-4 bg-neutral-100/80 dark:bg-neutral-800/80">
+          <div className="flex flex-col gap-4">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-3 transform text-gray-400 " size={18} />
+              <Search className="absolute left-3 top-3 transform text-gray-400" size={18} />
               <Input
                 placeholder="Buscar item..."
-                className="pl-10 w-full dark:border-none rounded-md bg-white dark:bg-neutral-700/40"
+                className="pl-10 w-full rounded-md bg-white dark:bg-neutral-700/40"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-3 justify-between">
-              {/* Category filter - scrollable on mobile */}
-              <div className="overflow-x-auto pb-1 -mx-1">
-                <div className="flex space-x-1 px-1 min-w-max">
+            <div className="flex flex-col sm:flex-row gap-3 justify-between items-start">
+              {/* Category filter - improved mobile scroll */}
+              <div className="w-full sm:flex-1">
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
                   {categories.map((category) => (
                     <button
                       key={category.id}
-                      className={`px-3 py-2 text-sm font-medium whitespace-nowrap dark:border-none ${
+                      className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 ${
                         selectedCategory === category.id
                           ? 'bg-lab-blue text-white dark:bg-lab-blue/80'
                           : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-700/80 dark:text-gray-300 dark:hover:bg-gray-700' 
@@ -261,66 +325,184 @@ const Inventory = () => {
                 </div>
               </div>
               
-              <Button className="flex items-center gap-2 whitespace-nowrap bg-neutral-950/90 dark:bg-gray-100/90">
-                <Plus size={16} />
-                <span className="hidden sm:inline">Novo Item</span>
-                <span className="sm:hidden">Novo</span>
-              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center gap-2 whitespace-nowrap bg-neutral-950/90 dark:bg-gray-100/90 flex-shrink-0">
+                    <Plus size={16} />
+                    <span className="hidden sm:inline">Novo Item</span>
+                    <span className="sm:hidden">Novo</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] max-w-[95vw]">
+                  <DialogHeader>
+                    <DialogTitle>Adicionar Novo Item</DialogTitle>
+                    <DialogDescription>
+                      Preencha as informações do novo item de inventário.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        Nome *
+                      </Label>
+                      <Input
+                        id="name"
+                        value={newItem.name}
+                        onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="category" className="text-right">
+                        Categoria *
+                      </Label>
+                      <Select 
+                        value={newItem.category} 
+                        onValueChange={(value) => setNewItem({...newItem, category: value})}
+                      >
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Selecione a categoria" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.filter(cat => cat.id !== 'all').map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="stock" className="text-right">
+                        Estoque *
+                      </Label>
+                      <Input
+                        id="stock"
+                        type="number"
+                        value={newItem.stock}
+                        onChange={(e) => setNewItem({...newItem, stock: e.target.value})}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="unit" className="text-right">
+                        Unidade *
+                      </Label>
+                      <Select 
+                        value={newItem.unit} 
+                        onValueChange={(value) => setNewItem({...newItem, unit: value})}
+                      >
+                        <SelectTrigger className="col-span-3">
+                          <SelectValue placeholder="Selecione a unidade" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Litros">Litros</SelectItem>
+                          <SelectItem value="Unidades">Unidades</SelectItem>
+                          <SelectItem value="Pares">Pares</SelectItem>
+                          <SelectItem value="Gramas">Gramas</SelectItem>
+                          <SelectItem value="Quilogramas">Quilogramas</SelectItem>
+                          <SelectItem value="Mililitros">Mililitros</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="location" className="text-right">
+                        Localização *
+                      </Label>
+                      <Input
+                        id="location"
+                        value={newItem.location}
+                        onChange={(e) => setNewItem({...newItem, location: e.target.value})}
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="size" className="text-right">
+                        Tamanho
+                      </Label>
+                      <Input
+                        id="size"
+                        value={newItem.size}
+                        onChange={(e) => setNewItem({...newItem, size: e.target.value})}
+                        className="col-span-3"
+                        placeholder="Ex: 500ml, 10cm"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="expiry" className="text-right">
+                        Validade
+                      </Label>
+                      <Input
+                        id="expiry"
+                        type="date"
+                        value={newItem.expiryDate}
+                        onChange={(e) => setNewItem({...newItem, expiryDate: e.target.value})}
+                        className="col-span-3"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit" onClick={handleAddItem}>
+                      Adicionar Item
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Items List - Responsive grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 item-list">
+      {/* Items List - Enhanced responsive grid */}
+      <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 item-list">
         {filteredItems.map((item) => {
-          const stockDetails = getStockDetails(item.id);
+          const stockDetails = getStockDetails(item);
           
           return (
-            <Card key={item.id} className="inventory-item overflow-hidden h-full bg-white dark:bg-neutral-900/50">
+            <Card key={item.id} className="inventory-item overflow-hidden h-full bg-white dark:bg-neutral-900/50 transition-all duration-200 hover:shadow-lg">
               <div 
                 className={`h-1 ${
                   item.status === 'low' ? 'bg-red-500' : 'bg-green-500'
                 }`}
               />
-              <CardContent className="p-4 flex flex-col h-full">
+              <CardContent className="p-3 sm:p-4 flex flex-col h-full">
                 <div className="flex justify-between items-start mb-3">
-                  <div className="mr-2">
-                    <h3 className="font-medium text-lg line-clamp-2">{item.name}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="mr-2 flex-1">
+                    <h3 className="font-medium text-base sm:text-lg line-clamp-2 leading-tight">{item.name}</h3>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {categories.find(c => c.id === item.category)?.name}
                     </p>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)} whitespace-nowrap`}>
+                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)} whitespace-nowrap flex-shrink-0`}>
                     {item.stock} {item.unit}
                   </span>
                 </div>
                 
-                <div className="mt-2 text-sm space-y-2 flex-grow">
-                  <div className="flex justify-between">
-                    <span className="text-gray-500 dark:text-gray-400">Localização:</span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">{item.location}</span>
+                <div className="mt-2 text-xs sm:text-sm space-y-2 flex-grow">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">Localização:</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2 truncate">{item.location}</span>
                   </div>
                   
                   {item.expiryDate && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500 dark:text-gray-400">Validade:</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">Validade:</span>
                       <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
                         {new Date(item.expiryDate).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
                   )}
                   
-                  <div className="flex justify-between">
-                    <span className="text-gray-500 dark:text-gray-400">Último uso:</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">Último uso:</span>
                     <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
                       {new Date(item.lastUsed).toLocaleDateString('pt-BR')}
                     </span>
                   </div>
 
                   {item.size && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-500 dark:text-gray-400">Tamanho:</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">Tamanho:</span>
                       <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
                         {item.size}
                       </span>
@@ -332,7 +514,7 @@ const Inventory = () => {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button 
-                        className="w-full bg-neutral-200 hover:bg-blue-400 dark:bg-neutral-950/60 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white transition-colors"
+                        className="w-full bg-neutral-200 hover:bg-blue-400 dark:bg-neutral-950/60 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white transition-colors text-xs sm:text-sm"
                       >
                         Ver Estoque
                       </Button>
