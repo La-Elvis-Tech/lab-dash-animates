@@ -40,15 +40,15 @@ const ExamsStats: React.FC<ExamsStatsProps> = ({ exams }) => {
     .sort(([,a], [,b]) => b - a)[0]?.[0] || 'N/A';
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <Card className="dark:bg-gray-800">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Exames (30 dias)</CardTitle>
+          <CardTitle className="text-sm font-medium">Exames</CardTitle>
           <Calendar className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{recentExams.length}</div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs pt-2 text-muted-foreground">
             {completedExams.length} concluídos
           </p>
         </CardContent>
@@ -61,7 +61,7 @@ const ExamsStats: React.FC<ExamsStatsProps> = ({ exams }) => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">R$ {totalCost.toFixed(2)}</div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs pt-2 text-muted-foreground">
             Últimos 30 dias
           </p>
         </CardContent>
@@ -74,7 +74,7 @@ const ExamsStats: React.FC<ExamsStatsProps> = ({ exams }) => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">R$ {averageCost.toFixed(2)}</div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs pt-2 text-muted-foreground">
             Por exame
           </p>
         </CardContent>
@@ -87,7 +87,7 @@ const ExamsStats: React.FC<ExamsStatsProps> = ({ exams }) => {
         </CardHeader>
         <CardContent>
           <div className="text-lg font-bold">{mostCommonExam}</div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs pt-2 text-muted-foreground">
             {examTypeCounts[mostCommonExam] || 0} realizados
           </p>
         </CardContent>

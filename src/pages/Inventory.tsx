@@ -517,7 +517,7 @@ const Inventory = () => {
       </Card>
 
       {/* Items List - Enhanced responsive grid */}
-      <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 item-list">
+      <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 item-list">
         {filteredItems.map((item) => {
           const stockDetails = getStockDetails(item);
 

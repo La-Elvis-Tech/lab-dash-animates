@@ -192,7 +192,7 @@ const Requests: React.FC = () => {
                   placeholder="Buscar por paciente, médico, tipo de exame..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-full border rounded-md bg-white dark:bg-gray-900/80 font-normal"
+                  className="pl-10 w-full border rounded-md font-normal bg-gray-200 bg-neutral-900/70 dark:border-transparent outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
                 />
               </div>
               
@@ -203,7 +203,7 @@ const Requests: React.FC = () => {
                     <Button
                       variant="outline"
                       className={cn(
-                        "justify-start text-left font-normal text-xs md:text-sm h-9 text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900",
+                        "justify-start text-left font-normal text-xs md:text-sm h-9 text-gray-800 dark:text-white bg-gray-200 bg-neutral-900/70 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200",
                         !selectedDate && "text-muted-foreground"
                       )}
                       size="sm"
@@ -225,7 +225,7 @@ const Requests: React.FC = () => {
                 
                 {/* Type filter - responsive */}
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-200 bg-neutral-900/70 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
                     <SelectValue placeholder="Tipo de exame" />
                   </SelectTrigger>
                   <SelectContent>
@@ -241,7 +241,7 @@ const Requests: React.FC = () => {
                 
                 {/* Unit filter - responsive */}
                 <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-200 dark:bg-neutral-900/70 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
                     <SelectValue placeholder="Unidade" />
                   </SelectTrigger>
                   <SelectContent>
@@ -257,7 +257,7 @@ const Requests: React.FC = () => {
                 
                 {/* Laboratory filter - responsive */}
                 <Select value={selectedLaboratory} onValueChange={setSelectedLaboratory}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-200 bg-neutral-900/70 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
                     <SelectValue placeholder="Laboratório" />
                   </SelectTrigger>
                   <SelectContent>
@@ -275,7 +275,7 @@ const Requests: React.FC = () => {
                 <Button 
                   variant="outline" 
                   onClick={resetFilters}
-                  className="whitespace-nowrap text-xs md:text-sm h-9 bg-gray-300/50 dark:bg-gray-900"
+                  className="whitespace-nowrap text-xs md:text-sm h-9 text-gray-800 dark:text-white bg-gray-200 dark:bg-neutral-900/70"
                   size="sm"
                 >
                   Limpar filtros
@@ -285,25 +285,25 @@ const Requests: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-0 pt-0">
-          <div className="p-3 md:py-4 px-6 bg-gray-200 dark:bg-gray-950/30 border-b border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div className="p-3 md:py-4 px-6 bg-gray-200 dark:bg-neutral-950/80 border-b border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
-              <span className="text-xs md:text-sm text-gray-500 dark:text-gray-300">
+              <span className="text-sm md:text-base text-gray-500 dark:text-gray-300">
                 Exames encontrados: <strong>{filteredExams.length}</strong>
               </span>
             </div>
             <div>
-              <span className="text-xs md:text-sm font-medium">
+              <span className="text-sm md:text-base font-medium">
                 Total de despesas: <strong className="text-green-600 dark:text-green-400">R$ {totalCost.toFixed(2)}</strong>
               </span>
             </div>
           </div>
           
-          <div className="p-6">
-            <ScrollArea className="h-[600px] w-full">
+          <div className="p-6 dark:bg-neutral-900/60">
+            <ScrollArea className="h-[600px] w-full ">
               {filteredExams.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {filteredExams.map((exam) => (
-                    <Card key={exam.id} className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600">
+                    <Card key={exam.id} className="relative bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600">
                       <CardHeader className="pb-3">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center space-x-2">
@@ -383,7 +383,7 @@ const Requests: React.FC = () => {
                               R$ {exam.cost.toFixed(2)}
                             </span>
                           </div>
-                          <div className="text-right">
+                          <div className="text-left md:text-right">
                             <p className="text-xs text-gray-500 dark:text-gray-400">Resultado</p>
                             <span className={`text-sm font-medium ${
                               exam.result === 'Alterado' 
