@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
           <div className="flex-row w-full">
             <div className="dashboard-chart 2xl:w-[100%] border-none">
               <div className="grid grid-cols-2 gap-3 sm:gap-4 pb-4">
-                <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                <Card className="dashboard-card bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80  dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 md:p-4 ">
                     <div className="flex items-center justify-between px-2 ">
                       <div>
@@ -194,7 +194,7 @@ const Dashboard: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                <Card className="dashboard-card bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80  dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-4">
                     <div className="flex items-center justify-between px-2">
                       <div>
@@ -213,7 +213,7 @@ const Dashboard: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                <Card className="dashboard-card bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80  dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
                     <div className="flex items-center justify-between px-2">
                       <div>
@@ -232,7 +232,7 @@ const Dashboard: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="dashboard-card bg-white border-neutral-300/60 border-opacity-80 dark:bg-neutral-900/70 dark:border-neutral-700 dark:border-opacity-20 ">
+                <Card className="dashboard-card bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80  dark:border-neutral-700 dark:border-opacity-20 ">
                   <CardContent className="pt-4 sm:pt-5 p-3 sm:p-4 md:p-5">
                     <div className="flex items-center justify-between px-2">
                       <div>
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
             </div>
             {/* Key metrics cards */}
             {/* Gauge charts section */}
-            <Card className="bg-white dark:bg-neutral-900/70 dashboard-chart border-none">
+            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 dashboard-chart border-none">
               <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
                 Estoque Geral
               </h1>
@@ -298,8 +298,8 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         {/* Recent Activity - keep existing code */}
-        <div className=" dashboard-chart max-h-auto w-full xl:w-[45%] 2xl:w-[35%]">
-          <div className="bg-white dark:bg-neutral-900/70 rounded-lg shadow-lg p-6">
+        <div className=" dashboard-chart max-h-auto w-full xl:w-[45%] 2xl:w-[35%] ">
+          <div className="  bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg p-6">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                 Recentes
@@ -314,7 +314,7 @@ const Dashboard: React.FC = () => {
                 {activities.map((activity, index) => (
                   <div
                     key={index}
-                    className="rounded-xl bg-gray-300/40 dark:bg-neutral-800/30 overflow-hidden"
+                    className="rounded-xl bg-gray-300/40 dark:bg-neutral-900/60 overflow-hidden"
                   >
                     <button
                       onClick={() => toggleAccordion(index)}
@@ -351,7 +351,7 @@ const Dashboard: React.FC = () => {
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.2, ease: "easeOut" }}
-                          className="px-2 pt-4 bg-gray-100/90 dark:bg-neutral-900/40"
+                          className="px-2 pt-4 bg-gray-100/90 dark:bg-neutral-800/40"
                         >
                           <div className="pl-2 xl:pl-4 pb-4 space-y-2 overflow-x-auto whitespace-nowrap">
                             {activity.description && (
@@ -423,7 +423,7 @@ const Dashboard: React.FC = () => {
       </div>
       {/* Items running low table - keep existing code */}
       <div className="dashboard-chart">
-        <Card className="bg-white dark:bg-neutral-900/70">
+        <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950/90">
           <div className="p-3 sm:p-4 md:p-6">
             <div className="flex items-center justify-between mb-3 md:mb-4">
               <h2 className="p-2 text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
@@ -440,7 +440,7 @@ const Dashboard: React.FC = () => {
               <div className="p-0 lg:px-6 min-w-[500px] md:min-w-0">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-base">
                   <thead>
-                    <tr className="text-gray-700 dark:text-gray-400">
+                    <tr className="text-gray-700 dark:text-gray-100">
                       <th
                         scope="col"
                         className="px-2 py-3 font-semibold text-left"
