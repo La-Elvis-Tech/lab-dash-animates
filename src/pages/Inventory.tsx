@@ -1,11 +1,10 @@
-
-import React, { useState, useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search, Plus, Calendar, Package, Database, Clock } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, Plus, Calendar, Package, Database, Clock } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Popover,
   PopoverContent,
@@ -31,124 +30,124 @@ import {
 
 // Mock data
 const categories = [
-  { id: 'all', name: 'Todos' },
-  { id: 'reagents', name: 'Reagentes' },
-  { id: 'glassware', name: 'Vidraria' },
-  { id: 'equipment', name: 'Equipamentos' },
-  { id: 'disposable', name: 'Descartáveis' },
+  { id: "all", name: "Todos" },
+  { id: "reagents", name: "Reagentes" },
+  { id: "glassware", name: "Vidraria" },
+  { id: "equipment", name: "Equipamentos" },
+  { id: "disposable", name: "Descartáveis" },
 ];
 
 const inventoryItems = [
   {
     id: 1,
-    name: 'Ácido Sulfúrico',
-    category: 'reagents',
+    name: "Ácido Sulfúrico",
+    category: "reagents",
     stock: 18,
-    unit: 'Litros',
-    location: 'Armário A3',
+    unit: "Litros",
+    location: "Armário A3",
     size: null,
-    expiryDate: '2025-10-15',
-    lastUsed: '2023-04-10',
-    status: 'ok'
+    expiryDate: "2025-10-15",
+    lastUsed: "2023-04-10",
+    status: "ok",
   },
   {
     id: 2,
-    name: 'Placas de Petri',
-    category: 'disposable',
+    name: "Placas de Petri",
+    category: "disposable",
     stock: 35,
-    unit: 'Unidades',
-    location: 'Armário D2',
+    unit: "Unidades",
+    location: "Armário D2",
     size: null,
-    expiryDate: '2025-08-22',
-    lastUsed: '2023-04-15', 
-    status: 'ok'
+    expiryDate: "2025-08-22",
+    lastUsed: "2023-04-15",
+    status: "ok",
   },
   {
     id: 3,
-    name: 'Etanol Absoluto',
-    category: 'reagents',
+    name: "Etanol Absoluto",
+    category: "reagents",
     stock: 3,
-    unit: 'Litros',
-    location: 'Armário A1',
+    unit: "Litros",
+    location: "Armário A1",
     size: null,
-    expiryDate: '2025-12-30',
-    lastUsed: '2023-04-12',
-    status: 'low'
+    expiryDate: "2025-12-30",
+    lastUsed: "2023-04-12",
+    status: "low",
   },
   {
     id: 4,
-    name: 'Balão Volumétrico',
-    category: 'glassware',
+    name: "Balão Volumétrico",
+    category: "glassware",
     stock: 12,
-    unit: 'Unidades',
-    location: 'Armário G4',
-    size: '500ml',
+    unit: "Unidades",
+    location: "Armário G4",
+    size: "500ml",
     expiryDate: null,
-    lastUsed: '2023-03-28',
-    status: 'ok'
+    lastUsed: "2023-03-28",
+    status: "ok",
   },
   {
     id: 5,
-    name: 'Luvas de Nitrila (M)',
-    category: 'disposable',
+    name: "Luvas de Nitrila (M)",
+    category: "disposable",
     stock: 10,
-    unit: 'Pares',
-    location: 'Armário D1',
+    unit: "Pares",
+    location: "Armário D1",
     size: null,
-    expiryDate: '2024-07-18',
-    lastUsed: '2023-04-18',
-    status: 'low'
+    expiryDate: "2024-07-18",
+    lastUsed: "2023-04-18",
+    status: "low",
   },
   {
     id: 6,
-    name: 'Microscópio Óptico',
-    category: 'equipment',
+    name: "Microscópio Óptico",
+    category: "equipment",
     stock: 5,
-    unit: 'Unidades',
-    location: 'Sala E2',
+    unit: "Unidades",
+    location: "Sala E2",
     expiryDate: null,
-    lastUsed: '2023-04-05',
-    status: 'ok'
+    lastUsed: "2023-04-05",
+    status: "ok",
   },
   {
     id: 7,
-    name: 'Pipeta Graduada',
-    category: 'glassware',
+    name: "Pipeta Graduada",
+    category: "glassware",
     stock: 25,
-    unit: 'Unidades',
-    location: 'Armário G2',
-    size: '10ml',
+    unit: "Unidades",
+    location: "Armário G2",
+    size: "10ml",
     expiryDate: null,
-    lastUsed: '2023-04-14',
-    status: 'ok'
+    lastUsed: "2023-04-14",
+    status: "ok",
   },
   {
     id: 8,
-    name: 'Tubos de Ensaio',
-    category: 'glassware',
+    name: "Tubos de Ensaio",
+    category: "glassware",
     stock: 8,
-    unit: 'Unidades',
-    location: 'Armário G3',
-    size: '15ml',
+    unit: "Unidades",
+    location: "Armário G3",
+    size: "15ml",
     expiryDate: null,
-    lastUsed: '2023-04-16',
-    status: 'low'
+    lastUsed: "2023-04-16",
+    status: "low",
   },
 ];
 
 const Inventory = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [filteredItems, setFilteredItems] = useState(inventoryItems);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newItem, setNewItem] = useState({
-    name: '',
-    category: '',
-    stock: '',
-    unit: '',
-    location: '',
-    size: '',
-    expiryDate: '',
+    name: "",
+    category: "",
+    stock: "",
+    unit: "",
+    location: "",
+    size: "",
+    expiryDate: "",
   });
   const containerRef = useRef(null);
   const { toast } = useToast();
@@ -156,30 +155,30 @@ const Inventory = () => {
   useEffect(() => {
     // Filtering logic
     let filtered = inventoryItems;
-    
+
     if (searchQuery) {
-      filtered = filtered.filter(item => 
+      filtered = filtered.filter((item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(item => item.category === selectedCategory);
+
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((item) => item.category === selectedCategory);
     }
-    
+
     setFilteredItems(filtered);
 
     // Animation when filter changes
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        '.inventory-item',
+        ".inventory-item",
         { opacity: 0, x: 10 },
-        { 
-          opacity: 1, 
-          x: 0, 
+        {
+          opacity: 1,
+          x: 0,
           duration: 0.4,
           stagger: 0.05,
-          ease: 'power2.out'
+          ease: "power2.out",
         }
       );
     }, containerRef);
@@ -191,21 +190,21 @@ const Inventory = () => {
     // Initial animation
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        '.inventory-filters',
+        ".inventory-filters",
         { opacity: 0, x: 20 },
-        { opacity: 1, x: 0, duration: 1, ease: 'power2.out' }
+        { opacity: 1, x: 0, duration: 1, ease: "power2.out" }
       );
-      
+
       gsap.fromTo(
-        '.item-list',
+        ".item-list",
         { opacity: 0, x: 20 },
-        { 
-          opacity: 1, 
-          x: 0, 
+        {
+          opacity: 1,
+          x: 0,
           duration: 1,
           stagger: 0.05,
           delay: 0.2,
-          ease: 'power2.out'
+          ease: "power2.out",
         }
       );
     }, containerRef);
@@ -213,7 +212,6 @@ const Inventory = () => {
     return () => ctx.revert();
   }, []);
 
-  
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
   };
@@ -227,12 +225,12 @@ const Inventory = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'low':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      case 'ok':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case "low":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
+      case "ok":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
   };
 
@@ -242,18 +240,24 @@ const Inventory = () => {
     const reserved = Math.floor(totalStock * 0.15); // 15% reserved
     const available = totalStock - reserved;
     const usedThisMonth = Math.floor(totalStock * 0.25); // 25% used this month
-    
+
     return {
       available,
       reserved,
       usedThisMonth,
-      lastReplenishment: '2024-05-01',
-      batchExpiry: item.expiryDate || '2025-12-30'
+      lastReplenishment: "2024-05-01",
+      batchExpiry: item.expiryDate || "2025-12-30",
     };
   };
 
   const handleAddItem = () => {
-    if (!newItem.name || !newItem.category || !newItem.stock || !newItem.unit || !newItem.location) {
+    if (
+      !newItem.name ||
+      !newItem.category ||
+      !newItem.stock ||
+      !newItem.unit ||
+      !newItem.location
+    ) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -263,8 +267,8 @@ const Inventory = () => {
     }
 
     // Here you would normally send to your API
-    console.log('Adding new item:', newItem);
-    
+    console.log("Adding new item:", newItem);
+
     toast({
       title: "Item adicionado",
       description: `${newItem.name} foi adicionado ao inventário com sucesso.`,
@@ -272,23 +276,27 @@ const Inventory = () => {
 
     // Reset form
     setNewItem({
-      name: '',
-      category: '',
-      stock: '',
-      unit: '',
-      location: '',
-      size: '',
-      expiryDate: '',
+      name: "",
+      category: "",
+      stock: "",
+      unit: "",
+      location: "",
+      size: "",
+      expiryDate: "",
     });
-    
+
     setIsDialogOpen(false);
   };
 
   return (
     <div ref={containerRef} className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Inventário</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">Gerencie os itens de laboratório</p>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+          Inventário
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">
+          Gerencie os itens de laboratório
+        </p>
       </div>
 
       {/* Filters - Improved for mobile */}
@@ -296,7 +304,10 @@ const Inventory = () => {
         <CardContent className="p-4 bg-neutral-100/80 dark:bg-neutral-800/80">
           <div className="flex flex-col gap-4">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-3 transform text-gray-400" size={18} />
+              <Search
+                className="absolute left-3 top-3 transform text-gray-400"
+                size={18}
+              />
               <Input
                 placeholder="Buscar item..."
                 className="pl-10 w-full rounded-md bg-white dark:bg-neutral-700/40"
@@ -304,7 +315,7 @@ const Inventory = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3 justify-between items-start">
               {/* Category filter - improved mobile scroll */}
               <div className="w-full sm:flex-1">
@@ -314,8 +325,8 @@ const Inventory = () => {
                       key={category.id}
                       className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 ${
                         selectedCategory === category.id
-                          ? 'bg-lab-blue text-white dark:bg-lab-blue/80'
-                          : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-700/80 dark:text-gray-300 dark:hover:bg-gray-700' 
+                          ? "bg-lab-blue text-white dark:bg-lab-blue/80"
+                          : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-700/80 dark:text-gray-300 dark:hover:bg-gray-700"
                       } rounded-md border border-gray-200 dark:border-gray-700 transition-colors`}
                       onClick={() => handleCategoryChange(category.id)}
                     >
@@ -324,125 +335,177 @@ const Inventory = () => {
                   ))}
                 </div>
               </div>
-              
+
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="flex items-center gap-2 whitespace-nowrap bg-neutral-950/90 dark:bg-gray-100/90 flex-shrink-0">
-                    <Plus size={16} />
-                    <span className="hidden sm:inline">Novo Item</span>
-                    <span className="sm:hidden">Novo</span>
+                  <Button className="flex items-center gap-2 whitespace-nowrap bg-neutral-950/90 dark:bg-gray-100/90 flex-shrink-0 ">
+                    <Plus size={18} />
+                    <span className="text-sm sm:text-base text-gray-200 dark:text-gray-800">Novo Item</span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] max-w-[95vw]">
-                  <DialogHeader>
-                    <DialogTitle>Adicionar Novo Item</DialogTitle>
-                    <DialogDescription>
-                      Preencha as informações do novo item de inventário.
+                <DialogContent className="border-none max-w-[95vw] sm:max-w-md md:max-w-lg rounded-lg bg-white dark:bg-neutral-950">
+                  <DialogHeader className="border-none pb-3">
+                    <DialogTitle className="text-xl">
+                      Adicionar Novo Item
+                    </DialogTitle>
+                    <DialogDescription className="pt-1">
+                      Preencha as informações do novo item de inventário
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">
+
+                  <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto px-2">
+                    {/* Nome */}
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="font-medium">
                         Nome *
                       </Label>
                       <Input
                         id="name"
                         value={newItem.name}
-                        onChange={(e) => setNewItem({...newItem, name: e.target.value})}
-                        className="col-span-3"
+                        placeholder="ex: Dipirona"
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, name: e.target.value })
+                        }
+                        className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="category" className="text-right">
+
+                    {/* Categoria */}
+                    <div className="space-y-2">
+                      <Label htmlFor="category" className="font-medium">
                         Categoria *
                       </Label>
-                      <Select 
-                        value={newItem.category} 
-                        onValueChange={(value) => setNewItem({...newItem, category: value})}
+                      <Select
+                        value={newItem.category}
+                        onValueChange={(value) =>
+                          setNewItem({ ...newItem, category: value })
+                        }
                       >
-                        <SelectTrigger className="col-span-3">
+                        <SelectTrigger className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
                           <SelectValue placeholder="Selecione a categoria" />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories.filter(cat => cat.id !== 'all').map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name}
+                          {categories
+                            .filter((cat) => cat.id !== "all")
+                            .map((category) => (
+                              <SelectItem
+                                key={category.id}
+                                value={category.id}
+                                className="py-2"
+                              >
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Estoque e Unidade - Agora lado a lado */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="stock" className="font-medium">
+                          Quantidade *
+                        </Label>
+                        <Input
+                          id="stock"
+                          type="number"
+                          value={newItem.stock}
+                          onChange={(e) =>
+                            setNewItem({ ...newItem, stock: e.target.value })
+                          }
+                          className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
+                          placeholder="ex: 10"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="unit" className="font-medium">
+                          Unidade *
+                        </Label>
+                        <Select
+                          value={newItem.unit}
+                          onValueChange={(value) =>
+                            setNewItem({ ...newItem, unit: value })
+                          }
+                        >
+                          <SelectTrigger className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
+                            <SelectValue placeholder="Selecione" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Litros">Litros</SelectItem>
+                            <SelectItem value="Unidades">Unidades</SelectItem>
+                            <SelectItem value="Pares">Pares</SelectItem>
+                            <SelectItem value="Gramas">Gramas</SelectItem>
+                            <SelectItem value="Quilogramas">
+                              Quilogramas
                             </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                            <SelectItem value="Mililitros">
+                              Mililitros
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="stock" className="text-right">
-                        Estoque *
-                      </Label>
-                      <Input
-                        id="stock"
-                        type="number"
-                        value={newItem.stock}
-                        onChange={(e) => setNewItem({...newItem, stock: e.target.value})}
-                        className="col-span-3"
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="unit" className="text-right">
-                        Unidade *
-                      </Label>
-                      <Select 
-                        value={newItem.unit} 
-                        onValueChange={(value) => setNewItem({...newItem, unit: value})}
-                      >
-                        <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Selecione a unidade" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Litros">Litros</SelectItem>
-                          <SelectItem value="Unidades">Unidades</SelectItem>
-                          <SelectItem value="Pares">Pares</SelectItem>
-                          <SelectItem value="Gramas">Gramas</SelectItem>
-                          <SelectItem value="Quilogramas">Quilogramas</SelectItem>
-                          <SelectItem value="Mililitros">Mililitros</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="location" className="text-right">
+
+                    {/* Localização */}
+                    <div className="space-y-2">
+                      <Label htmlFor="location" className="font-medium">
                         Localização *
                       </Label>
                       <Input
                         id="location"
                         value={newItem.location}
-                        onChange={(e) => setNewItem({...newItem, location: e.target.value})}
-                        className="col-span-3"
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, location: e.target.value })
+                        }
+                        className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
+                        placeholder="ex: Armário A1, Sala B2"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="size" className="text-right">
-                        Tamanho
-                      </Label>
-                      <Input
-                        id="size"
-                        value={newItem.size}
-                        onChange={(e) => setNewItem({...newItem, size: e.target.value})}
-                        className="col-span-3"
-                        placeholder="Ex: 500ml, 10cm"
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="expiry" className="text-right">
-                        Validade
-                      </Label>
-                      <Input
-                        id="expiry"
-                        type="date"
-                        value={newItem.expiryDate}
-                        onChange={(e) => setNewItem({...newItem, expiryDate: e.target.value})}
-                        className="col-span-3"
-                      />
+
+                    {/* Tamanho e Validade - Agora lado a lado */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="size" className="font-medium">
+                          Tamanho
+                        </Label>
+                        <Input
+                          id="size"
+                          value={newItem.size}
+                          onChange={(e) =>
+                            setNewItem({ ...newItem, size: e.target.value })
+                          }
+                          className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent py-2 px-3 outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
+                          placeholder="ex: 500ml, 10cm"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="expiry" className="font-medium">
+                          Validade
+                        </Label>
+                        <Input
+                          id="expiry"
+                          type="date"
+                          value={newItem.expiryDate}
+                          onChange={(e) =>
+                            setNewItem({
+                              ...newItem,
+                              expiryDate: e.target.value,
+                            })
+                          }
+                          className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200"
+                        />
+                      </div>
                     </div>
                   </div>
-                  <DialogFooter>
-                    <Button type="submit" onClick={handleAddItem}>
+
+                  <DialogFooter className="border-t-2 pt-5">
+                    <Button
+                      type="submit"
+                      onClick={handleAddItem}
+                      className="w-full sm:w-auto px-6 py-2.5 bg-primary hover:bg-primary/90"
+                    >
                       Adicionar Item
                     </Button>
                   </DialogFooter>
@@ -457,52 +520,71 @@ const Inventory = () => {
       <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 item-list">
         {filteredItems.map((item) => {
           const stockDetails = getStockDetails(item);
-          
+
           return (
-            <Card key={item.id} className="inventory-item overflow-hidden h-full bg-white dark:bg-neutral-900/50 transition-all duration-200 hover:shadow-lg">
-              <div 
+            <Card
+              key={item.id}
+              className="inventory-item overflow-hidden h-full bg-white dark:bg-neutral-900/50 transition-all duration-200 hover:shadow-lg"
+            >
+              <div
                 className={`h-1 ${
-                  item.status === 'low' ? 'bg-red-500' : 'bg-green-500'
+                  item.status === "low" ? "bg-red-500" : "bg-green-500"
                 }`}
               />
               <CardContent className="p-3 sm:p-4 flex flex-col h-full">
                 <div className="flex justify-between items-start mb-3">
                   <div className="mr-2 flex-1">
-                    <h3 className="font-medium text-base sm:text-lg line-clamp-2 leading-tight">{item.name}</h3>
+                    <h3 className="font-medium text-base sm:text-lg line-clamp-2 leading-tight">
+                      {item.name}
+                    </h3>
                     <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {categories.find(c => c.id === item.category)?.name}
+                      {categories.find((c) => c.id === item.category)?.name}
                     </p>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(item.status)} whitespace-nowrap flex-shrink-0`}>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(
+                      item.status
+                    )} whitespace-nowrap flex-shrink-0`}
+                  >
                     {item.stock} {item.unit}
                   </span>
                 </div>
-                
+
                 <div className="mt-2 text-xs sm:text-sm space-y-2 flex-grow">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">Localização:</span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2 truncate">{item.location}</span>
+                    <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">
+                      Localização:
+                    </span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2 truncate">
+                      {item.location}
+                    </span>
                   </div>
-                  
+
                   {item.expiryDate && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">Validade:</span>
+                      <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">
+                        Validade:
+                      </span>
                       <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
-                        {new Date(item.expiryDate).toLocaleDateString('pt-BR')}
+                        {new Date(item.expiryDate).toLocaleDateString("pt-BR")}
                       </span>
                     </div>
                   )}
-                  
+
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">Último uso:</span>
+                    <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">
+                      Último uso:
+                    </span>
                     <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
-                      {new Date(item.lastUsed).toLocaleDateString('pt-BR')}
+                      {new Date(item.lastUsed).toLocaleDateString("pt-BR")}
                     </span>
                   </div>
 
                   {item.size && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">Tamanho:</span>
+                      <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">
+                        Tamanho:
+                      </span>
                       <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
                         {item.size}
                       </span>
@@ -513,59 +595,81 @@ const Inventory = () => {
                 <div className="mt-4">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button 
-                        className="w-full bg-neutral-200 hover:bg-blue-400 dark:bg-neutral-950/60 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white transition-colors text-xs sm:text-sm"
-                      >
+                      <Button className="w-full bg-neutral-200 hover:bg-blue-400 dark:bg-neutral-950/60 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white transition-colors text-xs sm:text-sm">
                         Ver Estoque
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-72 p-0 sm:w-80">
                       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <h4 className="font-medium text-base mb-1">{item.name}</h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Detalhes do estoque</p>
+                        <h4 className="font-medium text-base mb-1">
+                          {item.name}
+                        </h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Detalhes do estoque
+                        </p>
                       </div>
                       <div className="p-4 space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Package className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">Disponíveis:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              Disponíveis:
+                            </span>
                           </div>
-                          <span className="font-medium">{stockDetails.available} {item.unit}</span>
+                          <span className="font-medium">
+                            {stockDetails.available} {item.unit}
+                          </span>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Database className="h-4 w-4 text-amber-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">Reservadas:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              Reservadas:
+                            </span>
                           </div>
-                          <span className="font-medium">{stockDetails.reserved} {item.unit}</span>
+                          <span className="font-medium">
+                            {stockDetails.reserved} {item.unit}
+                          </span>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4 text-purple-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">Utilizadas neste mês:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              Utilizadas neste mês:
+                            </span>
                           </div>
-                          <span className="font-medium">{stockDetails.usedThisMonth} {item.unit}</span>
+                          <span className="font-medium">
+                            {stockDetails.usedThisMonth} {item.unit}
+                          </span>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-green-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">Última reposição:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              Última reposição:
+                            </span>
                           </div>
                           <span className="font-medium">
-                            {new Date(stockDetails.lastReplenishment).toLocaleDateString('pt-BR')}
+                            {new Date(
+                              stockDetails.lastReplenishment
+                            ).toLocaleDateString("pt-BR")}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-red-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">Validade do lote:</span>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              Validade do lote:
+                            </span>
                           </div>
                           <span className="font-medium">
-                            {new Date(stockDetails.batchExpiry).toLocaleDateString('pt-BR')}
+                            {new Date(
+                              stockDetails.batchExpiry
+                            ).toLocaleDateString("pt-BR")}
                           </span>
                         </div>
                       </div>
@@ -580,7 +684,9 @@ const Inventory = () => {
 
       {filteredItems.length === 0 && (
         <div className="text-center py-10">
-          <p className="text-gray-500 dark:text-gray-400">Nenhum item encontrado com os filtros aplicados.</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            Nenhum item encontrado com os filtros aplicados.
+          </p>
         </div>
       )}
     </div>
