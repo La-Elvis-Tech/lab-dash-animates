@@ -1,12 +1,9 @@
+import React, { useRef, useState, useEffect, Suspense } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Text, OrbitControls } from '@react-three/drei';
+import { Mesh, Color } from 'three';
+import { useTheme } from '@/hooks/use-theme';
 
-import React, { useRef } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Text, RoundedBox } from "@react-three/drei";
-import { useTheme } from "../hooks/use-theme";
-import { useEffect } from "react";
-import { Mesh, MeshStandardMaterial } from "three";
-import { RoundedBoxGeometry } from "three-stdlib";
-import { gsap } from "gsap";
 interface Chart3DProps {
   data: Array<{ name: string; value: number }>;
   title: string;
@@ -137,13 +134,7 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
           </mesh>
 
           <OrbitControls
-            minDistance={6}
-            maxDistance={10}
             target={[0, 2.2, 0]}
-            minPolarAngle={Math.PI/3}
-            maxPolarAngle={Math.PI/2.2}
-            minAzimuthAngle={-Math.PI/4}
-            maxAzimuthAngle={Math.PI/4}
           />
         </Canvas>
       </div>

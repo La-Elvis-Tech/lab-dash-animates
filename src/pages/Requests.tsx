@@ -3,16 +3,8 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  Table, 
-  TableHeader, 
-  TableBody, 
-  TableRow, 
-  TableHead, 
-  TableCell 
-} from "@/components/ui/table";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Search, Building, Database } from "lucide-react";
+import { Calendar as CalendarIcon, Search, Building, Database, FileText, User, Stethoscope, DollarSign } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -306,80 +298,119 @@ const Requests: React.FC = () => {
             </div>
           </div>
           
-          <div className="w-full">
-            <ScrollArea className="h-[400px] md:h-[500px] w-full">
-              <div className="min-w-[900px]">
-                <Table>
-                  <TableHeader className="sticky top-0 bg-white dark:bg-gray-800 z-10">
-                    <TableRow>
-                      <TableHead className="w-[60px]">ID</TableHead>
-                      <TableHead className="min-w-[120px]">Paciente</TableHead>
-                      <TableHead className="min-w-[120px]">Tipo</TableHead>
-                      <TableHead className="w-[90px]">Data</TableHead>
-                      <TableHead className="min-w-[120px]">Médico</TableHead>
-                      <TableHead className="min-w-[120px]">Laboratório</TableHead>
-                      <TableHead className="min-w-[120px]">Unidade</TableHead>
-                      <TableHead className="w-[100px]">Custo (R$)</TableHead>
-                      <TableHead className="w-[90px]">Status</TableHead>
-                      <TableHead className="w-[90px]">Resultado</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredExams.length > 0 ? (
-                      filteredExams.map((exam) => (
-                        <TableRow key={exam.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                          <TableCell className="font-medium text-xs">{exam.id}</TableCell>
-                          <TableCell className="text-sm">{exam.patient}</TableCell>
-                          <TableCell className="text-sm">{exam.type}</TableCell>
-                          <TableCell className="text-sm">{format(exam.date, "dd/MM/yyyy")}</TableCell>
-                          <TableCell className="text-sm">{exam.doctor}</TableCell>
-                          <TableCell className="text-sm">
-                            <div className="flex items-center">
-                              <Database className="h-3 w-3 mr-1" />
-                              {exam.laboratory}
+          <div className="p-6">
+            <ScrollArea className="h-[600px] w-full">
+              {filteredExams.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {filteredExams.map((exam) => (
+                    <Card key={exam.id} className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600">
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-center space-x-2">
+                            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                              <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                             </div>
-                          </TableCell>
-                          <TableCell className="text-sm">
-                            <div className="flex items-center">
-                              <Building className="h-3 w-3 mr-1" />
-                              {exam.unit}
+                            <div>
+                              <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
+                                {exam.type}
+                              </CardTitle>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                ID: {exam.id}
+                              </p>
                             </div>
-                          </TableCell>
-                          <TableCell className="font-medium text-sm">
-                            {exam.cost.toFixed(2)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge className={`text-xs ${
-                              exam.status === 'Concluído' 
-                                ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
-                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
-                            }`} variant="secondary">
-                              {exam.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-sm">
-                            <span className={`${
+                          </div>
+                          <Badge className={`text-xs ${
+                            exam.status === 'Concluído' 
+                              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
+                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+                          }`} variant="secondary">
+                            {exam.status}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      
+                      <CardContent className="space-y-3">
+                        {/* Paciente */}
+                        <div className="flex items-center space-x-2">
+                          <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Paciente</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{exam.patient}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Médico */}
+                        <div className="flex items-center space-x-2">
+                          <Stethoscope className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Médico</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{exam.doctor}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Data */}
+                        <div className="flex items-center space-x-2">
+                          <CalendarIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Data</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{format(exam.date, "dd/MM/yyyy")}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Laboratório e Unidade */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex items-center space-x-1">
+                            <Database className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">Lab</p>
+                              <p className="text-xs font-medium text-gray-900 dark:text-white">{exam.laboratory}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Building className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">Unidade</p>
+                              <p className="text-xs font-medium text-gray-900 dark:text-white">{exam.unit}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Custo e Resultado */}
+                        <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center space-x-1">
+                            <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                              R$ {exam.cost.toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Resultado</p>
+                            <span className={`text-sm font-medium ${
                               exam.result === 'Alterado' 
                                 ? 'text-red-600 dark:text-red-400' 
                                 : exam.result === 'Normal'
                                   ? 'text-green-600 dark:text-green-400'
-                                  : ''
+                                  : 'text-gray-500 dark:text-gray-400'
                             }`}>
                               {exam.result}
                             </span>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={10} className="text-center py-6 text-sm text-gray-500 dark:text-gray-400">
-                          Nenhum exame encontrado com os filtros selecionados.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <FileText className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
+                    Nenhum exame encontrado
+                  </p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                    Tente ajustar os filtros para encontrar os exames desejados.
+                  </p>
+                </div>
+              )}
             </ScrollArea>
           </div>
         </CardContent>
