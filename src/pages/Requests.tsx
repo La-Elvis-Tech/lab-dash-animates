@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Search, Building, Database, FileText, User, Stethoscope, DollarSign, Filter, X } from "lucide-react";
+import { Calendar as CalendarIcon, Search, Building, Database, FileText, User, Stethoscope, DollarSign } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -21,14 +22,6 @@ import {
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import ExamsStats from "@/components/exams/ExamsStats";
 
 // Mock data for exams
@@ -144,7 +137,6 @@ const Requests: React.FC = () => {
   const [selectedUnit, setSelectedUnit] = useState<string>('Todas Unidades');
   const [selectedLaboratory, setSelectedLaboratory] = useState<string>('Todos Labs');
   const [exams, setExams] = useState(mockExams);
-  const [showFilters, setShowFilters] = useState(false);
 
   // Filter exams based on search, date, type, unit and laboratory
   const filteredExams = exams.filter(exam => {
@@ -180,254 +172,249 @@ const Requests: React.FC = () => {
     setSelectedLaboratory('Todos Labs');
   };
 
-  // Count active filters
-  const activeFiltersCount = [
-    selectedDate,
-    selectedType !== 'Todos Exames',
-    selectedUnit !== 'Todas Unidades',
-    selectedLaboratory !== 'Todos Labs'
-  ].filter(Boolean).length;
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header mais simples */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Sistema de Exames
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Gerencie e acompanhe todos os exames médicos
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Exames</h1>
       </div>
-
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        {/* Stats Cards */}
-        <div className="mb-6">
-          <ExamsStats exams={exams} />
-        </div>
-
-        {/* Filtros e busca mais simples */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Filtros e Busca</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Busca */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Buscar paciente, médico, tipo de exame..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Filtros em linha */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {/* Data */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Data"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-
-              {/* Tipo */}
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Tipo de Exame" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {examTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-
-              {/* Unidade */}
-              <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Unidade" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {units.map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {unit}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-
-              {/* Laboratório */}
-              <Select value={selectedLaboratory} onValueChange={setSelectedLaboratory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Laboratório" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {laboratories.map((lab) => (
-                      <SelectItem key={lab} value={lab}>
-                        {lab}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-
-              {/* Limpar */}
-              <Button variant="outline" onClick={resetFilters}>
-                <X className="mr-2 h-4 w-4" />
-                Limpar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tabela de resultados */}
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>
-                Exames ({filteredExams.length} encontrados)
-              </CardTitle>
-              <div className="flex items-center space-x-2">
-                <DollarSign className="h-4 w-4 text-green-600" />
-                <span className="font-semibold text-green-600">
-                  R$ {totalCost.toFixed(2)}
-                </span>
+      
+      {/* Estatísticas dos Exames */}
+      <ExamsStats exams={exams} />
+      
+      <Card className="overflow-hidden dark:bg-gray-900 dark:text-gray-100 dark:border-none">
+        <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700 p-4">
+          <CardTitle className="text-base md:text-xl">
+            <div className="space-y-4">
+              {/* Search input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 " />
+                <Input
+                  placeholder="Buscar por paciente, médico, tipo de exame..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-full border rounded-md bg-white dark:bg-gray-900/80 font-normal"
+                />
+              </div>
+              
+              <div className="flex flex-wrap gap-3">
+                {/* Date filter */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "justify-start text-left font-normal text-xs md:text-sm h-9 text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                      size="sm"
+                    >
+                      <CalendarIcon className="mr-1 h-3 w-3 md:h-4 md:w-4" />
+                      {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Filtrar por data"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                {/* Type filter - responsive */}
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
+                    <SelectValue placeholder="Tipo de exame" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {examTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                
+                {/* Unit filter - responsive */}
+                <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
+                    <SelectValue placeholder="Unidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {units.map((unit) => (
+                        <SelectItem key={unit} value={unit}>
+                          {unit}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                
+                {/* Laboratory filter - responsive */}
+                <Select value={selectedLaboratory} onValueChange={setSelectedLaboratory}>
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-300/50 dark:bg-gray-900">
+                    <SelectValue placeholder="Laboratório" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {laboratories.map((lab) => (
+                        <SelectItem key={lab} value={lab}>
+                          {lab}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                
+                {/* Reset filters button - responsive */}
+                <Button 
+                  variant="outline" 
+                  onClick={resetFilters}
+                  className="whitespace-nowrap text-xs md:text-sm h-9 bg-gray-300/50 dark:bg-gray-900"
+                  size="sm"
+                >
+                  Limpar filtros
+                </Button>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[600px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Exame</TableHead>
-                    <TableHead>Paciente</TableHead>
-                    <TableHead>Médico</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Lab/Unidade</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Resultado</TableHead>
-                    <TableHead className="text-right">Custo</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredExams.length > 0 ? (
-                    filteredExams.map((exam) => (
-                      <TableRow key={exam.id}>
-                        <TableCell>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-0 pt-0">
+          <div className="p-3 md:py-4 px-6 bg-gray-200 dark:bg-gray-950/30 border-b border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+              <span className="text-xs md:text-sm text-gray-500 dark:text-gray-300">
+                Exames encontrados: <strong>{filteredExams.length}</strong>
+              </span>
+            </div>
+            <div>
+              <span className="text-xs md:text-sm font-medium">
+                Total de despesas: <strong className="text-green-600 dark:text-green-400">R$ {totalCost.toFixed(2)}</strong>
+              </span>
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <ScrollArea className="h-[600px] w-full">
+              {filteredExams.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {filteredExams.map((exam) => (
+                    <Card key={exam.id} className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600">
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
                           <div className="flex items-center space-x-2">
-                            <FileText className="h-4 w-4 text-blue-500" />
+                            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                              <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            </div>
                             <div>
-                              <div className="font-medium">{exam.type}</div>
-                              <div className="text-sm text-gray-500">#{exam.id}</div>
+                              <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
+                                {exam.type}
+                              </CardTitle>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                ID: {exam.id}
+                              </p>
                             </div>
                           </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <User className="h-4 w-4 text-gray-400" />
-                            <span>{exam.patient}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Stethoscope className="h-4 w-4 text-gray-400" />
-                            <span>{exam.doctor}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <CalendarIcon className="h-4 w-4 text-gray-400" />
-                            <span>{format(exam.date, "dd/MM/yyyy")}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-y-1">
-                            <div className="flex items-center space-x-1">
-                              <Database className="h-3 w-3 text-blue-500" />
-                              <span className="text-sm">{exam.laboratory}</span>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <Building className="h-3 w-3 text-purple-500" />
-                              <span className="text-sm">{exam.unit}</span>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={exam.status === 'Concluído' ? 'default' : 'secondary'}
-                            className={exam.status === 'Concluído' 
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' 
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'}
-                          >
+                          <Badge className={`text-xs ${
+                            exam.status === 'Concluído' 
+                              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
+                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+                          }`} variant="secondary">
                             {exam.status}
                           </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <span className={`font-medium ${
-                            exam.result === 'Alterado' 
-                              ? 'text-red-600 dark:text-red-400' 
-                              : exam.result === 'Normal'
-                                ? 'text-green-600 dark:text-green-400'
-                                : 'text-gray-500 dark:text-gray-400'
-                          }`}>
-                            {exam.result}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end space-x-1">
-                            <DollarSign className="h-4 w-4 text-green-600" />
-                            <span className="font-semibold text-green-600">
-                              {exam.cost.toFixed(2)}
+                        </div>
+                      </CardHeader>
+                      
+                      <CardContent className="space-y-3">
+                        {/* Paciente */}
+                        <div className="flex items-center space-x-2">
+                          <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Paciente</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{exam.patient}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Médico */}
+                        <div className="flex items-center space-x-2">
+                          <Stethoscope className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Médico</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{exam.doctor}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Data */}
+                        <div className="flex items-center space-x-2">
+                          <CalendarIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Data</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{format(exam.date, "dd/MM/yyyy")}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Laboratório e Unidade */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex items-center space-x-1">
+                            <Database className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">Lab</p>
+                              <p className="text-xs font-medium text-gray-900 dark:text-white">{exam.laboratory}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Building className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">Unidade</p>
+                              <p className="text-xs font-medium text-gray-900 dark:text-white">{exam.unit}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Custo e Resultado */}
+                        <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center space-x-1">
+                            <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+                            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                              R$ {exam.cost.toFixed(2)}
                             </span>
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
-                        <div className="flex flex-col items-center space-y-2">
-                          <FileText className="h-8 w-8 text-gray-400" />
-                          <span className="text-gray-500">Nenhum exame encontrado</span>
+                          <div className="text-right">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Resultado</p>
+                            <span className={`text-sm font-medium ${
+                              exam.result === 'Alterado' 
+                                ? 'text-red-600 dark:text-red-400' 
+                                : exam.result === 'Normal'
+                                  ? 'text-green-600 dark:text-green-400'
+                                  : 'text-gray-500 dark:text-gray-400'
+                            }`}>
+                              {exam.result}
+                            </span>
+                          </div>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <FileText className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
+                    Nenhum exame encontrado
+                  </p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                    Tente ajustar os filtros para encontrar os exames desejados.
+                  </p>
+                </div>
+              )}
             </ScrollArea>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
