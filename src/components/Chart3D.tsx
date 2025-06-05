@@ -137,12 +137,8 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
           </mesh>
 
           <OrbitControls
-            enabled
-            enableZoom
-            enableRotate
             minDistance={6}
             maxDistance={10}
-            enablePan={false}
             target={[0, 2.2, 0]}
             minPolarAngle={Math.PI/3}
             maxPolarAngle={Math.PI/2.2}
