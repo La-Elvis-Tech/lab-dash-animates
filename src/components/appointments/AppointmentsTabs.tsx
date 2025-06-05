@@ -18,6 +18,7 @@ interface AppointmentsTabsProps {
   sevenDaysFromNow: Date;
   endOfCurrentMonth: Date;
   getStatusColor: (status: string) => string;
+  onUpdateStatus?: (appointmentId: string, newStatus: string) => void;
 }
 
 const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
@@ -31,6 +32,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
   sevenDaysFromNow,
   endOfCurrentMonth,
   getStatusColor,
+  onUpdateStatus,
 }) => {
   return (
     <Tabs defaultValue="next7days">
@@ -54,6 +56,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
         <AppointmentsTable 
           appointments={recentAppointments} 
           getStatusColor={getStatusColor}
+          onUpdateStatus={onUpdateStatus}
         />
       </TabsContent>
       
@@ -64,6 +67,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
         <AppointmentsTable 
           appointments={next7DaysAppointments} 
           getStatusColor={getStatusColor}
+          onUpdateStatus={onUpdateStatus}
         />
       </TabsContent>
       
@@ -74,6 +78,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
         <AppointmentsTable 
           appointments={restOfMonthAppointments} 
           getStatusColor={getStatusColor}
+          onUpdateStatus={onUpdateStatus}
         />
       </TabsContent>
 
@@ -92,6 +97,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
           <AppointmentsTable 
             appointments={selectedDateAppointments} 
             getStatusColor={getStatusColor}
+            onUpdateStatus={onUpdateStatus}
           />
         </TabsContent>
       )}

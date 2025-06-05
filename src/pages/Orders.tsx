@@ -142,6 +142,17 @@ const Orders: React.FC = () => {
   const [appointments, setAppointments] = useState(mockAppointments);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  // Função para atualizar status do agendamento
+  const handleUpdateAppointmentStatus = (appointmentId: string, newStatus: string) => {
+    setAppointments(prevAppointments => 
+      prevAppointments.map(appointment => 
+        appointment.id === appointmentId 
+          ? { ...appointment, status: newStatus }
+          : appointment
+      )
+    );
+  };
+
   // Date calculations
   const sevenDaysFromNow = addDays(today, 6); // 7 dias incluindo hoje (hoje + 6)
   const endOfCurrentMonth = endOfMonth(today);
@@ -234,6 +245,7 @@ const Orders: React.FC = () => {
               sevenDaysFromNow={sevenDaysFromNow}
               endOfCurrentMonth={endOfCurrentMonth}
               getStatusColor={getStatusColor}
+              onUpdateStatus={handleUpdateAppointmentStatus}
             />
           </CardContent>
         </Card>

@@ -30,6 +30,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ExamsStats from "@/components/exams/ExamsStats";
 
 // Mock data for exams
 const mockExams = [
@@ -185,6 +186,9 @@ const Requests: React.FC = () => {
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Exames</h1>
       </div>
       
+      {/* Estatísticas dos Exames */}
+      <ExamsStats exams={exams} />
+      
       <Card className="overflow-hidden dark:bg-gray-900 dark:text-gray-100 dark:border-none">
         <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700 p-4">
           <CardTitle className="text-base md:text-xl">
@@ -302,80 +306,82 @@ const Requests: React.FC = () => {
             </div>
           </div>
           
-          <ScrollArea className="h-[400px] md:h-[500px] bg-white dark:bg-gray-800">
-            <div className="w-full min-w-[700px] md:min-w-[1000px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs md:text-sm">ID</TableHead>
-                    <TableHead className="text-xs md:text-sm">Paciente</TableHead>
-                    <TableHead className="text-xs md:text-sm">Tipo</TableHead>
-                    <TableHead className="text-xs md:text-sm">Data</TableHead>
-                    <TableHead className="text-xs md:text-sm">Médico</TableHead>
-                    <TableHead className="text-xs md:text-sm">Laboratório</TableHead>
-                    <TableHead className="text-xs md:text-sm">Unidade</TableHead>
-                    <TableHead className="text-xs md:text-sm">Custo (R$)</TableHead>
-                    <TableHead className="text-xs md:text-sm">Status</TableHead>
-                    <TableHead className="text-xs md:text-sm">Resultado</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredExams.length > 0 ? (
-                    filteredExams.map((exam) => (
-                      <TableRow key={exam.id} className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-none">
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.id}</TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.patient}</TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.type}</TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{format(exam.date, "dd/MM/yyyy")}</TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">{exam.doctor}</TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">
-                          <div className="flex items-center">
-                            <Database className="h-3 w-3 mr-1" />
-                            {exam.laboratory}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">
-                          <div className="flex items-center">
-                            <Building className="h-3 w-3 mr-1" />
-                            {exam.unit}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4 font-medium">
-                          {exam.cost.toFixed(2)}
-                        </TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">
-                          <Badge className={`px-1.5 py-0.5 text-[10px] md:px-2 md:py-1 md:text-xs rounded-full font-medium ${
-                            exam.status === 'Concluído' 
-                              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
-                          }`}>
-                            {exam.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-xs md:text-sm py-2 md:py-4">
-                          <span className={`${
-                            exam.result === 'Alterado' 
-                              ? 'text-red-600 dark:text-red-400' 
-                              : exam.result === 'Normal'
-                                ? 'text-green-600 dark:text-green-400'
-                                : ''
-                          }`}>
-                            {exam.result}
-                          </span>
+          <div className="w-full">
+            <ScrollArea className="h-[400px] md:h-[500px] w-full">
+              <div className="min-w-[900px]">
+                <Table>
+                  <TableHeader className="sticky top-0 bg-white dark:bg-gray-800 z-10">
+                    <TableRow>
+                      <TableHead className="w-[60px]">ID</TableHead>
+                      <TableHead className="min-w-[120px]">Paciente</TableHead>
+                      <TableHead className="min-w-[120px]">Tipo</TableHead>
+                      <TableHead className="w-[90px]">Data</TableHead>
+                      <TableHead className="min-w-[120px]">Médico</TableHead>
+                      <TableHead className="min-w-[120px]">Laboratório</TableHead>
+                      <TableHead className="min-w-[120px]">Unidade</TableHead>
+                      <TableHead className="w-[100px]">Custo (R$)</TableHead>
+                      <TableHead className="w-[90px]">Status</TableHead>
+                      <TableHead className="w-[90px]">Resultado</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredExams.length > 0 ? (
+                      filteredExams.map((exam) => (
+                        <TableRow key={exam.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <TableCell className="font-medium text-xs">{exam.id}</TableCell>
+                          <TableCell className="text-sm">{exam.patient}</TableCell>
+                          <TableCell className="text-sm">{exam.type}</TableCell>
+                          <TableCell className="text-sm">{format(exam.date, "dd/MM/yyyy")}</TableCell>
+                          <TableCell className="text-sm">{exam.doctor}</TableCell>
+                          <TableCell className="text-sm">
+                            <div className="flex items-center">
+                              <Database className="h-3 w-3 mr-1" />
+                              {exam.laboratory}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            <div className="flex items-center">
+                              <Building className="h-3 w-3 mr-1" />
+                              {exam.unit}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium text-sm">
+                            {exam.cost.toFixed(2)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={`text-xs ${
+                              exam.status === 'Concluído' 
+                                ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+                            }`} variant="secondary">
+                              {exam.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            <span className={`${
+                              exam.result === 'Alterado' 
+                                ? 'text-red-600 dark:text-red-400' 
+                                : exam.result === 'Normal'
+                                  ? 'text-green-600 dark:text-green-400'
+                                  : ''
+                            }`}>
+                              {exam.result}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={10} className="text-center py-6 text-sm text-gray-500 dark:text-gray-400">
+                          Nenhum exame encontrado com os filtros selecionados.
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={10} className="text-center py-6 text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                        Nenhum exame encontrado com os filtros selecionados.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </ScrollArea>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </ScrollArea>
+          </div>
         </CardContent>
       </Card>
     </div>
