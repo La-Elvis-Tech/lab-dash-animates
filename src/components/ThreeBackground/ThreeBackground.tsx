@@ -68,7 +68,11 @@ export default function ThreeBackground() {
           <Environment preset="city" />
         </Suspense>
         
-        <OrbitControls enableZoom={false} enablePan={false} />
+        <OrbitControls 
+          enabled
+          enableZoom={false} 
+          enablePan={false}
+        />
       </Canvas>
     </div>
   )

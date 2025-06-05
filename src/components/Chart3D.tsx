@@ -137,16 +137,17 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
           </mesh>
 
           <OrbitControls
-            enableZoom={true}
-            enableRotate={true}
+            enabled
+            enableZoom
+            enableRotate
             minDistance={6}
             maxDistance={10}
             enablePan={false}
             target={[0, 2.2, 0]}
-            minPolarAngle={Math.PI/3}   // Ângulo mínimo de 30 graus (impede visão de cima)
-            maxPolarAngle={Math.PI/2.2} // Ângulo máximo de ~80 graus (impede visão de baixo)
-            minAzimuthAngle={-Math.PI/4} // Rotação horizontal mínima
-            maxAzimuthAngle={Math.PI/4}  // Rotação horizontal máxima
+            minPolarAngle={Math.PI/3}
+            maxPolarAngle={Math.PI/2.2}
+            minAzimuthAngle={-Math.PI/4}
+            maxAzimuthAngle={Math.PI/4}
           />
         </Canvas>
       </div>
