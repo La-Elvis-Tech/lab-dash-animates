@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Text, OrbitControls } from '@react-three/drei';
@@ -31,35 +32,38 @@ const Bar3D: React.FC<{
     meshRef.current.position.y = 0;
 
     // Animação
-    gsap.to(meshRef.current.scale, {
-      y: 1,
-      duration: 2.2,
-      ease: "elastic.out(1, 0.9)",
-      delay: position[0] * 0.3 // Delay escalonado
-    });
+    if (typeof window !== 'undefined' && (window as any).gsap) {
+      const gsap = (window as any).gsap;
+      gsap.to(meshRef.current.scale, {
+        y: 1,
+        duration: 2.2,
+        ease: "elastic.out(1, 0.9)",
+        delay: position[0] * 0.3 // Delay escalonado
+      });
 
-    gsap.to(meshRef.current.position, {
-      y: height / 2,
-      duration: 2,
-      ease: "power3.out",
-      delay: position[0] * 0.3
-    });
+      gsap.to(meshRef.current.position, {
+        y: height / 2,
+        duration: 2,
+        ease: "power3.out",
+        delay: position[0] * 0.3
+      });
+    }
 
   }, [height, position]);
 
   return (
     <group position={position}>
-      <RoundedBox
+      <mesh
         ref={meshRef}
-        args={[1, height, 1]}
-        radius={0.06}
+        position={[0, height / 2, 0]}
       >
+        <boxGeometry args={[1, height, 1]} />
         <meshStandardMaterial 
           color={color}
           metalness={0.4}
           roughness={0.1}
         />
-      </RoundedBox>
+      </mesh>
       <Text
         position={[textOffsetX, height + 0.3, -0.5]}
         fontSize={0.25}
