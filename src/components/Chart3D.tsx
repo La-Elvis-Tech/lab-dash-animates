@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Text, RoundedBox } from "@react-three/drei";
@@ -136,7 +137,7 @@ const Chart3D: React.FC<Chart3DProps> = ({ data, title }) => {
           </mesh>
 
           <OrbitControls
-            enableZoom={true} //ignora o erro, nao existe
+            enableZoom={true}
             enableRotate={true}
             minDistance={6}
             maxDistance={10}
