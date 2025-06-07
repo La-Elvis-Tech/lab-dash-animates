@@ -32,6 +32,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   const profileDetailsRef = useRef<HTMLDivElement>(null);
   const navItemsRef = useRef<HTMLDivElement>(null);
   const itemTextsRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const itemIconsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     const path = location.pathname;
@@ -45,46 +47,57 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
 
   useEffect(() => {
     if (!contentRef.current) return;
-    
+
+    timelineRef.current = gsap.timeline({
+      defaults: { duration: 0.4, ease: "power2.inOut" }
+    });
+
     const ctx = gsap.context(() => {
       contentRef.current!.style.width = isCollapsed ? '80px' : '260px';
       
-      // Criar timeline para coordenar todas as animações
-      const tl = gsap.timeline({ defaults: { duration: 0.3, ease: "power2.inOut" } });
-      
       if (isCollapsed) {
-        tl.to(logoTextRef.current, {
-          width: 0,
-          opacity: 0,
-          onComplete: () => {
-            if (logoTextRef.current) logoTextRef.current.style.display = 'none';
-          }
-        })
-        .to(profileDetailsRef.current, {
-          opacity: 0,
-          height: 0,
-          marginTop: 0,
-          marginBottom: 0,
-          paddingTop: 0,
-          paddingBottom: 0,
-          onComplete: () => {
-            if (profileDetailsRef.current) profileDetailsRef.current.style.display = 'none';
-          }
-        }, "-=0.2")
-        .to(itemTextsRef.current, {
-          opacity: 0,
-          height: 0,
-          stagger: 0.05,
-          onComplete: () => {
-            itemTextsRef.current.forEach(el => {
-              if (el) el.style.display = 'none';
-            });
-          }
-        }, "-=0.1")
-        .to('.nav-grid', {
-          gridTemplateColumns: 'repeat(1, 1fr)',
-          duration: 0.2
-        }, "-=0.1");
+        // Animação de recolhimento
+        timelineRef.current!
+          .to('.nav-grid', { 
+            gridTemplateColumns: 'repeat(1, 1fr)',
+            duration: 0.3 //esse tempo tem q ser igual ao do to abaixo
+          }, 0)
+          .to(itemTextsRef.current, {
+            opacity: 0,
+            height: 0,
+            stagger: { 
+              each: 0.3, //esse tempo tem q ser igual ao do de cima
+              from: "end",
+              ease: "power2.in"
+            },
+            onComplete: () => {
+              itemTextsRef.current.forEach(el => {
+                if (el) el.style.display = 'none';
+              });
+            }
+          }, 0.1)
+          .to(itemIconsRef.current, {
+            scale: 0.9,
+            stagger: 0.03,
+          }, 0)
+          .to(profileDetailsRef.current, {
+            opacity: 0,
+            height: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+            marginTop: 0,
+            marginBottom: 0,
+            onComplete: () => {
+              if (profileDetailsRef.current) profileDetailsRef.current.style.display = 'none';
+            }
+          }, 0.15)
+          .to(logoTextRef.current, {
+            width: 0,
+            opacity: 0,
+            onComplete: () => {
+              if (logoTextRef.current) logoTextRef.current.style.display = 'none';
+            }
+          }, 0.2);
         
       } else {
         // Pré-configurar elementos antes da animação
@@ -104,28 +117,41 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
             gsap.set(el, { opacity: 0, height: 0 });
           }
         });
+
+        gsap.set(itemIconsRef.current, { scale: 0.9 });
         
-        tl.to(logoTextRef.current, {
-          width: 'auto',
-          opacity: 1
-        })
-        .to(profileDetailsRef.current, {
-          opacity: 1,
-          height: 'auto',
-          paddingTop: '1rem',
-          paddingBottom: '1rem',
-          marginTop: '0',
-          marginBottom: '0'
-        }, "-=0.1")
-        .to(itemTextsRef.current, {
-          opacity: 1,
-          height: 'auto',
-          stagger: 0.08
-        }, "-=0.1")
-        .to('.nav-grid', {
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          duration: 0.4
-        }, "-=0.1");
+        // Animação de expansão (processo reverso)
+        timelineRef.current!
+          .to(logoTextRef.current, {
+            width: 'auto',
+            opacity: 1
+          }, 0)
+          .to(profileDetailsRef.current, {
+            opacity: 1,
+            height: 'auto',
+            paddingTop: '1rem',
+            paddingBottom: '1rem',
+            marginTop: '0',
+            marginBottom: '0'
+          }, 0.1)
+          .to(itemIconsRef.current, {
+            scale: 1,
+            stagger: 0.04,
+            ease: "elastic.out(1, 0.5)"
+          }, 0.15)
+          .to(itemTextsRef.current, {
+            opacity: 1,
+            height: 'auto',
+            stagger: {
+              each: 0.06,
+              from: "start",
+              ease: "power2.out"
+            }
+          }, 0.2)
+          .to('.nav-grid', {
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            duration: 0.3
+          }, 0.1);
       }
     }, contentRef);
 
@@ -148,7 +174,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   return (
     <div 
       ref={contentRef} 
-      className="sidebar-content h-screen bg-white/90 backdrop-blur-sm flex flex-col transition-all overflow-hidden border-r border-gray-100 dark:bg-neutral-900 dark:border-neutral-800"
+      className="sidebar-content h-screen bg-white/90 backdrop-blur-sm flex flex-col transition-all overflow-hidden dark:bg-neutral-900"
       style={{ width: isCollapsed ? '80px' : '260px' }}
     >
       {/* Header com Logo */}
@@ -215,9 +241,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
               }`}
               style={{ aspectRatio: isCollapsed ? '1' : '1.2' }}
             >
-              <div className={`flex items-center justify-center transition-all duration-200 ${
-                isCollapsed ? 'mb-0' : 'mb-2'
-              }`}>
+              <div 
+                ref={el => itemIconsRef.current[index] = el}
+                className={`flex items-center justify-center transition-all duration-200 ${
+                  isCollapsed ? 'mb-0' : 'mb-2'
+                }`}
+              >
                 <item.icon size={20} strokeWidth={1.5} />
               </div>
               <span 

@@ -36,7 +36,7 @@ const Settings = () => {
             Ajuste as configurações do sistema
           </p>
         </div>
-        <div className="hidden sm:block">
+        <div className="hidden sm:block bg-gray-100 rounded-lg dark:bg-gray-800 p-1">
           <ThemeToggle />
         </div>
       </div>
@@ -45,20 +45,20 @@ const Settings = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 mb-8 p-1 bg-gradient-to-r from-purple-100/80 to-indigo-100/80 dark:from-purple-900/30 dark:to-indigo-900/30">
             <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="h-4 w-4" /> Perfil
+              <User className="hidden xl:block h-4 w-4" /> Perfil
             </TabsTrigger>
             <TabsTrigger
               value="notifications"
               className="flex items-center gap-2"
             >
-              <Calendar className="h-4 w-4" /> Notificações
+              <Calendar className="hidden xl:block h-4 w-4" /> Notificações
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2">
-              <SettingsIcon className="h-4 w-4" /> Segurança
+              <SettingsIcon className="hidden xl:block h-4 w-4" /> Segurança
             </TabsTrigger>
           </TabsList>
 
-          <div className="p-6">
+          <div className="p-2">
             <TabsContent value="profile" className="mt-0">
               <LaboratoryProfile />
             </TabsContent>
