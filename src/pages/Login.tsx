@@ -34,7 +34,7 @@ export const Login = () => {
       <ThreeBackground />
 
       {/* Login Form Container */}
-      <div className="relative z-10 min-h-screen bg-gradient-to-br from-gray-500/40 to to-indigo-500/70 dark:from-gray-100/40 flex items-center justify-center p-4 ">
+      <div className="relative z-10 min-h-screen bg-gradient-to-br from-gray-500/40 to to-indigo-500/70 dark:from-neutral-700/90 dark:to-black/25 flex items-center justify-center p-4 ">
         <div className="max-w-md z-12  w-full bg-neutral-800/40 rounded-2xl shadow-xl p-8 relative overflow-hidden transition-all duration-300 hover:shadow-2xl  ">
           {/* Decorative elements */}
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-purple-400 "></div>
