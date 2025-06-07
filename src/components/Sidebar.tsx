@@ -11,7 +11,8 @@ import {
   Settings, 
   ChevronsLeft,
   ChevronsRight,
-  LogOut
+  LogOut,
+  User
 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -57,6 +58,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
           duration: 0.2,
           ease: 'power2.out'
         });
+        gsap.to('.profile-details', {
+          opacity: 0,
+          display: 'none',
+          duration: 0.2,
+          ease: 'power2.out'
+        });
         gsap.to('.nav-grid', {
           gridTemplateColumns: 'repeat(1, 1fr)',
           duration: 0.2,
@@ -71,6 +78,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
           ease: 'power2.out'
         });
         gsap.to('.sidebar-logo-text', {
+          opacity: 1,
+          display: 'block',
+          duration: 0.3,
+          delay: 0.1,
+          ease: 'power2.out'
+        });
+        gsap.to('.profile-details', {
           opacity: 1,
           display: 'block',
           duration: 0.3,
@@ -104,19 +118,53 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   return (
     <div 
       ref={contentRef} 
-      className="sidebar-content h-screen bg-white dark:bg-gray-900 flex flex-col transition-all overflow-hidden border-r border-gray-200 dark:border-gray-800"
+      className="sidebar-content h-screen bg-white/90 backdrop-blur-sm flex flex-col transition-all overflow-hidden border-r border-gray-100"
       style={{ width: isCollapsed ? '80px' : '260px' }}
     >
-      {/* Header */}
-      <div className="flex items-center p-4 border-b border-gray-200 dark:border-gray-800">
+      {/* Header com Logo */}
+      <div className="flex items-center p-4 border-b border-gray-100">
         <div className="flex items-center">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
             <img src={Logo} alt="Logo" className="w-5 h-5" />
           </div>
-          <h1 className="font-michroma sidebar-logo-text text-sm font-semibold text-gray-900 dark:text-white ml-3">
+          <h1 className="font-michroma sidebar-logo-text text-sm font-semibold text-gray-800 ml-3">
             La Elvis Tech
           </h1>
         </div>
+      </div>
+
+      {/* Profile Section - Movido para o topo */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex items-center">
+          <Avatar className="w-12 h-12 ring-2 ring-blue-100">
+            <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-semibold">
+              {user ? getUserInitials(user.username) : 'LC'}
+            </AvatarFallback>
+          </Avatar>
+          {!isCollapsed && (
+            <div className="profile-details ml-3 min-w-0 flex-1">
+              <p className="font-semibold text-sm text-gray-800 truncate">
+                {user?.username || 'Lab Central'}
+              </p>
+              <p className="text-xs text-gray-500 mb-1">
+                {user?.role === 'admin' ? 'Administrador' : 'Usuário'}
+              </p>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-xs text-green-600">Online</span>
+              </div>
+            </div>
+          )}
+        </div>
+        {!isCollapsed && (
+          <button
+            onClick={signout}
+            className="profile-details w-full mt-3 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
+          >
+            <LogOut size={14} />
+            <span>Sair da Conta</span>
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -127,19 +175,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
               key={item.id}
               to={item.path}
               onClick={() => setActiveItem(item.id)}
-              className={`group relative flex flex-col items-center justify-center p-3 rounded-lg transition-all duration-200 ${
+              className={`group relative flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 ${
                 activeItem === item.id 
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'
+                  ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 shadow-sm border border-blue-100'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
               }`}
               style={{ aspectRatio: isCollapsed ? '1' : '1.2' }}
             >
               <div className={`flex items-center justify-center transition-all duration-200 ${
                 isCollapsed ? 'mb-0' : 'mb-2'
               }`}>
-                <item.icon size={20} strokeWidth={2} />
+                <item.icon size={20} strokeWidth={1.5} />
               </div>
-              <span className={`item-text text-xs font-medium text-center ${
+              <span className={`item-text text-xs font-medium text-center leading-tight ${
                 isCollapsed ? 'hidden' : 'block'
               }`}>
                 {item.name}
@@ -150,49 +198,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
       </div>
 
       {/* Toggle Button */}
-      <div className="px-3 pb-3">
+      <div className="p-3">
         <button 
           onClick={toggleSidebar} 
-          className="w-full py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center"
+          className="w-full py-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200 flex items-center justify-center group"
         >
           {isCollapsed ? (
-            <ChevronsRight size={18} className="text-gray-600 dark:text-gray-400" />
+            <ChevronsRight size={18} className="text-gray-500 group-hover:text-gray-700" />
           ) : (
-            <ChevronsLeft size={18} className="text-gray-600 dark:text-gray-400" />
+            <ChevronsLeft size={18} className="text-gray-500 group-hover:text-gray-700" />
           )}
         </button>
-      </div>
-
-      {/* Profile Section */}
-      <div className="p-3 border-t border-gray-200 dark:border-gray-800">
-        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-          <div className="flex items-center flex-1 min-w-0">
-            <Avatar className="w-8 h-8">
-              <AvatarFallback className="bg-blue-500 text-white text-xs font-semibold">
-                {user ? getUserInitials(user.username) : 'LC'}
-              </AvatarFallback>
-            </Avatar>
-            {!isCollapsed && (
-              <div className="item-text ml-3 min-w-0 flex-1">
-                <p className="font-medium text-sm text-gray-900 dark:text-white truncate">
-                  {user?.username || 'Lab Central'}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {user?.role === 'admin' ? 'Administrador' : 'Usuário'}
-                </p>
-              </div>
-            )}
-          </div>
-          {!isCollapsed && (
-            <button
-              onClick={signout}
-              className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-all duration-200"
-              title="Sair"
-            >
-              <LogOut size={16} />
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );
