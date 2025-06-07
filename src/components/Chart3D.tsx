@@ -80,7 +80,7 @@ export default function Chart3D({ data, width = 400, height = 300 }: Chart3DProp
           />
         ))}
         
-        <OrbitControls enableDamping dampingFactor={0.05} />
+        <OrbitControls enableDamping />
       </Canvas>
     </div>
   );
