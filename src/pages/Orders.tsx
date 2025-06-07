@@ -198,7 +198,7 @@ const Orders: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between flex-wrap items-center">
         <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
           Agendamentos
         </h1>
@@ -206,7 +206,7 @@ const Orders: React.FC = () => {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 dark:from-gray-800 dark:to-gray-700 dark:hover:from-gray-700 dark:hover:to-gray-600 dark:border-none"
+              className="bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 dark:from-gray-800 dark:to-gray-700 dark:hover:from-gray-700 dark:hover:to-gray-600 dark:border-none mt-4 xs:mt-2 md:mt-0"
             >
               <CalendarIcon className="h-4 w-4 mr-2" />
               Calendário
@@ -233,7 +233,7 @@ const Orders: React.FC = () => {
               Visualize seus agendamentos recentes e futuros
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-x-auto whitespace-nowrap grid ">
             <AppointmentsTabs
               recentAppointments={recentAppointments}
               next7DaysAppointments={next7DaysAppointments}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from 'date-fns';
 import { Clock, MapPin, CheckCircle, XCircle } from 'lucide-react';
@@ -36,12 +35,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   onUpdateStatus 
 }) => {
   const [selectedAppointment, setSelectedAppointment] = React.useState<string | null>(null);
+  const [dialogAction, setDialogAction] = React.useState<'complete' | 'cancel' | null>(null);
 
-  const handleStatusUpdate = (appointmentId: string, newStatus: string) => {
-    if (onUpdateStatus) {
-      onUpdateStatus(appointmentId, newStatus);
+  const handleStatusUpdate = (newStatus: string) => {
+    if (selectedAppointment && onUpdateStatus) {
+      onUpdateStatus(selectedAppointment, newStatus);
     }
     setSelectedAppointment(null);
+    setDialogAction(null);
   };
 
   const canChangeStatus = (status: string) => {
@@ -49,11 +50,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   };
 
   return (
-    <div className="w-full">
-      <ScrollArea className="h-[400px] w-full">
+    <div className="w-full border border-hidden rounded-xl ">
+      <ScrollArea className="h-[400px] w-full rounded-lg ">
         <div className="min-w-[1000px]">
-          <Table>
-            <TableHeader className="sticky top-0 bg-white dark:bg-gray-800 z-10">
+          <Table >
+            <TableHeader className="sticky top-0 bg-background z-10 whitespace-nowrap">
               <TableRow>
                 <TableHead className="w-[60px]">ID</TableHead>
                 <TableHead className="min-w-[120px]">Paciente</TableHead>
@@ -70,15 +71,15 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
             <TableBody>
               {appointments.length > 0 ? (
                 appointments.map((appointment) => (
-                  <TableRow key={appointment.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <TableRow key={appointment.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium text-xs">{appointment.id}</TableCell>
                     <TableCell className="text-sm">{appointment.patient}</TableCell>
                     <TableCell className="text-sm">{appointment.type}</TableCell>
-                    <TableCell className="text-sm">{format(appointment.date, "dd/MM/yyyy")}</TableCell>
+                    <TableCell className="text-sm">{format(new Date(appointment.date), "dd/MM/yyyy")}</TableCell>
                     <TableCell className="text-sm">
                       <div className="flex items-center">
                         <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
-                        {format(appointment.date, "HH:mm")}
+                        {format(new Date(appointment.date), "HH:mm")}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">{appointment.doctor}</TableCell>
@@ -99,83 +100,29 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                     <TableCell>
                       {canChangeStatus(appointment.status) && (
                         <div className="flex gap-1">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8 w-8 p-0"
-                                onClick={() => setSelectedAppointment(appointment.id)}
-                              >
-                                <CheckCircle className="h-3 w-3 text-green-600" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
-                                <DialogTitle>Confirmar Conclusão</DialogTitle>
-                                <DialogDescription>
-                                  Tem certeza que deseja marcar este agendamento como concluído?
-                                  <br />
-                                  <strong>Paciente:</strong> {appointment.patient}
-                                  <br />
-                                  <strong>Tipo:</strong> {appointment.type}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter>
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setSelectedAppointment(null)}
-                                >
-                                  Cancelar
-                                </Button>
-                                <Button
-                                  onClick={() => handleStatusUpdate(appointment.id, 'Concluído')}
-                                  className="bg-green-600 hover:bg-green-700"
-                                >
-                                  Confirmar
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              setSelectedAppointment(appointment.id);
+                              setDialogAction('complete');
+                            }}
+                          >
+                            <CheckCircle className="h-3 w-3 text-green-600" />
+                          </Button>
                           
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8 w-8 p-0"
-                                onClick={() => setSelectedAppointment(appointment.id)}
-                              >
-                                <XCircle className="h-3 w-3 text-red-600" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                              <DialogHeader>
-                                <DialogTitle>Confirmar Cancelamento</DialogTitle>
-                                <DialogDescription>
-                                  Tem certeza que deseja cancelar este agendamento?
-                                  <br />
-                                  <strong>Paciente:</strong> {appointment.patient}
-                                  <br />
-                                  <strong>Tipo:</strong> {appointment.type}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter>
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setSelectedAppointment(null)}
-                                >
-                                  Voltar
-                                </Button>
-                                <Button
-                                  onClick={() => handleStatusUpdate(appointment.id, 'Cancelado')}
-                                  variant="destructive"
-                                >
-                                  Cancelar Agendamento
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0"
+                            onClick={() => {
+                              setSelectedAppointment(appointment.id);
+                              setDialogAction('cancel');
+                            }}
+                          >
+                            <XCircle className="h-3 w-3 text-red-600" />
+                          </Button>
                         </div>
                       )}
                     </TableCell>
@@ -183,7 +130,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-6 text-gray-500 dark:text-gray-400">
+                  <TableCell colSpan={10} className="text-center py-6 text-muted-foreground">
                     Nenhum agendamento encontrado para este período.
                   </TableCell>
                 </TableRow>
@@ -192,6 +139,52 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
           </Table>
         </div>
       </ScrollArea>
+
+      {/* Diálogos unificados */}
+      <Dialog open={!!dialogAction} onOpenChange={(open) => !open && setDialogAction(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>
+              {dialogAction === 'complete' 
+                ? "Confirmar Conclusão" 
+                : "Confirmar Cancelamento"}
+            </DialogTitle>
+            <DialogDescription>
+              {dialogAction === 'complete'
+                ? "Tem certeza que deseja marcar este agendamento como concluído?"
+                : "Tem certeza que deseja cancelar este agendamento?"}
+              <br /><br />
+              <strong>Paciente:</strong> {
+                appointments.find(a => a.id === selectedAppointment)?.patient
+              }<br />
+              <strong>Tipo:</strong> {
+                appointments.find(a => a.id === selectedAppointment)?.type
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDialogAction(null)}
+            >
+              {dialogAction === 'complete' ? "Cancelar" : "Voltar"}
+            </Button>
+            <Button
+              onClick={() => handleStatusUpdate(
+                dialogAction === 'complete' ? 'Concluído' : 'Cancelado'
+              )}
+              className={dialogAction === 'complete' 
+                ? "bg-green-600 hover:bg-green-700" 
+                : ""}
+              variant={dialogAction === 'cancel' ? "destructive" : "default"}
+            >
+              {dialogAction === 'complete' 
+                ? "Confirmar Conclusão" 
+                : "Cancelar Agendamento"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

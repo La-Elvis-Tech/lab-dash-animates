@@ -27,8 +27,8 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
   const data = [{ name: title, value }];
 
   // converte strokeWidth para % de raio interno
-  const outerRadius = 121;
-  const innerRadius = outerRadius - (strokeWidth / size) * 110;
+  const outerRadius = 120;
+  const innerRadius = outerRadius - (strokeWidth / size) * 100;
 
   return (
     <div

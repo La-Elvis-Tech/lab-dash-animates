@@ -47,7 +47,7 @@ const Layout = () => {
       {isMobile && (
         <div
           ref={mobileHeaderRef}
-          className="fixed top-0 left-0 right-0 z-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm shadow-sm "
+          className="fixed top-0 left-0 right-0 z-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm shadow-sm py-0.5"
         >
           <div className="flex items-center justify-between px-4 h-14 ">
             <div className="flex items-center">
