@@ -60,7 +60,7 @@ export const Login = () => {
                   <input
                     id="username"
                     className="bg-gray-100/80 text-gray-700 w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 outline-none transition-all duration-300 placeholder-gray-500"
-                    placeholder="joao@dasa2025.com"
+                    placeholder="joao@dasa2025"
                     value={u}
                     onChange={e => setU(e.target.value)}
                     disabled={isLoading}

@@ -234,21 +234,21 @@ const Reports = () => {
               Análise de Despesas
             </CardTitle>
             <CardDescription className="dark:text-gray-300">
-              Visualização detalhada das despesas por período
+              Visualização detalhada das despesas por período e tipo de exame
             </CardDescription>
           </CardHeader>
           <CardContent className="p-3 sm:p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="overflow-x-auto -mx-3 px-3 pb-2">
+              <div className="overflow-x-auto mx-1 xl:-mx-3 px-1 sm:px-2">
                 <TabsList className="mb-4 sm:mb-6 w-full sm:w-auto">
-                  <TabsTrigger value="weekly" className="text-xs sm:text-sm">
-                    Semanal
+                  <TabsTrigger value="weekly" className="text-xs sm:text-sm ">
+                    Semana
                   </TabsTrigger>
-                  <TabsTrigger value="monthly" className="text-xs sm:text-sm">
-                    Mensal por Unidade
+                  <TabsTrigger value="monthly" className="text-xs sm:text-sm ">
+                    Mês por Unidade
                   </TabsTrigger>
                   <TabsTrigger value="byType" className="text-xs sm:text-sm">
-                    Por Tipo de Exame
+                    Tipo de Exame
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -406,7 +406,7 @@ const Reports = () => {
                         >
                           <div className="flex items-center">
                             <div
-                              className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2"
+                              className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:"
                               style={{
                                 backgroundColor:
                                   CHART_COLORS[index % CHART_COLORS.length],

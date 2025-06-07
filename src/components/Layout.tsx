@@ -42,7 +42,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen w-full transition-colors duration-300 relative bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:from-gray-600/80 dark:via-indigo-300/15 dark:to-black/25">
+    <div className="flex h-screen w-full transition-colors duration-300 relative bg-gradient-to-br from-white via-violet-500/30 to-fuchsia-500/30 dark:bg-gradient-to-br dark:from-neutral-700/90 dark:to-black/25">
       {/* Mobile Header */}
       {isMobile && (
         <div
@@ -71,7 +71,7 @@ const Layout = () => {
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500/50 to-purple-600/20 rounded-lg flex items-center justify-center shadow-sm">
               <img src={Logo} alt="Logo" className="w-5 h-5" />
             </div>
-            <h1 className="-ml-6 font-michroma text-lg font-semibold text-lab-blue dark:text-white ">
+            <h1 className="-ml-4 font-michroma text-lg font-semibold text-lab-blue dark:text-white ">
               La Elvis Tech
             </h1>
             <div  className=" rounded-md flex items-center mr-2">
