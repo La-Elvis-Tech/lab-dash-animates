@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
@@ -11,8 +10,7 @@ import {
   Settings, 
   ChevronsLeft,
   ChevronsRight,
-  LogOut,
-  User
+  LogOut
 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -28,6 +26,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   const [activeItem, setActiveItem] = React.useState('dashboard');
   const location = useLocation();
   const { user, signout } = useContext(AuthContext);
+  
+  // Referências para animação
+  const logoTextRef = useRef<HTMLDivElement>(null);
+  const profileDetailsRef = useRef<HTMLDivElement>(null);
+  const navItemsRef = useRef<HTMLDivElement>(null);
+  const itemTextsRef = useRef<(HTMLSpanElement | null)[]>([]);
 
   useEffect(() => {
     const path = location.pathname;
@@ -45,57 +49,83 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
     const ctx = gsap.context(() => {
       contentRef.current!.style.width = isCollapsed ? '80px' : '260px';
       
+      // Criar timeline para coordenar todas as animações
+      const tl = gsap.timeline({ defaults: { duration: 0.3, ease: "power2.inOut" } });
+      
       if (isCollapsed) {
-        gsap.to('.item-text', {
+        tl.to(logoTextRef.current, {
+          width: 0,
           opacity: 0,
-          display: 'none',
-          duration: 0.2,
-          ease: 'power2.out'
-        });
-        gsap.to('.sidebar-logo-text', {
+          onComplete: () => {
+            if (logoTextRef.current) logoTextRef.current.style.display = 'none';
+          }
+        })
+        .to(profileDetailsRef.current, {
           opacity: 0,
-          display: 'none',
-          duration: 0.2,
-          ease: 'power2.out'
-        });
-        gsap.to('.profile-details', {
+          height: 0,
+          marginTop: 0,
+          marginBottom: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+          onComplete: () => {
+            if (profileDetailsRef.current) profileDetailsRef.current.style.display = 'none';
+          }
+        }, "-=0.2")
+        .to(itemTextsRef.current, {
           opacity: 0,
-          display: 'none',
-          duration: 0.2,
-          ease: 'power2.out'
-        });
-        gsap.to('.nav-grid', {
+          height: 0,
+          stagger: 0.05,
+          onComplete: () => {
+            itemTextsRef.current.forEach(el => {
+              if (el) el.style.display = 'none';
+            });
+          }
+        }, "-=0.1")
+        .to('.nav-grid', {
           gridTemplateColumns: 'repeat(1, 1fr)',
-          duration: 0.2,
-          ease: 'power2.out'
-        });
+          duration: 0.2
+        }, "-=0.1");
+        
       } else {
-        gsap.to('.item-text', {
-          opacity: 1,
-          display: 'block',
-          duration: 0.3,
-          delay: 0.1,
-          ease: 'power2.out'
+        // Pré-configurar elementos antes da animação
+        if (logoTextRef.current) {
+          logoTextRef.current.style.display = 'block';
+          gsap.set(logoTextRef.current, { width: 0, opacity: 0 });
+        }
+        
+        if (profileDetailsRef.current) {
+          profileDetailsRef.current.style.display = 'block';
+          gsap.set(profileDetailsRef.current, { opacity: 0, height: 0 });
+        }
+        
+        itemTextsRef.current.forEach(el => {
+          if (el) {
+            el.style.display = 'block';
+            gsap.set(el, { opacity: 0, height: 0 });
+          }
         });
-        gsap.to('.sidebar-logo-text', {
+        
+        tl.to(logoTextRef.current, {
+          width: 'auto',
+          opacity: 1
+        })
+        .to(profileDetailsRef.current, {
           opacity: 1,
-          display: 'block',
-          duration: 0.3,
-          delay: 0.1,
-          ease: 'power2.out'
-        });
-        gsap.to('.profile-details', {
+          height: 'auto',
+          paddingTop: '1rem',
+          paddingBottom: '1rem',
+          marginTop: '0',
+          marginBottom: '0'
+        }, "-=0.1")
+        .to(itemTextsRef.current, {
           opacity: 1,
-          display: 'block',
-          duration: 0.3,
-          delay: 0.1,
-          ease: 'power2.out'
-        });
-        gsap.to('.nav-grid', {
+          height: 'auto',
+          stagger: 0.08
+        }, "-=0.1")
+        .to('.nav-grid', {
           gridTemplateColumns: 'repeat(2, 1fr)',
-          duration: 0.2,
-          ease: 'power2.out'
-        });
+          duration: 0.4
+        }, "-=0.1");
       }
     }, contentRef);
 
@@ -118,67 +148,70 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   return (
     <div 
       ref={contentRef} 
-      className="sidebar-content h-screen bg-white/90 backdrop-blur-sm flex flex-col transition-all overflow-hidden border-r border-gray-100"
+      className="sidebar-content h-screen bg-white/90 backdrop-blur-sm flex flex-col transition-all overflow-hidden border-r border-gray-100 dark:bg-neutral-900 dark:border-neutral-800"
       style={{ width: isCollapsed ? '80px' : '260px' }}
     >
       {/* Header com Logo */}
-      <div className="flex items-center p-4 border-b border-gray-100">
-        <div className="flex items-center">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+      <div className="flex items-center p-5 border-b border-gray-100 dark:border-neutral-800">
+        <div className="flex items-center w-full">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500/50 to-purple-600/20 rounded-lg flex items-center justify-center shadow-sm">
             <img src={Logo} alt="Logo" className="w-5 h-5" />
           </div>
-          <h1 className="font-michroma sidebar-logo-text text-sm font-semibold text-gray-800 ml-3">
-            La Elvis Tech
-          </h1>
+          
+          <div 
+            ref={logoTextRef}
+            className="overflow-hidden ml-3"
+            style={{ display: isCollapsed ? 'none' : 'block' }}
+          >
+            <h1 className="font-michroma text-base font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">
+              La Elvis Tech
+            </h1>
+          </div>
         </div>
       </div>
 
-      {/* Profile Section - Movido para o topo */}
-      <div className="p-4 border-b border-gray-100">
+      {/* Profile Section */}
+      <div 
+        ref={profileDetailsRef}
+        className="p-4 border-b border-gray-100 dark:border-neutral-800"
+        style={{ display: isCollapsed ? 'none' : 'block' }}
+      >
         <div className="flex items-center">
-          <Avatar className="w-12 h-12 ring-2 ring-blue-100">
+          <Avatar className="w-12 h-12 ring-2 ring-blue-100 dark:ring-blue-900/30">
             <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-semibold">
               {user ? getUserInitials(user.username) : 'LC'}
             </AvatarFallback>
           </Avatar>
-          {!isCollapsed && (
-            <div className="profile-details ml-3 min-w-0 flex-1">
-              <p className="font-semibold text-sm text-gray-800 truncate">
-                {user?.username || 'Lab Central'}
-              </p>
-              <p className="text-xs text-gray-500 mb-1">
-                {user?.role === 'admin' ? 'Administrador' : 'Usuário'}
-              </p>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-xs text-green-600">Online</span>
-              </div>
-            </div>
-          )}
+          <div className="ml-4 min-w-0 flex-1">
+            <p className="font-semibold text-sm text-gray-800 dark:text-gray-200 truncate">
+              {user?.username || 'Lab Central'}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {user?.role === 'admin' ? 'Administrador' : 'Usuário'}
+            </p>
+          </div>
         </div>
-        {!isCollapsed && (
-          <button
-            onClick={signout}
-            className="profile-details w-full mt-3 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-gray-600 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
-          >
-            <LogOut size={14} />
-            <span>Sair da Conta</span>
-          </button>
-        )}
+        <button
+          onClick={signout}
+          className="w-full mt-4 flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs bg-red-300/40 dark:bg-red-900/50 text-gray-700 hover:text-red-600 hover:bg-red-600/50 dark:text-gray-200 dark:hover:text-red-400 dark:hover:bg-red-600/40 transition-colors duration-200"
+        >
+          <LogOut size={14} />
+          <span>Sair da Conta</span>
+        </button>
       </div>
 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-4 px-3">
         <div className={`nav-grid grid gap-2 ${isCollapsed ? 'grid-cols-1' : 'grid-cols-2'}`}>
-          {navItems.map((item) => (
+          {navItems.map((item, index) => (
             <Link
               key={item.id}
               to={item.path}
               onClick={() => setActiveItem(item.id)}
-              className={`group relative flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 ${
+              className={`group relative flex flex-col items-center justify-center p-3 rounded-xl transition-colors duration-200 ${
                 activeItem === item.id 
-                  ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 shadow-sm border border-blue-100'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                  ? 'bg-gradient-to-br from-indigo-100 to-purple-50 text-blue-600 shadow-sm border-2 border-blue-200/60 dark:from-indigo-900/40 dark:to-purple-900/20 dark:text-blue-400 dark:border-indigo-800/50'
+                  : 'text-gray-600 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-neutral-800 dark:hover:text-gray-200'
               }`}
               style={{ aspectRatio: isCollapsed ? '1' : '1.2' }}
             >
@@ -187,9 +220,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
               }`}>
                 <item.icon size={20} strokeWidth={1.5} />
               </div>
-              <span className={`item-text text-xs font-medium text-center leading-tight ${
-                isCollapsed ? 'hidden' : 'block'
-              }`}>
+              <span 
+                ref={el => itemTextsRef.current[index] = el}
+                className={`text-xs font-medium text-center leading-tight ${
+                  isCollapsed ? 'hidden' : 'block'
+                }`}
+                style={{ display: isCollapsed ? 'none' : 'block' }}
+              >
                 {item.name}
               </span>
             </Link>
@@ -201,12 +238,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
       <div className="p-3">
         <button 
           onClick={toggleSidebar} 
-          className="w-full py-2.5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200 flex items-center justify-center group"
+          className="w-full py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 transition-colors duration-200 flex items-center justify-center group"
         >
           {isCollapsed ? (
-            <ChevronsRight size={18} className="text-gray-500 group-hover:text-gray-700" />
+            <ChevronsRight size={18} className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200" />
           ) : (
-            <ChevronsLeft size={18} className="text-gray-500 group-hover:text-gray-700" />
+            <ChevronsLeft size={18} className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200" />
           )}
         </button>
       </div>
