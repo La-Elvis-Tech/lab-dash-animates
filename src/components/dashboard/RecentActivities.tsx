@@ -40,7 +40,7 @@ const RecentActivities: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg p-8">
+    <div className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg p-8">
       <div className="flex items-center mb-6">
         <Clock 
           size={18}
@@ -56,7 +56,7 @@ const RecentActivities: React.FC = () => {
           {activities.map((activity, index) => (
             <div
               key={index}
-              className="rounded-xl bg-gray-300/40 dark:bg-neutral-900/60 overflow-hidden"
+              className="rounded-xl bg-gray-300/40 dark:bg-neutral-950/60 overflow-hidden"
             >
               <button
                 onClick={() => toggleAccordion(index)}

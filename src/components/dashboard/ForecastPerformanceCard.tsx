@@ -2,19 +2,19 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { Target } from "lucide-react";
 
 const ForecastPerformanceCard: React.FC = () => {
   const mapeScore = 12.3; // Mean Absolute Percentage Error
   
   const performanceData = [
-    { month: "Jan", real: 180, predicted: 175 },
-    { month: "Fev", real: 195, predicted: 190 },
-    { month: "Mar", real: 220, predicted: 205 },
-    { month: "Abr", real: 185, predicted: 195 },
-    { month: "Mai", real: 210, predicted: 215 },
-    { month: "Jun", real: 235, predicted: 225 }
+    { month: "Jan", real: 200, predicted: 175 },
+    { month: "Fev", real: 305, predicted: 190 },
+    { month: "Mar", real: 220, predicted: 145 },
+    { month: "Abr", real: 135, predicted: 195 },
+    { month: "Mai", real: 250, predicted: 215 },
+    { month: "Jun", real: 295, predicted: 225 }
   ];
 
   const getPerformanceLevel = (mape: number) => {
@@ -27,7 +27,7 @@ const ForecastPerformanceCard: React.FC = () => {
   const performance = getPerformanceLevel(mapeScore);
 
   return (
-    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+    <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg ">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
           <Target size={18} className="text-indigo-600 dark:text-indigo-400" />
@@ -36,7 +36,7 @@ const ForecastPerformanceCard: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
+          <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-800/60 rounded-xl border border-gray-200 dark:border-neutral-900">
             <div>
               <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                 {mapeScore}%
@@ -50,9 +50,19 @@ const ForecastPerformanceCard: React.FC = () => {
             </Badge>
           </div>
 
-          <div className="h-24 px-3">
+          <div className="h-24 px-3 ">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={performanceData}>
+              <AreaChart data={performanceData}>
+                <defs>
+                  <linearGradient id="realGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.7}/>
+                    <stop offset="95%" stopColor="#4F46E5" stopOpacity={0.1}/>
+                  </linearGradient>
+                  <linearGradient id="predictedGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#b6a9a9" stopOpacity={0.7}/>
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
                 <XAxis dataKey="month" hide />
                 <YAxis hide />
                 <Tooltip 
@@ -65,24 +75,26 @@ const ForecastPerformanceCard: React.FC = () => {
                     padding: '6px'
                   }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="real" 
-                  stroke="#4F46E5" 
-                  strokeWidth={2} 
-                  dot={false} 
+                <Area
+                  type="monotone"
+                  dataKey="real"
+                  stroke="#7b76e7"
+                  fill="url(#realGradient)"
+                  strokeWidth={2}
+                  dot={false}
                   name="Real"
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="predicted" 
-                  stroke="#A5B4FC" 
-                  strokeWidth={2} 
-                  strokeDasharray="5 5"
-                  dot={false} 
+                <Area
+                  type="monotone"
+                  dataKey="predicted"
+                  stroke="#796f6f"
+                  fill="url(#predictedGradient)"
+                  strokeWidth={3}
+                  strokeDasharray="7 5"
+                  dot={false}
                   name="Previsto"
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </div>
           

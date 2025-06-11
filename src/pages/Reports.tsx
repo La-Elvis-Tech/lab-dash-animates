@@ -166,7 +166,7 @@ const Reports = () => {
       
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="overflow-x-auto mx-1 xl:-mx-3 px-1 sm:px-2">
+        <div className="overflow-x-auto mx-1 xl:-mx-3 px-0 sm:px-2">
           <TabsList className="mb-4 sm:mb-6 w-full sm:w-auto bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">
               Geral
@@ -312,7 +312,7 @@ const Reports = () => {
                     {mockAppointments.map((app) => (
                       <div
                         key={app.id}
-                        className="border-l-4 border-l-blue-500 pl-3 py-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-r-md"
+                        className="border-l-4 border-l-blue-500 pl-3 py-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-r-md px-4"
                       >
                         <div className="flex justify-between items-start">
                           <div>

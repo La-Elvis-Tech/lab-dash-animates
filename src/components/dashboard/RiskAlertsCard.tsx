@@ -30,7 +30,7 @@ const RiskAlertsCard: React.FC = () => {
   return (
     <div className="grid grid-cols-1 gap-4">
       {/* Rupturas Imediatas */}
-      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+      <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
             <Package size={18} className="text-red-600 dark:text-red-400" />
@@ -66,7 +66,7 @@ const RiskAlertsCard: React.FC = () => {
       </Card>
 
       {/* Vencimentos */}
-      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+      <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
             <Clock size={18} className="text-amber-600 dark:text-amber-400" />

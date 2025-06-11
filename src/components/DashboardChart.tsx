@@ -58,7 +58,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 value={percentage} 
                 className="h-1.5 sm:h-2.5"
                 style={{
-                  background: 'linear-gradient(to right, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2))',
+                  background: 'linear-gradient(to right, rgba(228, 218, 253, 0.2), rgba(64, 45, 117, 0.3))',
                 }}
               />
             </div>
@@ -73,7 +73,7 @@ const DashboardChart = ({ type, data, title, description }) => {
       case 'bar':
         return (
           <ResponsiveContainer width="100%" height={400} minHeight={100}>
-            <BarChart data={data} margin={{  top: 10, right: 30, left:-30, bottom: 5 }} >
+            <BarChart data={data} margin={{  top: 10, right: 30, left:-25, bottom: 5 }} >
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="name" 

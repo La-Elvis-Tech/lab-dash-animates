@@ -76,7 +76,7 @@ const UnitSelectorCard: React.FC = () => {
   };
 
   return (
-    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+    <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
           <Building2
@@ -102,7 +102,7 @@ const UnitSelectorCard: React.FC = () => {
                 .map((unit) => (
                   <div
                     key={unit.id}
-                    className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl mb-2 last:mb-0 border border-gray-200 dark:border-neutral-900 transition-colors hover:bg-gray-300/80 dark:hover:bg-gray-800"
+                    className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-950/60 rounded-xl mb-2 last:mb-0 border border-gray-200 dark:border-neutral-900 transition-colors hover:bg-gray-300/80 dark:hover:bg-gray-800"
                   >
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-gray-50 dark:bg-neutral-700 rounded-lg text-indigo-600 dark:text-indigo-300">

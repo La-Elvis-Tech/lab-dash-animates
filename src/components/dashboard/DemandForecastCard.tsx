@@ -31,7 +31,7 @@ const DemandForecastCard: React.FC = () => {
 
   return (
     <>
-      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+      <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg ">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
             <BarChart3
@@ -43,7 +43,7 @@ const DemandForecastCard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 my-2 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
+            <div className="flex items-center justify-between p-3 my-2 bg-gray-300/40 dark:bg-neutral-800/60 rounded-xl border border-gray-200 dark:border-neutral-900">
               <div>
                 <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                   {forecastData.nextMonth}
@@ -70,11 +70,11 @@ const DemandForecastCard: React.FC = () => {
 
             <Dialog open={isSimulationOpen} onOpenChange={setIsSimulationOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full text-indigo-700 dark:text-indigo-50 bg-indigo-100 dark:bg-neutral-800 border-transparent hover:bg-indigo-50 dark:hover:bg-neutral-700/40 rounded-xl">
+                <Button variant="outline" size="sm" className="w-full text-indigo-700 dark:text-indigo-50 bg-indigo-100 dark:bg-neutral-800/60 border-transparent hover:bg-indigo-50 dark:hover:bg-neutral-700/40 rounded-xl">
                   Simular Cenário
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-md bg-white dark:bg-neutral-800/100 border-neutral-200 dark:border-neutral-800">
                 <DialogHeader>
                   <DialogTitle>Simulação de Demanda</DialogTitle>
                   <DialogDescription>
@@ -83,7 +83,7 @@ const DemandForecastCard: React.FC = () => {
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     <Label>Taxa de Crescimento: {growthRate[0]}%</Label>
                     <Slider
                       value={growthRate}
@@ -95,7 +95,7 @@ const DemandForecastCard: React.FC = () => {
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     <Label>Sazonalidade: {seasonality[0] > 0 ? '+' : ''}{seasonality[0]}%</Label>
                     <Slider
                       value={seasonality}
@@ -107,7 +107,7 @@ const DemandForecastCard: React.FC = () => {
                     />
                   </div>
 
-                  <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="my-6 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="text-sm font-medium">Resultado da Simulação:</div>
                     <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
                       {Math.round(forecastData.currentEstimate)} itens

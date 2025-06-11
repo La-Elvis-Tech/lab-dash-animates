@@ -41,7 +41,7 @@ const QuickActionsCard: React.FC = () => {
   ];
 
   return (
-    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+    <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between text-lg font-bold text-gray-800 dark:text-gray-100">
           <span className="flex items-center gap-2">
@@ -64,7 +64,7 @@ const QuickActionsCard: React.FC = () => {
             <Link
               key={index}
               to={action.link}
-              className={`block p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl hover:bg-gray-300/80 dark:hover:bg-gray-800 transition-colors border-l border-gray-200 dark:border-neutral-900`}
+              className={`block p-3 bg-gray-300/40 dark:bg-neutral-950/60 rounded-xl hover:bg-gray-300/80 dark:hover:bg-gray-800 transition-colors border-l border-gray-200 dark:border-neutral-900`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
