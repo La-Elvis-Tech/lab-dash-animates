@@ -118,7 +118,7 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
               <Checkbox
                 id="auto-report"
                 checked={autoReport}
-                onCheckedChange={setAutoReport}
+                onCheckedChange={(checked) => setAutoReport(!!checked)}
               />
               <label htmlFor="auto-report" className="text-sm font-medium">
                 Relatórios Automáticos

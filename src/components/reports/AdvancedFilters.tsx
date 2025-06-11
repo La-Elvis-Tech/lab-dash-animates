@@ -10,9 +10,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Calendar as CalendarIcon, Filter, X } from "lucide-react";
 import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 interface FilterState {
-  dateRange: { from: Date | undefined; to: Date | undefined };
+  dateRange: DateRange | undefined;
   examTypes: string[];
   units: string[];
   items: string[];
@@ -25,7 +26,7 @@ interface AdvancedFiltersProps {
 
 const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) => {
   const [filters, setFilters] = useState<FilterState>({
-    dateRange: { from: undefined, to: undefined },
+    dateRange: undefined,
     examTypes: [],
     units: [],
     items: [],
@@ -58,7 +59,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
 
   const clearFilters = () => {
     const clearedFilters: FilterState = {
-      dateRange: { from: undefined, to: undefined },
+      dateRange: undefined,
       examTypes: [],
       units: [],
       items: [],
@@ -85,7 +86,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start text-left">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {filters.dateRange.from ? (
+                  {filters.dateRange?.from ? (
                     filters.dateRange.to ? (
                       <>
                         {format(filters.dateRange.from, "dd/MM/yyyy")} - {format(filters.dateRange.to, "dd/MM/yyyy")}
@@ -102,10 +103,10 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
                 <Calendar
                   initialFocus
                   mode="range"
-                  defaultMonth={filters.dateRange.from}
+                  defaultMonth={filters.dateRange?.from}
                   selected={filters.dateRange}
                   onSelect={(range) => {
-                    const newFilters = { ...filters, dateRange: range || { from: undefined, to: undefined } };
+                    const newFilters = { ...filters, dateRange: range };
                     setFilters(newFilters);
                     onFiltersChange(newFilters);
                   }}
