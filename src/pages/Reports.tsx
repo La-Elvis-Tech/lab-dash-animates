@@ -1,4 +1,3 @@
-import DashboardChart, { CHART_COLORS } from "@/components/DashboardChart.js";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -12,6 +11,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { addDays, format, startOfDay } from "date-fns";
 import { gsap } from "gsap";
 import { useEffect, useRef, useState } from "react";
+
+// Import new advanced components
+import AdvancedFilters from "@/components/reports/AdvancedFilters";
+import PerformanceMetrics from "@/components/reports/PerformanceMetrics";
+import CostAnalysis from "@/components/reports/CostAnalysis";
+import ExportControls from "@/components/reports/ExportControls";
+
+import DashboardChart, { CHART_COLORS } from "@/components/DashboardChart.js";
 
 // Mock data for appointments (same as in Orders.tsx)
 
@@ -131,7 +138,8 @@ const mockAppointments = [
 
 const Reports = () => {
   const pageRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState("weekly");
+  const [activeTab, setActiveTab] = useState("overview");
+  const [filters, setFilters] = useState({});
   const today = startOfDay(new Date());
 
   useEffect(() => {
@@ -216,241 +224,293 @@ const Reports = () => {
     0
   );
 
+  const handleExport = (format: string, dataTypes: string[]) => {
+    console.log(`Exporting ${dataTypes.join(', ')} in ${format} format`);
+    // Implementation for actual export would go here
+  };
+
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters(newFilters);
+    // Apply filters to data
+  };
+
   return (
     <div ref={pageRef} className="space-y-6">
       <div className="rounded-lg mb-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
-          Relatórios
+          Relatórios Avançados
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
-          Análise de despesas e consumo
+          Análise detalhada com métricas de performance e previsões
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:gap-6 mb-6">
-        <Card className="dark:bg-gray-800/50 dark:text-gray-100 overflow-hidden">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="text-lg sm:text-xl">
-              Análise de Despesas
-            </CardTitle>
-            <CardDescription className="dark:text-gray-300">
-              Visualização detalhada das despesas por período e tipo de exame
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="overflow-x-auto mx-1 xl:-mx-3 px-1 sm:px-2">
-                <TabsList className="mb-4 sm:mb-6 w-full sm:w-auto">
-                  <TabsTrigger value="weekly" className="text-xs sm:text-sm ">
-                    Semana
-                  </TabsTrigger>
-                  <TabsTrigger value="monthly" className="text-xs sm:text-sm ">
-                    Mês por Unidade
-                  </TabsTrigger>
-                  <TabsTrigger value="byType" className="text-xs sm:text-sm">
-                    Tipo de Exame
-                  </TabsTrigger>
-                </TabsList>
-              </div>
+      {/* Advanced Filters */}
+      <AdvancedFilters onFiltersChange={handleFiltersChange} />
 
-              <TabsContent value="weekly" className="mt-0">
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="w-full overflow-hidden">
-                    <DashboardChart
-                      type="bar"
-                      data={weeklyExpenses}
-                      title="Despesas Semanais"
-                      description="Gastos previstos para os próximos 7 dias"
-                    />
+      {/* Main Content Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <div className="overflow-x-auto mx-1 xl:-mx-3 px-1 sm:px-2">
+          <TabsList className="mb-4 sm:mb-6 w-full sm:w-auto">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">
+              Visão Geral
+            </TabsTrigger>
+            <TabsTrigger value="performance" className="text-xs sm:text-sm">
+              Performance
+            </TabsTrigger>
+            <TabsTrigger value="cost-analysis" className="text-xs sm:text-sm">
+              Análise de Custos
+            </TabsTrigger>
+            <TabsTrigger value="export" className="text-xs sm:text-sm">
+              Exportação
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="overview" className="mt-0">
+          <div className="space-y-6">
+            {/* Original expense analysis - keeping existing functionality */}
+            <Card className="dark:bg-gray-800/50 dark:text-gray-100 overflow-hidden">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-lg sm:text-xl">
+                  Análise de Despesas
+                </CardTitle>
+                <CardDescription className="dark:text-gray-300">
+                  Visualização detalhada das despesas por período e tipo de exame
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <div className="overflow-x-auto mx-1 xl:-mx-3 px-1 sm:px-2">
+                    <TabsList className="mb-4 sm:mb-6 w-full sm:w-auto">
+                      <TabsTrigger value="weekly" className="text-xs sm:text-sm ">
+                        Semana
+                      </TabsTrigger>
+                      <TabsTrigger value="monthly" className="text-xs sm:text-sm ">
+                        Mês por Unidade
+                      </TabsTrigger>
+                      <TabsTrigger value="byType" className="text-xs sm:text-sm">
+                        Tipo de Exame
+                      </TabsTrigger>
+                    </TabsList>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-4 ">
-                    <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
-                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
-                        Total de despesas previstas
-                      </p>
-                      <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        R$ {totalWeeklyExpenses.toFixed(2)}
-                      </p>
-                    </div>
+                  <TabsContent value="weekly" className="mt-0">
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="w-full overflow-hidden">
+                        <DashboardChart
+                          type="bar"
+                          data={weeklyExpenses}
+                          title="Despesas Semanais"
+                          description="Gastos previstos para os próximos 7 dias"
+                        />
+                      </div>
 
-                    <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
-                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
-                        Média diária
-                      </p>
-                      <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        R$ {(totalWeeklyExpenses / 7).toFixed(2)}
-                      </p>
-                    </div>
-
-                    <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
-                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
-                        N° de agendamentos
-                      </p>
-                      <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                        {mockAppointments.length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="monthly" className="mt-0">
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="w-full overflow-hidden">
-                    <DashboardChart
-                      type="bar"
-                      data={monthlyExpensesByUnit}
-                      title="Despesas por Unidade"
-                      description="Gastos mensais distribuídos por unidade"
-                    />
-                  </div>
-
-                  <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
-                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      Total de despesas mensais
-                    </p>
-                    <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                      R$ {totalMonthlyExpenses.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="byType" className="mt-0">
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="w-full overflow-hidden">
-                    <DashboardChart
-                      type="progress"
-                      data={expensesByExamType}
-                      title="Despesas por Tipo de Exame"
-                      description="Distribuição de gastos por categoria de exame"
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        <Card className="dark:bg-gray-800/50 dark:text-gray-100">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="text-lg sm:text-xl">
-              Resumo Financeiro
-            </CardTitle>
-            <CardDescription className="dark:text-gray-300">
-              Visão geral das despesas recentes
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-3 sm:p-6">
-            <div className="space-y-4 mt-2">
-              <ScrollArea className="h-[400px] sm:h-[500px] overflow-auto">
-                <div className="space-y-4">
-                  <h4 className="font-medium text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2">
-                    PRÓXIMOS AGENDAMENTOS
-                  </h4>
-                  <div className="space-y-3">
-                    {mockAppointments
-                      .filter((app) => new Date(app.date) >= today)
-                      .sort(
-                        (a, b) =>
-                          new Date(a.date).getTime() -
-                          new Date(b.date).getTime()
-                      )
-                      .slice(0, 5)
-                      .map((app) => (
-                        <div
-                          key={app.id}
-                          className="border-l-4 pl-2 sm:pl-3 py-2 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800 dark:to-gray-900/80 rounded-r-md"
-                          style={{
-                            borderImageSource:
-                              "linear-gradient(to bottom, #8B5CF6, #6366F1)",
-                            borderImageSlice: 1,
-                          }}
-                        >
-                          <div className="flex flex-col sm:flex-row sm:justify-between">
-                            <span className="font-medium text-sm sm:text-base">
-                              {app.patient}
-                            </span>
-                            <span className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm mt-1 sm:mt-0">
-                              R$ {app.cost.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span>
-                              {format(app.date, "dd/MM/yyyy")} · {app.type}
-                            </span>
-                          </div>
-                          <div className="flex items-center mt-1">
-                            <Badge
-                              variant="outline"
-                              className="text-xs bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-800 dark:text-blue-200 border-0 px-2 py-1"
-                            >
-                              {app.unit}
-                            </Badge>
-                          </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-4 ">
+                        <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
+                          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
+                            Total de despesas previstas
+                          </p>
+                          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+                            R$ {totalWeeklyExpenses.toFixed(2)}
+                          </p>
                         </div>
-                      ))}
-                  </div>
 
-                  <h4 className="font-medium text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-6 mb-2">
-                    DESPESAS POR TIPO
-                  </h4>
-                  <div className="space-y-2">
-                    {expensesByExamType
-                      .sort((a, b) => b.value - a.value)
-                      .map((type, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between items-center py-2"
-                        >
-                          <div className="flex items-center">
+                        <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
+                          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
+                            Média diária
+                          </p>
+                          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+                            R$ {(totalWeeklyExpenses / 7).toFixed(2)}
+                          </p>
+                        </div>
+
+                        <div className="p-3 sm:p-4 rounded-lg bg-white dark:bg-neutral-900/50">
+                          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
+                            N° de agendamentos
+                          </p>
+                          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+                            {mockAppointments.length}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="monthly" className="mt-0">
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="w-full overflow-hidden">
+                        <DashboardChart
+                          type="bar"
+                          data={monthlyExpensesByUnit}
+                          title="Despesas por Unidade"
+                          description="Gastos mensais distribuídos por unidade"
+                        />
+                      </div>
+
+                      <div className="p-3 sm:p-4 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50">
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
+                          Total de despesas mensais
+                        </p>
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          R$ {totalMonthlyExpenses.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="byType" className="mt-0">
+                    <div className="space-y-4 sm:space-y-6">
+                      <div className="w-full overflow-hidden">
+                        <DashboardChart
+                          type="progress"
+                          data={expensesByExamType}
+                          title="Despesas por Tipo de Exame"
+                          description="Distribuição de gastos por categoria de exame"
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Original financial summary - keeping existing functionality */}
+            <Card className="dark:bg-gray-800/50 dark:text-gray-100">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-lg sm:text-xl">
+                  Resumo Financeiro
+                </CardTitle>
+                <CardDescription className="dark:text-gray-300">
+                  Visão geral das despesas recentes
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6">
+                <div className="space-y-4 mt-2">
+                  <ScrollArea className="h-[400px] sm:h-[500px] overflow-auto">
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        PRÓXIMOS AGENDAMENTOS
+                      </h4>
+                      <div className="space-y-3">
+                        {mockAppointments
+                          .filter((app) => new Date(app.date) >= today)
+                          .sort(
+                            (a, b) =>
+                              new Date(a.date).getTime() -
+                              new Date(b.date).getTime()
+                          )
+                          .slice(0, 5)
+                          .map((app) => (
                             <div
-                              className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:"
+                              key={app.id}
+                              className="border-l-4 pl-2 sm:pl-3 py-2 bg-gradient-to-br from-white to-gray-50/80 dark:from-gray-800 dark:to-gray-900/80 rounded-r-md"
                               style={{
-                                backgroundColor:
-                                  CHART_COLORS[index % CHART_COLORS.length],
+                                borderImageSource:
+                                  "linear-gradient(to bottom, #8B5CF6, #6366F1)",
+                                borderImageSlice: 1,
                               }}
-                            />
-                            <span className="text-xs sm:text-sm truncate max-w-[100px] sm:max-w-[160px]">
-                              {type.name}
-                            </span>
-                          </div>
-                          <span className="font-medium text-xs sm:text-sm">
-                            R$ {type.value.toFixed(2)}
-                          </span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              </ScrollArea>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                            >
+                              <div className="flex flex-col sm:flex-row sm:justify-between">
+                                <span className="font-medium text-sm sm:text-base">
+                                  {app.patient}
+                                </span>
+                                <span className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm mt-1 sm:mt-0">
+                                  R$ {app.cost.toFixed(2)}
+                                </span>
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <span>
+                                  {format(app.date, "dd/MM/yyyy")} · {app.type}
+                                </span>
+                              </div>
+                              <div className="flex items-center mt-1">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-800 dark:text-blue-200 border-0 px-2 py-1"
+                                >
+                                  {app.unit}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
 
-      <Card className="dark:bg-gray-800/50 dark:text-gray-100">
-        <CardHeader className="p-4 sm:p-6 ">
-          <CardTitle className="text-lg sm:text-xl">
-            Tendências de Despesas
-          </CardTitle>
-          <CardDescription className="dark:text-gray-300">
-            Análise de tendências de gastos ao longo do tempo
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-3 sm:p-6">
-          <div className="w-full overflow-hidden">
-            <DashboardChart
-              type="area"
-              data={weeklyExpenses}
-              title="Projeção Semanal"
-              description="Previsão de gastos para os próximos dias"
-            />
+                      <h4 className="font-medium text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-6 mb-2">
+                        DESPESAS POR TIPO
+                      </h4>
+                      <div className="space-y-2">
+                        {expensesByExamType
+                          .sort((a, b) => b.value - a.value)
+                          .map((type, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center py-2"
+                            >
+                              <div className="flex items-center">
+                                <div
+                                  className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:"
+                                  style={{
+                                    backgroundColor:
+                                      CHART_COLORS[index % CHART_COLORS.length],
+                                  }}
+                                />
+                                <span className="text-xs sm:text-sm truncate max-w-[100px] sm:max-w-[160px]">
+                                  {type.name}
+                                </span>
+                              </div>
+                              <span className="font-medium text-xs sm:text-sm">
+                                R$ {type.value.toFixed(2)}
+                              </span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  </ScrollArea>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Original trends chart - keeping existing functionality */}
+            <Card className="dark:bg-gray-800/50 dark:text-gray-100">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-lg sm:text-xl">
+                  Tendências de Despesas
+                </CardTitle>
+                <CardDescription className="dark:text-gray-300">
+                  Análise de tendências de gastos ao longo do tempo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6">
+                <div className="w-full overflow-hidden">
+                  <DashboardChart
+                    type="area"
+                    data={weeklyExpenses}
+                    title="Projeção Semanal"
+                    description="Previsão de gastos para os próximos dias"
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
+
+        <TabsContent value="performance" className="mt-0">
+          <PerformanceMetrics />
+        </TabsContent>
+
+        <TabsContent value="cost-analysis" className="mt-0">
+          <CostAnalysis />
+        </TabsContent>
+
+        <TabsContent value="export" className="mt-0">
+          <ExportControls onExport={handleExport} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
 
 export default Reports;
+
+</edits_to_apply>
