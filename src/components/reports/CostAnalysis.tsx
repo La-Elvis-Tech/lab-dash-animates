@@ -32,9 +32,9 @@ const CostAnalysis: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Cost per Exam */}
-      <Card>
+      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80 dark:border-neutral-700 dark:border-opacity-20">
         <CardHeader>
-          <CardTitle className="text-lg">Custo Médio por Exame</CardTitle>
+          <CardTitle className="text-lg text-gray-800 dark:text-white">Custo Médio por Exame</CardTitle>
         </CardHeader>
         <CardContent>
           <DashboardChart
@@ -48,9 +48,9 @@ const CostAnalysis: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pareto Analysis */}
-        <Card>
+        <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80 dark:border-neutral-700 dark:border-opacity-20">
           <CardHeader>
-            <CardTitle className="text-lg">Análise de Pareto - Itens mais Caros</CardTitle>
+            <CardTitle className="text-lg text-gray-800 dark:text-white">Análise de Pareto - Itens mais Caros</CardTitle>
           </CardHeader>
           <CardContent>
             <DashboardChart
@@ -63,9 +63,9 @@ const CostAnalysis: React.FC = () => {
         </Card>
 
         {/* Cost Heatmap */}
-        <Card>
+        <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80 dark:border-neutral-700 dark:border-opacity-20">
           <CardHeader>
-            <CardTitle className="text-lg">Heatmap de Consumo</CardTitle>
+            <CardTitle className="text-lg text-gray-800 dark:text-white">Heatmap de Consumo</CardTitle>
           </CardHeader>
           <CardContent>
             <DashboardChart

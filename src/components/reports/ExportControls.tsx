@@ -58,9 +58,9 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
   };
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80 dark:border-neutral-700 dark:border-opacity-20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
           <Download size={20} />
           Exportação e Relatórios
         </CardTitle>
@@ -69,12 +69,12 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
         <div className="space-y-4">
           {/* Format Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Formato de Exportação</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Formato de Exportação</label>
             <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white dark:bg-neutral-800">
                 <SelectValue placeholder="Selecionar formato" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-neutral-800">
                 <SelectItem value="csv">CSV</SelectItem>
                 <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
                 <SelectItem value="pdf">PDF</SelectItem>
@@ -85,7 +85,7 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
 
           {/* Data Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Dados para Exportar</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Dados para Exportar</label>
             <div className="space-y-2">
               {dataOptions.map((option) => (
                 <div key={option.id} className="flex items-center space-x-2">
@@ -94,7 +94,7 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
                     checked={selectedData.includes(option.id)}
                     onCheckedChange={(checked) => handleDataSelection(option.id, !!checked)}
                   />
-                  <label htmlFor={option.id} className="text-sm">{option.label}</label>
+                  <label htmlFor={option.id} className="text-sm text-gray-700 dark:text-gray-300">{option.label}</label>
                 </div>
               ))}
             </div>
@@ -113,30 +113,30 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
           </div>
 
           {/* Auto Report Settings */}
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t border-gray-200 dark:border-neutral-700">
             <div className="flex items-center space-x-2 mb-2">
               <Checkbox
                 id="auto-report"
                 checked={autoReport}
                 onCheckedChange={(checked) => setAutoReport(!!checked)}
               />
-              <label htmlFor="auto-report" className="text-sm font-medium">
+              <label htmlFor="auto-report" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Relatórios Automáticos
               </label>
             </div>
             {autoReport && (
               <div className="ml-6 space-y-2">
                 <Select>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full bg-white dark:bg-neutral-800">
                     <SelectValue placeholder="Frequência" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white dark:bg-neutral-800">
                     <SelectItem value="daily">Diário</SelectItem>
                     <SelectItem value="weekly">Semanal</SelectItem>
                     <SelectItem value="monthly">Mensal</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <Mail size={14} />
                   <span>Enviado por email para stakeholders</span>
                 </div>

@@ -6,14 +6,14 @@ import { inventoryPercent } from "@/data/InventoryPercent";
 
 const InventoryGauges: React.FC = () => {
   return (
-    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 dashboard-chart border-none">
+    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80 dark:border-neutral-700 dark:border-opacity-20">
       <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
         Estoque Geral
       </h1>
       <p className="px-6 py-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
         Itens disponíveis no estoque
       </p>
-      <CardContent className="dashboard-chart grid grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3 mt-2 md:mt-0">
+      <CardContent className="grid grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-4 md:gap-6 my-0 md:my-3 mt-2 md:mt-0">
         {inventoryPercent.map((item) => (
           <div key={item.name}>
             <div className="block sm:inline md:hidden">
