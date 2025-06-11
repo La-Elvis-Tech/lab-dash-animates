@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Calendar, Package, Database, Clock } from "lucide-react";
+import { Search, Plus, Calendar, Package, Database, Clock, Download, Upload, AlertTriangle, TrendingUp, Edit2, ShoppingCart, Link } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import {
   Popover,
   PopoverContent,
@@ -28,6 +30,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Components
+import InventoryStockHealth from "@/components/inventory/InventoryStockHealth";
+import InventoryItemCard from "@/components/inventory/InventoryItemCard";
+import InventoryAddItemDialog from "@/components/inventory/InventoryAddItemDialog";
+import InventoryExportDialog from "@/components/inventory/InventoryExportDialog";
+
 // Mock data
 const categories = [
   { id: "all", name: "Todos" },
@@ -35,6 +43,7 @@ const categories = [
   { id: "glassware", name: "Vidraria" },
   { id: "equipment", name: "Equipamentos" },
   { id: "disposable", name: "Descartáveis" },
+  { id: "expiring", name: "Vencendo", icon: AlertTriangle },
 ];
 
 const inventoryItems = [
@@ -49,6 +58,10 @@ const inventoryItems = [
     expiryDate: "2025-10-15",
     lastUsed: "2023-04-10",
     status: "ok",
+    minStock: 15,
+    maxStock: 50,
+    reservedForAppointments: 3,
+    consumptionHistory: [12, 15, 18, 22, 20, 18],
   },
   {
     id: 2,
@@ -61,6 +74,10 @@ const inventoryItems = [
     expiryDate: "2025-08-22",
     lastUsed: "2023-04-15",
     status: "ok",
+    minStock: 20,
+    maxStock: 100,
+    reservedForAppointments: 8,
+    consumptionHistory: [25, 30, 35, 40, 38, 35],
   },
   {
     id: 3,
@@ -70,9 +87,13 @@ const inventoryItems = [
     unit: "Litros",
     location: "Armário A1",
     size: null,
-    expiryDate: "2025-12-30",
+    expiryDate: "2024-12-15",
     lastUsed: "2023-04-12",
     status: "low",
+    minStock: 10,
+    maxStock: 30,
+    reservedForAppointments: 1,
+    consumptionHistory: [8, 10, 6, 4, 3, 3],
   },
   {
     id: 4,
@@ -85,6 +106,10 @@ const inventoryItems = [
     expiryDate: null,
     lastUsed: "2023-03-28",
     status: "ok",
+    minStock: 5,
+    maxStock: 20,
+    reservedForAppointments: 2,
+    consumptionHistory: [8, 10, 12, 14, 12, 12],
   },
   {
     id: 5,
@@ -97,6 +122,10 @@ const inventoryItems = [
     expiryDate: "2024-07-18",
     lastUsed: "2023-04-18",
     status: "low",
+    minStock: 50,
+    maxStock: 200,
+    reservedForAppointments: 5,
+    consumptionHistory: [45, 50, 35, 25, 15, 10],
   },
   {
     id: 6,
@@ -108,6 +137,10 @@ const inventoryItems = [
     expiryDate: null,
     lastUsed: "2023-04-05",
     status: "ok",
+    minStock: 3,
+    maxStock: 8,
+    reservedForAppointments: 0,
+    consumptionHistory: [5, 5, 5, 5, 5, 5],
   },
   {
     id: 7,
@@ -120,6 +153,10 @@ const inventoryItems = [
     expiryDate: null,
     lastUsed: "2023-04-14",
     status: "ok",
+    minStock: 15,
+    maxStock: 40,
+    reservedForAppointments: 4,
+    consumptionHistory: [20, 22, 25, 28, 26, 25],
   },
   {
     id: 8,
@@ -132,6 +169,10 @@ const inventoryItems = [
     expiryDate: null,
     lastUsed: "2023-04-16",
     status: "low",
+    minStock: 20,
+    maxStock: 60,
+    reservedForAppointments: 2,
+    consumptionHistory: [35, 30, 25, 20, 15, 8],
   },
 ];
 
@@ -139,22 +180,24 @@ const Inventory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [filteredItems, setFilteredItems] = useState(inventoryItems);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newItem, setNewItem] = useState({
-    name: "",
-    category: "",
-    stock: "",
-    unit: "",
-    location: "",
-    size: "",
-    expiryDate: "",
-  });
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [items, setItems] = useState(inventoryItems);
   const containerRef = useRef(null);
   const { toast } = useToast();
 
+  // Calculate expiring items (within 30 days)
+  const expiringItems = items.filter(item => {
+    if (!item.expiryDate) return false;
+    const today = new Date();
+    const expiryDate = new Date(item.expiryDate);
+    const timeDiff = expiryDate.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return daysDiff <= 30 && daysDiff > 0;
+  });
+
   useEffect(() => {
-    // Filtering logic
-    let filtered = inventoryItems;
+    let filtered = items;
 
     if (searchQuery) {
       filtered = filtered.filter((item) =>
@@ -162,7 +205,9 @@ const Inventory = () => {
       );
     }
 
-    if (selectedCategory !== "all") {
+    if (selectedCategory === "expiring") {
+      filtered = expiringItems;
+    } else if (selectedCategory !== "all") {
       filtered = filtered.filter((item) => item.category === selectedCategory);
     }
 
@@ -184,7 +229,7 @@ const Inventory = () => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, items, expiringItems]);
 
   useEffect(() => {
     // Initial animation
@@ -216,76 +261,44 @@ const Inventory = () => {
     setSelectedCategory(categoryId);
   };
 
-  const handleConsumeItem = (itemId) => {
+  const handleUpdateItem = (itemId, updatedData) => {
+    setItems(prevItems => 
+      prevItems.map(item => 
+        item.id === itemId ? { ...item, ...updatedData } : item
+      )
+    );
+    
     toast({
-      title: "Item consumido",
-      description: "O consumo foi registrado com sucesso.",
+      title: "Item atualizado",
+      description: "As informações foram salvas com sucesso.",
     });
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "low":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-      case "ok":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
-    }
-  };
-
-  // Improved stock details calculation
-  const getStockDetails = (item) => {
-    const totalStock = item.stock;
-    const reserved = Math.floor(totalStock * 0.15); // 15% reserved
-    const available = totalStock - reserved;
-    const usedThisMonth = Math.floor(totalStock * 0.25); // 25% used this month
-
-    return {
-      available,
-      reserved,
-      usedThisMonth,
-      lastReplenishment: "2024-05-01",
-      batchExpiry: item.expiryDate || "2025-12-30",
-    };
-  };
-
-  const handleAddItem = () => {
-    if (
-      !newItem.name ||
-      !newItem.category ||
-      !newItem.stock ||
-      !newItem.unit ||
-      !newItem.location
-    ) {
-      toast({
-        title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Here you would normally send to your API
-    console.log("Adding new item:", newItem);
-
+  const handleReserveItem = (itemId, quantity) => {
+    setItems(prevItems => 
+      prevItems.map(item => 
+        item.id === itemId 
+          ? { 
+              ...item, 
+              reservedForAppointments: item.reservedForAppointments + quantity,
+              stock: item.stock - quantity 
+            } 
+          : item
+      )
+    );
+    
     toast({
-      title: "Item adicionado",
-      description: `${newItem.name} foi adicionado ao inventário com sucesso.`,
+      title: "Item reservado",
+      description: `${quantity} unidades foram reservadas para agendamento.`,
     });
+  };
 
-    // Reset form
-    setNewItem({
-      name: "",
-      category: "",
-      stock: "",
-      unit: "",
-      location: "",
-      size: "",
-      expiryDate: "",
+  const handleRequestRestock = (itemId) => {
+    const item = items.find(i => i.id === itemId);
+    toast({
+      title: "Solicitação enviada",
+      description: `Solicitação de reposição para ${item?.name} foi enviada ao responsável.`,
     });
-
-    setIsDialogOpen(false);
   };
 
   return (
@@ -295,11 +308,14 @@ const Inventory = () => {
           Inventário
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
-          Gerencie os itens de laboratório
+          Gerencie os itens de laboratório com controle avançado
         </p>
       </div>
 
-      {/* Filters - Improved for mobile */}
+      {/* Dashboard de Saúde do Estoque */}
+      <InventoryStockHealth items={items} expiringItems={expiringItems} />
+
+      {/* Filters */}
       <Card className="inventory-filters">
         <CardContent className="p-4 bg-neutral-100/80 dark:bg-neutral-800/80">
           <div className="flex flex-col gap-4">
@@ -317,369 +333,67 @@ const Inventory = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-between items-start">
-              {/* Category filter - improved mobile scroll */}
+              {/* Category filter */}
               <div className="w-full sm:flex-1">
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
                   {categories.map((category) => (
                     <button
                       key={category.id}
-                      className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 ${
+                      className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 flex items-center gap-2 ${
                         selectedCategory === category.id
                           ? "bg-lab-blue text-white dark:bg-lab-blue/80"
                           : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-700/80 dark:text-gray-300 dark:hover:bg-gray-700"
                       } rounded-md border border-gray-200 dark:border-gray-700 transition-colors`}
                       onClick={() => handleCategoryChange(category.id)}
                     >
+                      {category.icon && <category.icon size={16} />}
                       {category.name}
+                      {category.id === "expiring" && expiringItems.length > 0 && (
+                        <Badge variant="destructive" className="ml-1 text-xs">
+                          {expiringItems.length}
+                        </Badge>
+                      )}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="flex items-center gap-2 whitespace-nowrap bg-neutral-950/90 dark:bg-gray-100/90 flex-shrink-0 ">
-                    <Plus size={18} />
-                    <span className="text-sm sm:text-base text-gray-200 dark:text-gray-800">Novo Item</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="border-none max-w-[95vw] sm:max-w-md md:max-w-lg rounded-lg bg-white dark:bg-neutral-950">
-                  <DialogHeader className="border-none pb-3">
-                    <DialogTitle className="text-xl">
-                      Adicionar Novo Item
-                    </DialogTitle>
-                    <DialogDescription className="pt-1">
-                      Preencha as informações do novo item de inventário
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto px-2">
-                    {/* Nome */}
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="font-medium">
-                        Nome *
-                      </Label>
-                      <Input
-                        id="name"
-                        value={newItem.name}
-                        placeholder="ex: Dipirona"
-                        onChange={(e) =>
-                          setNewItem({ ...newItem, name: e.target.value })
-                        }
-                        className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
-                      />
-                    </div>
-
-                    {/* Categoria */}
-                    <div className="space-y-2">
-                      <Label htmlFor="category" className="font-medium">
-                        Categoria *
-                      </Label>
-                      <Select
-                        value={newItem.category}
-                        onValueChange={(value) =>
-                          setNewItem({ ...newItem, category: value })
-                        }
-                      >
-                        <SelectTrigger className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
-                          <SelectValue placeholder="Selecione a categoria" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories
-                            .filter((cat) => cat.id !== "all")
-                            .map((category) => (
-                              <SelectItem
-                                key={category.id}
-                                value={category.id}
-                                className="py-2"
-                              >
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Estoque e Unidade - Agora lado a lado */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="stock" className="font-medium">
-                          Quantidade *
-                        </Label>
-                        <Input
-                          id="stock"
-                          type="number"
-                          value={newItem.stock}
-                          onChange={(e) =>
-                            setNewItem({ ...newItem, stock: e.target.value })
-                          }
-                          className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
-                          placeholder="ex: 10"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="unit" className="font-medium">
-                          Unidade *
-                        </Label>
-                        <Select
-                          value={newItem.unit}
-                          onValueChange={(value) =>
-                            setNewItem({ ...newItem, unit: value })
-                          }
-                        >
-                          <SelectTrigger className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
-                            <SelectValue placeholder="Selecione" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Litros">Litros</SelectItem>
-                            <SelectItem value="Unidades">Unidades</SelectItem>
-                            <SelectItem value="Pares">Pares</SelectItem>
-                            <SelectItem value="Gramas">Gramas</SelectItem>
-                            <SelectItem value="Quilogramas">
-                              Quilogramas
-                            </SelectItem>
-                            <SelectItem value="Mililitros">
-                              Mililitros
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    {/* Localização */}
-                    <div className="space-y-2">
-                      <Label htmlFor="location" className="font-medium">
-                        Localização *
-                      </Label>
-                      <Input
-                        id="location"
-                        value={newItem.location}
-                        onChange={(e) =>
-                          setNewItem({ ...newItem, location: e.target.value })
-                        }
-                        className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent  py-2 px-3 outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
-                        placeholder="ex: Armário A1, Sala B2"
-                      />
-                    </div>
-
-                    {/* Tamanho e Validade - Agora lado a lado */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="size" className="font-medium">
-                          Tamanho
-                        </Label>
-                        <Input
-                          id="size"
-                          value={newItem.size}
-                          onChange={(e) =>
-                            setNewItem({ ...newItem, size: e.target.value })
-                          }
-                          className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent py-2 px-3 outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
-                          placeholder="ex: 500ml, 10cm"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="expiry" className="font-medium">
-                          Validade
-                        </Label>
-                        <Input
-                          id="expiry"
-                          type="date"
-                          value={newItem.expiryDate}
-                          onChange={(e) =>
-                            setNewItem({
-                              ...newItem,
-                              expiryDate: e.target.value,
-                            })
-                          }
-                          className="w-full bg-gray-200 dark:bg-neutral-800 dark:border-transparent py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <DialogFooter className="border-t-2 pt-5">
-                    <Button
-                      type="submit"
-                      onClick={handleAddItem}
-                      className="w-full sm:w-auto px-6 py-2.5 bg-primary hover:bg-primary/90"
-                    >
-                      Adicionar Item
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <div className="flex gap-2">
+                <InventoryExportDialog 
+                  items={filteredItems}
+                  isOpen={isExportDialogOpen}
+                  setIsOpen={setIsExportDialogOpen}
+                />
+                
+                <InventoryAddItemDialog 
+                  isOpen={isAddDialogOpen}
+                  setIsOpen={setIsAddDialogOpen}
+                  categories={categories.filter(c => c.id !== "all" && c.id !== "expiring")}
+                  onAddItem={(newItem) => {
+                    setItems(prev => [...prev, { ...newItem, id: Date.now() }]);
+                    toast({
+                      title: "Item adicionado",
+                      description: `${newItem.name} foi adicionado ao inventário.`,
+                    });
+                  }}
+                />
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Items List - Enhanced responsive grid */}
+      {/* Items List */}
       <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 item-list">
-        {filteredItems.map((item) => {
-          const stockDetails = getStockDetails(item);
-
-          return (
-            <Card
-              key={item.id}
-              className="inventory-item overflow-hidden h-full bg-white dark:bg-neutral-900/50 transition-all duration-200 hover:shadow-lg"
-            >
-              <div
-                className={`h-1 ${
-                  item.status === "low" ? "bg-red-500" : "bg-green-500"
-                }`}
-              />
-              <CardContent className="p-3 sm:p-4 flex flex-col h-full">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="mr-2 flex-1">
-                    <h3 className="font-medium text-base sm:text-lg line-clamp-2 leading-tight">
-                      {item.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {categories.find((c) => c.id === item.category)?.name}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(
-                      item.status
-                    )} whitespace-nowrap flex-shrink-0`}
-                  >
-                    {item.stock} {item.unit}
-                  </span>
-                </div>
-
-                <div className="mt-2 text-xs sm:text-sm space-y-2 flex-grow">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">
-                      Localização:
-                    </span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2 truncate">
-                      {item.location}
-                    </span>
-                  </div>
-
-                  {item.expiryDate && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">
-                        Validade:
-                      </span>
-                      <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
-                        {new Date(item.expiryDate).toLocaleDateString("pt-BR")}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">
-                      Último uso:
-                    </span>
-                    <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
-                      {new Date(item.lastUsed).toLocaleDateString("pt-BR")}
-                    </span>
-                  </div>
-
-                  {item.size && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-500 dark:text-gray-400 flex-shrink-0">
-                        Tamanho:
-                      </span>
-                      <span className="font-medium text-gray-700 dark:text-gray-300 text-right ml-2">
-                        {item.size}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-4">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button className="w-full bg-neutral-200 hover:bg-blue-400 dark:bg-neutral-950/60 dark:hover:bg-blue-300 dark:hover:text-gray-800 text-gray-700 dark:text-white transition-colors text-xs sm:text-sm">
-                        Ver Estoque
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-72 p-0 sm:w-80">
-                      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <h4 className="font-medium text-base mb-1">
-                          {item.name}
-                        </h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Detalhes do estoque
-                        </p>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Package className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                              Disponíveis:
-                            </span>
-                          </div>
-                          <span className="font-medium">
-                            {stockDetails.available} {item.unit}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Database className="h-4 w-4 text-amber-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                              Reservadas:
-                            </span>
-                          </div>
-                          <span className="font-medium">
-                            {stockDetails.reserved} {item.unit}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-purple-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                              Utilizadas neste mês:
-                            </span>
-                          </div>
-                          <span className="font-medium">
-                            {stockDetails.usedThisMonth} {item.unit}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-green-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                              Última reposição:
-                            </span>
-                          </div>
-                          <span className="font-medium">
-                            {new Date(
-                              stockDetails.lastReplenishment
-                            ).toLocaleDateString("pt-BR")}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-red-500" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                              Validade do lote:
-                            </span>
-                          </div>
-                          <span className="font-medium">
-                            {new Date(
-                              stockDetails.batchExpiry
-                            ).toLocaleDateString("pt-BR")}
-                          </span>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {filteredItems.map((item) => (
+          <InventoryItemCard
+            key={item.id}
+            item={item}
+            onUpdateItem={handleUpdateItem}
+            onReserveItem={handleReserveItem}
+            onRequestRestock={handleRequestRestock}
+          />
+        ))}
       </div>
 
       {filteredItems.length === 0 && (
