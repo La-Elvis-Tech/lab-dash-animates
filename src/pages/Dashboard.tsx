@@ -22,6 +22,13 @@ import { Link } from "react-router-dom";
 import { recentActivity } from "@/data/recentActivity";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Import new components
+import DemandForecastCard from "@/components/dashboard/DemandForecastCard";
+import RiskAlertsCard from "@/components/dashboard/RiskAlertsCard";
+import ForecastPerformanceCard from "@/components/dashboard/ForecastPerformanceCard";
+import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
+import UnitSelectorCard from "@/components/dashboard/UnitSelectorCard";
+
 interface ConsumptionData {
   name: string;
   value: number;
@@ -169,6 +176,29 @@ const Dashboard: React.FC = () => {
         </p>
       </div>
 
+      {/* Unit Selector */}
+      <div className="dashboard-card">
+        <UnitSelectorCard />
+      </div>
+
+      {/* Advanced Analytics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="dashboard-card">
+          <DemandForecastCard />
+        </div>
+        <div className="dashboard-card">
+          <ForecastPerformanceCard />
+        </div>
+        <div className="dashboard-card">
+          <QuickActionsCard />
+        </div>
+      </div>
+
+      {/* Risk Alerts Section */}
+      <div className="dashboard-card">
+        <RiskAlertsCard />
+      </div>
+
       {/* Key metrics and charts section */}
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex w-full xl:w-[55%] 2xl:w-[65%]">
@@ -252,7 +282,6 @@ const Dashboard: React.FC = () => {
                 </Card>
               </div>
             </div>
-            {/* Key metrics cards */}
             {/* Gauge charts section */}
             <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 dashboard-chart border-none">
               <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
