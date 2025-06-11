@@ -484,10 +484,10 @@ const Reports = () => {
               <CardContent className="p-3 sm:p-6">
                 <div className="w-full overflow-hidden">
                   <DashboardChart
-                    type="area"
+                    type="line"
                     data={weeklyExpenses}
-                    title="Projeção Semanal"
-                    description="Previsão de gastos para os próximos dias"
+                    title="Tendências Semanais"
+                    description="Variação das despesas ao longo das últimas semanas"
                   />
                 </div>
               </CardContent>
@@ -512,5 +512,3 @@ const Reports = () => {
 };
 
 export default Reports;
-
-</edits_to_apply>
