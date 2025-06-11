@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Clock, Package } from "lucide-react";
+import { AlertTriangle, Clock, Package, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const RiskAlertsCard: React.FC = () => {
@@ -30,22 +30,22 @@ const RiskAlertsCard: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Rupturas Imediatas */}
-      <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-red-200 dark:border-red-800">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-red-700 dark:text-red-300 flex items-center gap-2">
-            <Package size={16} />
+      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
+            <Package size={18} className="text-red-600 dark:text-red-400" />
             Rupturas Imediatas
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
               <span className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {criticalItems.length}
               </span>
               <Link 
                 to="/inventory?filter=critical" 
-                className="text-xs text-red-600 hover:underline"
+                className="text-sm text-red-600 hover:underline"
               >
                 Ver Críticos
               </Link>
@@ -53,8 +53,8 @@ const RiskAlertsCard: React.FC = () => {
             
             <div className="space-y-2 max-h-32 overflow-y-auto">
               {criticalItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between text-xs">
-                  <span className="truncate">{item.name}</span>
+                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg text-sm">
+                  <span className="truncate text-gray-800 dark:text-gray-200">{item.name}</span>
                   <Badge className={getUrgencyColor(item.urgency)}>
                     {item.current}/{item.min} {item.unit}
                   </Badge>
@@ -66,22 +66,22 @@ const RiskAlertsCard: React.FC = () => {
       </Card>
 
       {/* Vencimentos */}
-      <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20 border-amber-200 dark:border-amber-800">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-amber-700 dark:text-amber-300 flex items-center gap-2">
-            <Clock size={16} />
+      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
+            <Clock size={18} className="text-amber-600 dark:text-amber-400" />
             Vencimentos (30 dias)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
               <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                 {expiringItems.length}
               </span>
               <Link 
                 to="/inventory?filter=expiring" 
-                className="text-xs text-amber-600 hover:underline"
+                className="text-sm text-amber-600 hover:underline"
               >
                 Ver Todos
               </Link>
@@ -89,8 +89,8 @@ const RiskAlertsCard: React.FC = () => {
             
             <div className="space-y-2 max-h-32 overflow-y-auto">
               {expiringItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between text-xs">
-                  <span className="truncate">{item.name}</span>
+                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg text-sm">
+                  <span className="truncate text-gray-800 dark:text-gray-200">{item.name}</span>
                   <Badge variant="outline" className="text-amber-700 border-amber-300">
                     {item.days}d
                   </Badge>

@@ -35,24 +35,24 @@ const NotificationSettings = () => {
   };
 
   return (
-    <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+    <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
       <CardHeader>
-        <CardTitle className="text-xl text-gray-900 dark:text-gray-100">
+        <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
           Notificações
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-neutral-600 dark:text-neutral-300">
           Configure como deseja receber notificações do sistema
         </CardDescription>
       </CardHeader>
       
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Notificações por Email</h3>
+          <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">Notificações por Email</h3>
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="emailAppointments">Novos Agendamentos</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="emailAppointments" className="text-neutral-900 dark:text-neutral-100">Novos Agendamentos</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Receba emails quando novos agendamentos forem criados
               </p>
             </div>
@@ -65,8 +65,8 @@ const NotificationSettings = () => {
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="emailResults">Resultados Disponíveis</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="emailResults" className="text-neutral-900 dark:text-neutral-100">Resultados Disponíveis</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Receba emails quando novos resultados estiverem disponíveis
               </p>
             </div>
@@ -79,8 +79,8 @@ const NotificationSettings = () => {
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="emailMarketing">Materiais Educativos</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="emailMarketing" className="text-neutral-900 dark:text-neutral-100">Materiais Educativos</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Receba emails com conteúdo educativo e promoções
               </p>
             </div>
@@ -93,12 +93,12 @@ const NotificationSettings = () => {
         </div>
         
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Notificações Push</h3>
+          <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">Notificações Push</h3>
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="pushNewAppointments">Novos Agendamentos</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="pushNewAppointments" className="text-neutral-900 dark:text-neutral-100">Novos Agendamentos</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Receba notificações quando novos agendamentos forem criados
               </p>
             </div>
@@ -111,8 +111,8 @@ const NotificationSettings = () => {
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="pushAppointmentReminders">Lembretes de Agendamentos</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="pushAppointmentReminders" className="text-neutral-900 dark:text-neutral-100">Lembretes de Agendamentos</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Receba lembretes de agendamentos próximos
               </p>
             </div>
@@ -125,8 +125,8 @@ const NotificationSettings = () => {
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="pushResultsAvailable">Resultados Disponíveis</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="pushResultsAvailable" className="text-neutral-900 dark:text-neutral-100">Resultados Disponíveis</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Receba notificações quando novos resultados estiverem disponíveis
               </p>
             </div>
@@ -139,12 +139,12 @@ const NotificationSettings = () => {
         </div>
         
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Notificações SMS</h3>
+          <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">Notificações SMS</h3>
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="smsAppointmentReminders">Lembretes de Agendamentos</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="smsAppointmentReminders" className="text-neutral-900 dark:text-neutral-100">Lembretes de Agendamentos</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Receba lembretes de agendamentos por SMS
               </p>
             </div>
@@ -157,10 +157,10 @@ const NotificationSettings = () => {
         </div>
       </CardContent>
       
-      <CardFooter className="flex justify-end border-t border-gray-100 dark:border-gray-700 pt-4">
+      <CardFooter className="flex justify-end border-t border-neutral-200 dark:border-neutral-700 pt-4">
         <Button 
           onClick={handleSave}
-          className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
+          className="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
         >
           Salvar Configurações
         </Button>

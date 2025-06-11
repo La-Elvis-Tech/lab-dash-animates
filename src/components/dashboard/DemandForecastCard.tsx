@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 
 const DemandForecastCard: React.FC = () => {
@@ -32,29 +31,32 @@ const DemandForecastCard: React.FC = () => {
 
   return (
     <>
-      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-purple-200 dark:border-purple-800">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300 flex items-center gap-2">
-            <BarChart3 size={16} />
+      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
+            <BarChart3
+              size={18}
+              className="text-indigo-600 dark:text-indigo-400"
+            />
             Previsão de Demanda
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
               <div>
-                <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                   {forecastData.nextMonth}
                 </span>
-                <p className="text-xs text-purple-600 dark:text-purple-400">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   itens próximo mês
                 </p>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 {forecastData.trend === "up" ? (
-                  <TrendingUp size={14} className="text-green-500" />
+                  <TrendingUp size={16} className="text-green-500" />
                 ) : (
-                  <TrendingDown size={14} className="text-red-500" />
+                  <TrendingDown size={16} className="text-red-500" />
                 )}
                 <span className="text-sm font-medium text-green-500">
                   +{forecastData.trendPercent}%
@@ -62,13 +64,13 @@ const DemandForecastCard: React.FC = () => {
               </div>
             </div>
             
-            <div className="text-xs text-purple-600 dark:text-purple-400">
+            <div className="text-sm text-gray-600 dark:text-gray-400 px-3">
               Intervalo: {forecastData.confidence.min} - {forecastData.confidence.max} itens
             </div>
 
             <Dialog open={isSimulationOpen} onOpenChange={setIsSimulationOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full text-purple-700 border-purple-300">
+                <Button variant="outline" size="sm" className="w-full text-indigo-700 border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
                   Simular Cenário
                 </Button>
               </DialogTrigger>
@@ -107,7 +109,7 @@ const DemandForecastCard: React.FC = () => {
 
                   <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="text-sm font-medium">Resultado da Simulação:</div>
-                    <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                    <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
                       {Math.round(forecastData.currentEstimate)} itens
                     </div>
                     <div className="text-xs text-gray-500">

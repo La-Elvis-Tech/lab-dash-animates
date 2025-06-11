@@ -36,155 +36,55 @@ import InventoryItemCard from "@/components/inventory/InventoryItemCard";
 import InventoryAddItemDialog from "@/components/inventory/InventoryAddItemDialog";
 import InventoryExportDialog from "@/components/inventory/InventoryExportDialog";
 
-// Mock data
-const categories = [
-  { id: "all", name: "Todos" },
-  { id: "reagents", name: "Reagentes" },
-  { id: "glassware", name: "Vidraria" },
-  { id: "equipment", name: "Equipamentos" },
-  { id: "disposable", name: "Descartáveis" },
-  { id: "expiring", name: "Vencendo", icon: AlertTriangle },
-];
-
-const inventoryItems = [
-  {
-    id: 1,
-    name: "Ácido Sulfúrico",
-    category: "reagents",
-    stock: 18,
-    unit: "Litros",
-    location: "Armário A3",
-    size: null,
-    expiryDate: "2025-10-15",
-    lastUsed: "2023-04-10",
-    status: "ok",
-    minStock: 15,
-    maxStock: 50,
-    reservedForAppointments: 3,
-    consumptionHistory: [12, 15, 18, 22, 20, 18],
-  },
-  {
-    id: 2,
-    name: "Placas de Petri",
-    category: "disposable",
-    stock: 35,
-    unit: "Unidades",
-    location: "Armário D2",
-    size: null,
-    expiryDate: "2025-08-22",
-    lastUsed: "2023-04-15",
-    status: "ok",
-    minStock: 20,
-    maxStock: 100,
-    reservedForAppointments: 8,
-    consumptionHistory: [25, 30, 35, 40, 38, 35],
-  },
-  {
-    id: 3,
-    name: "Etanol Absoluto",
-    category: "reagents",
-    stock: 3,
-    unit: "Litros",
-    location: "Armário A1",
-    size: null,
-    expiryDate: "2024-12-15",
-    lastUsed: "2023-04-12",
-    status: "low",
-    minStock: 10,
-    maxStock: 30,
-    reservedForAppointments: 1,
-    consumptionHistory: [8, 10, 6, 4, 3, 3],
-  },
-  {
-    id: 4,
-    name: "Balão Volumétrico",
-    category: "glassware",
-    stock: 12,
-    unit: "Unidades",
-    location: "Armário G4",
-    size: "500ml",
-    expiryDate: null,
-    lastUsed: "2023-03-28",
-    status: "ok",
-    minStock: 5,
-    maxStock: 20,
-    reservedForAppointments: 2,
-    consumptionHistory: [8, 10, 12, 14, 12, 12],
-  },
-  {
-    id: 5,
-    name: "Luvas de Nitrila (M)",
-    category: "disposable",
-    stock: 10,
-    unit: "Pares",
-    location: "Armário D1",
-    size: null,
-    expiryDate: "2024-07-18",
-    lastUsed: "2023-04-18",
-    status: "low",
-    minStock: 50,
-    maxStock: 200,
-    reservedForAppointments: 5,
-    consumptionHistory: [45, 50, 35, 25, 15, 10],
-  },
-  {
-    id: 6,
-    name: "Microscópio Óptico",
-    category: "equipment",
-    stock: 5,
-    unit: "Unidades",
-    location: "Sala E2",
-    expiryDate: null,
-    lastUsed: "2023-04-05",
-    status: "ok",
-    minStock: 3,
-    maxStock: 8,
-    reservedForAppointments: 0,
-    consumptionHistory: [5, 5, 5, 5, 5, 5],
-  },
-  {
-    id: 7,
-    name: "Pipeta Graduada",
-    category: "glassware",
-    stock: 25,
-    unit: "Unidades",
-    location: "Armário G2",
-    size: "10ml",
-    expiryDate: null,
-    lastUsed: "2023-04-14",
-    status: "ok",
-    minStock: 15,
-    maxStock: 40,
-    reservedForAppointments: 4,
-    consumptionHistory: [20, 22, 25, 28, 26, 25],
-  },
-  {
-    id: 8,
-    name: "Tubos de Ensaio",
-    category: "glassware",
-    stock: 8,
-    unit: "Unidades",
-    location: "Armário G3",
-    size: "15ml",
-    expiryDate: null,
-    lastUsed: "2023-04-16",
-    status: "low",
-    minStock: 20,
-    maxStock: 60,
-    reservedForAppointments: 2,
-    consumptionHistory: [35, 30, 25, 20, 15, 8],
-  },
-];
+// Data imports
+import { 
+  getInventoryItems, 
+  getInventoryCategories, 
+  updateInventoryItem, 
+  reserveInventoryItem,
+  type InventoryItem,
+  type InventoryCategory 
+} from "@/data/inventory";
 
 const Inventory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [filteredItems, setFilteredItems] = useState(inventoryItems);
+  const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
-  const [items, setItems] = useState(inventoryItems);
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [categories, setCategories] = useState<InventoryCategory[]>([]);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
   const { toast } = useToast();
+
+  // Load data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [itemsData, categoriesData] = await Promise.all([
+          getInventoryItems(),
+          getInventoryCategories()
+        ]);
+        
+        setItems(itemsData);
+        setCategories([
+          ...categoriesData,
+          { id: "expiring", name: "Vencendo", icon: AlertTriangle }
+        ]);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error loading inventory data:", error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível carregar os dados do inventário.",
+          variant: "destructive"
+        });
+      }
+    };
+
+    loadData();
+  }, [toast]);
 
   // Calculate expiring items (within 30 days)
   const expiringItems = items.filter(item => {
@@ -197,6 +97,8 @@ const Inventory = () => {
   });
 
   useEffect(() => {
+    if (loading) return;
+
     let filtered = items;
 
     if (searchQuery) {
@@ -229,9 +131,11 @@ const Inventory = () => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, [searchQuery, selectedCategory, items, expiringItems]);
+  }, [searchQuery, selectedCategory, items, expiringItems, loading]);
 
   useEffect(() => {
+    if (loading) return;
+
     // Initial animation
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -255,51 +159,82 @@ const Inventory = () => {
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading]);
 
-  const handleCategoryChange = (categoryId) => {
+  const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
   };
 
-  const handleUpdateItem = (itemId, updatedData) => {
-    setItems(prevItems => 
-      prevItems.map(item => 
-        item.id === itemId ? { ...item, ...updatedData } : item
-      )
-    );
-    
-    toast({
-      title: "Item atualizado",
-      description: "As informações foram salvas com sucesso.",
-    });
+  const handleUpdateItem = async (itemId: number, updatedData: any) => {
+    try {
+      await updateInventoryItem(itemId, updatedData);
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === itemId ? { ...item, ...updatedData } : item
+        )
+      );
+      
+      toast({
+        title: "Item atualizado",
+        description: "As informações foram salvas com sucesso.",
+      });
+    } catch (error) {
+      console.error("Error updating item:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o item.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleReserveItem = (itemId, quantity) => {
-    setItems(prevItems => 
-      prevItems.map(item => 
-        item.id === itemId 
-          ? { 
-              ...item, 
-              reservedForAppointments: item.reservedForAppointments + quantity,
-              stock: item.stock - quantity 
-            } 
-          : item
-      )
-    );
-    
-    toast({
-      title: "Item reservado",
-      description: `${quantity} unidades foram reservadas para agendamento.`,
-    });
+  const handleReserveItem = async (itemId: number, quantity: number) => {
+    try {
+      await reserveInventoryItem(itemId, quantity);
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === itemId 
+            ? { 
+                ...item, 
+                reservedForAppointments: item.reservedForAppointments + quantity,
+                stock: item.stock - quantity 
+              } 
+            : item
+        )
+      );
+      
+      toast({
+        title: "Item reservado",
+        description: `${quantity} unidades foram reservadas para agendamento.`,
+      });
+    } catch (error) {
+      console.error("Error reserving item:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível reservar o item.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleRequestRestock = (itemId) => {
+  const handleRequestRestock = (itemId: number) => {
     const item = items.find(i => i.id === itemId);
     toast({
       title: "Solicitação enviada",
       description: `Solicitação de reposição para ${item?.name} foi enviada ao responsável.`,
     });
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando inventário...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className="space-y-6">

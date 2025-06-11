@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -175,36 +174,33 @@ const Requests: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-800 dark:text-white">Exames</h1>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Exames</h1>
       </div>
       
-      {/* Estatísticas dos Exames */}
       <ExamsStats exams={exams} />
       
-      <Card className="overflow-hidden dark:bg-gray-900 dark:text-gray-100 dark:border-none">
-        <CardHeader className="bg-gray-50 dark:bg-neutral-900 border-b dark:border-gray-700 p-4">
+      <Card className="overflow-hidden bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+        <CardHeader className="bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-700 p-4">
           <CardTitle className="text-base md:text-xl">
             <div className="space-y-4">
-              {/* Search input */}
               <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 " />
+                <Search className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
                 <Input
                   placeholder="Buscar por paciente, médico, tipo de exame..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-full border rounded-md font-normal bg-gray-200 dark:bg-neutral-800/70 dark:border-transparent outline-none focus:ring-0 transition-all focus:border-transparent focus-visible:ring-blue-500 duration-200"
+                  className="pl-10 w-full border rounded-md font-normal bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               
               <div className="flex flex-wrap gap-3">
-                {/* Date filter */}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "justify-start text-left font-normal text-xs md:text-sm h-9 text-gray-800 dark:text-white bg-gray-200 dark:bg-neutral-800/70 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200",
-                        !selectedDate && "text-muted-foreground"
+                        "justify-start text-left font-normal text-xs md:text-sm h-9 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700",
+                        !selectedDate && "text-neutral-500 dark:text-neutral-400"
                       )}
                       size="sm"
                     >
@@ -223,9 +219,8 @@ const Requests: React.FC = () => {
                   </PopoverContent>
                 </Popover>
                 
-                {/* Type filter - responsive */}
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-200 dark:bg-neutral-800/70 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                     <SelectValue placeholder="Tipo de exame" />
                   </SelectTrigger>
                   <SelectContent>
@@ -239,9 +234,8 @@ const Requests: React.FC = () => {
                   </SelectContent>
                 </Select>
                 
-                {/* Unit filter - responsive */}
                 <Select value={selectedUnit} onValueChange={setSelectedUnit}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-200 dark:bg-neutral-800/70 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                     <SelectValue placeholder="Unidade" />
                   </SelectTrigger>
                   <SelectContent>
@@ -255,9 +249,8 @@ const Requests: React.FC = () => {
                   </SelectContent>
                 </Select>
                 
-                {/* Laboratory filter - responsive */}
                 <Select value={selectedLaboratory} onValueChange={setSelectedLaboratory}>
-                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal text-gray-800 dark:text-white bg-gray-200 dark:bg-neutral-800/70 dark:border-transparent  py-2 px-3 outline-none focus:ring-hidden focus:ring-offset-1 focus:border-transparent focus-visible:ring-blue-500 transition-all duration-200">
+                  <SelectTrigger className="w-[130px] md:w-[180px] h-9 text-xs md:text-sm font-normal bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                     <SelectValue placeholder="Laboratório" />
                   </SelectTrigger>
                   <SelectContent>
@@ -271,11 +264,10 @@ const Requests: React.FC = () => {
                   </SelectContent>
                 </Select>
                 
-                {/* Reset filters button - responsive */}
                 <Button 
                   variant="outline" 
                   onClick={resetFilters}
-                  className="whitespace-nowrap text-xs md:text-sm h-9 text-gray-800 dark:text-white bg-gray-200 dark:bg-neutral-900/70"
+                  className="whitespace-nowrap text-xs md:text-sm h-9 bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700"
                   size="sm"
                 >
                   Limpar filtros
@@ -285,25 +277,25 @@ const Requests: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-0 pt-0">
-          <div className="p-3 md:py-4 px-6 bg-gray-200 dark:bg-neutral-950/80 border-b border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div className="p-3 md:py-4 px-6 bg-neutral-50 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
-              <span className="text-sm md:text-base text-gray-500 dark:text-gray-300">
+              <span className="text-sm md:text-base text-neutral-600 dark:text-neutral-300">
                 Exames encontrados: <strong>{filteredExams.length}</strong>
               </span>
             </div>
             <div>
               <span className="text-sm md:text-base font-medium">
-                Total de despesas: <strong className="text-green-600 dark:text-green-400">R$ {totalCost.toFixed(2)}</strong>
+                Total de despesas: <strong className="text-emerald-600 dark:text-emerald-400">R$ {totalCost.toFixed(2)}</strong>
               </span>
             </div>
           </div>
           
-          <div className="p-6 dark:bg-neutral-900/60">
-            <ScrollArea className="h-[600px] w-full ">
+          <div className="p-6 bg-white dark:bg-neutral-900/50">
+            <ScrollArea className="h-[600px] w-full">
               {filteredExams.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredExams.map((exam) => (
-                    <Card key={exam.id} className="relative bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600">
+                    <Card key={exam.id} className="relative bg-white dark:bg-neutral-900/50 hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600 border-neutral-200 dark:border-neutral-800">
                       <CardHeader className="pb-3">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center space-x-2">
@@ -311,18 +303,18 @@ const Requests: React.FC = () => {
                               <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                              <CardTitle className="text-sm font-semibold text-gray-900 dark:text-white">
+                              <CardTitle className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                                 {exam.type}
                               </CardTitle>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                              <p className="text-xs text-neutral-500 dark:text-neutral-400">
                                 ID: {exam.id}
                               </p>
                             </div>
                           </div>
                           <Badge className={`text-xs ${
                             exam.status === 'Concluído' 
-                              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100'
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100' 
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-800 dark:text-amber-100'
                           }`} variant="secondary">
                             {exam.status}
                           </Badge>
@@ -330,65 +322,60 @@ const Requests: React.FC = () => {
                       </CardHeader>
                       
                       <CardContent className="space-y-4 mt-2">
-                        {/* Paciente */}
                         <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <User className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
                           <div className="pl-2">
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Paciente</p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">{exam.patient}</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Paciente</p>
+                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{exam.patient}</p>
                           </div>
                         </div>
                         
-                        {/* Médico */}
                         <div className="flex items-center space-x-2">
-                          <Stethoscope className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <Stethoscope className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
                           <div className="pl-2">
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Médico</p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">{exam.doctor}</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Médico</p>
+                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{exam.doctor}</p>
                           </div>
                         </div>
                         
-                        {/* Data */}
                         <div className="flex items-center space-x-2">
-                          <CalendarIcon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                          <CalendarIcon className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
                           <div className="pl-2">
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Data</p>
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">{format(exam.date, "dd/MM/yyyy")}</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Data</p>
+                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{format(exam.date, "dd/MM/yyyy")}</p>
                           </div>
                         </div>
                         
-                        {/* Laboratório e Unidade */}
-                          <div className="flex items-center space-x-2">
-                            <Database className="h-3 w-3 text-gray-500 dark:text-gray-400" />
-                            <div className="pl-2">
-                              <p className="text-xs text-gray-500 dark:text-gray-400">Lab</p>
-                              <p className="text-xs font-medium text-gray-900 dark:text-white">{exam.laboratory}</p>
-                            </div>
+                        <div className="flex items-center space-x-2">
+                          <Database className="h-3 w-3 text-neutral-500 dark:text-neutral-400" />
+                          <div className="pl-2">
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Lab</p>
+                            <p className="text-xs font-medium text-neutral-900 dark:text-neutral-100">{exam.laboratory}</p>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <Building className="h-3 w-3 text-gray-500 dark:text-gray-400" />
-                            <div className="pl-2">
-                              <p className="text-xs text-gray-500 dark:text-gray-400">Unidade</p>
-                              <p className="text-xs font-medium text-gray-900 dark:text-white">{exam.unit}</p>
-                            </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Building className="h-3 w-3 text-neutral-500 dark:text-neutral-400" />
+                          <div className="pl-2">
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Unidade</p>
+                            <p className="text-xs font-medium text-neutral-900 dark:text-neutral-100">{exam.unit}</p>
                           </div>
+                        </div>
 
-                        {/* Custo e Resultado */}
-                        <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex justify-between items-center pt-2 border-t border-neutral-200 dark:border-neutral-700">
                           <div className="flex items-center space-x-1 mt-3">
-                            <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
-                            <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                            <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                            <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                               R$ {exam.cost.toFixed(2)}
                             </span>
                           </div>
                           <div className="flex items-center text-left md:text-right mt-2">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Resultado:</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Resultado:</p>
                             <span className={`text-sm font-medium ml-3 ${
                               exam.result === 'Alterado' 
                                 ? 'text-red-600 dark:text-red-400' 
                                 : exam.result === 'Normal'
-                                  ? 'text-green-600 dark:text-green-400'
-                                  : 'text-gray-500 dark:text-gray-400'
+                                  ? 'text-emerald-600 dark:text-emerald-400'
+                                  : 'text-neutral-500 dark:text-neutral-400'
                             }`}>
                               {exam.result}
                             </span>
@@ -400,11 +387,11 @@ const Requests: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <FileText className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-                  <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
+                  <FileText className="h-12 w-12 text-neutral-400 dark:text-neutral-600 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-neutral-500 dark:text-neutral-400 mb-2">
                     Nenhum exame encontrado
                   </p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500">
+                  <p className="text-sm text-neutral-400 dark:text-neutral-500">
                     Tente ajustar os filtros para encontrar os exames desejados.
                   </p>
                 </div>

@@ -83,19 +83,19 @@ const SecuritySettings = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+      <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl text-gray-900 dark:text-gray-100">
+          <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
             Alterar Senha
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-neutral-600 dark:text-neutral-300">
             Atualize sua senha de acesso ao sistema
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="currentPassword">Senha Atual</Label>
+            <Label htmlFor="currentPassword" className="text-neutral-900 dark:text-neutral-100">Senha Atual</Label>
             <div className="relative">
               <Input 
                 id="currentPassword"
@@ -104,11 +104,12 @@ const SecuritySettings = () => {
                 value={passwordForm.currentPassword}
                 onChange={handlePasswordChange}
                 placeholder="Digite sua senha atual"
+                className="border-neutral-200 dark:border-neutral-700"
               />
               <button 
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 px-2 text-gray-500"
+                className="absolute right-3 top-3 px-2 text-neutral-500"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -116,7 +117,7 @@ const SecuritySettings = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="newPassword">Nova Senha</Label>
+            <Label htmlFor="newPassword" className="text-neutral-900 dark:text-neutral-100">Nova Senha</Label>
             <Input 
               id="newPassword"
               name="newPassword"
@@ -124,11 +125,12 @@ const SecuritySettings = () => {
               value={passwordForm.newPassword}
               onChange={handlePasswordChange}
               placeholder="Digite a nova senha"
+              className="border-neutral-200 dark:border-neutral-700"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirme a Nova Senha</Label>
+            <Label htmlFor="confirmPassword" className="text-neutral-900 dark:text-neutral-100">Confirme a Nova Senha</Label>
             <Input 
               id="confirmPassword"
               name="confirmPassword"
@@ -136,26 +138,27 @@ const SecuritySettings = () => {
               value={passwordForm.confirmPassword}
               onChange={handlePasswordChange}
               placeholder="Confirme a nova senha"
+              className="border-neutral-200 dark:border-neutral-700"
             />
           </div>
         </CardContent>
         
-        <CardFooter className="justify-end">
+        <CardFooter className="justify-end border-t border-neutral-200 dark:border-neutral-700 pt-4">
           <Button 
             onClick={handleChangePassword}
-            className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
+            className="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
           >
             Alterar Senha
           </Button>
         </CardFooter>
       </Card>
       
-      <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+      <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent dark:from-indigo-400 dark:to-purple-400">
+          <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
             Segurança da Conta
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-neutral-600 dark:text-neutral-300">
             Configure opções de segurança adicionais
           </CardDescription>
         </CardHeader>
@@ -163,8 +166,8 @@ const SecuritySettings = () => {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="twoFactorAuth">Autenticação em Dois Fatores</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="twoFactorAuth" className="text-neutral-900 dark:text-neutral-100">Autenticação em Dois Fatores</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Ative a verificação em duas etapas para mais segurança
               </p>
             </div>
@@ -175,12 +178,12 @@ const SecuritySettings = () => {
             />
           </div>
           
-          <Separator />
+          <Separator className="bg-neutral-200 dark:bg-neutral-700" />
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="sessionTimeout">Timeout de Sessão</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="sessionTimeout" className="text-neutral-900 dark:text-neutral-100">Timeout de Sessão</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Encerre automaticamente sessões inativas após 30 minutos
               </p>
             </div>
@@ -191,12 +194,12 @@ const SecuritySettings = () => {
             />
           </div>
           
-          <Separator />
+          <Separator className="bg-neutral-200 dark:bg-neutral-700" />
           
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="accessLogs">Registro de Acessos</Label>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Label htmlFor="accessLogs" className="text-neutral-900 dark:text-neutral-100">Registro de Acessos</Label>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
                 Mantenha um registro de todos os acessos à sua conta
               </p>
             </div>
@@ -208,10 +211,10 @@ const SecuritySettings = () => {
           </div>
         </CardContent>
         
-        <CardFooter className="justify-end border-t border-gray-100 dark:border-gray-700 pt-4">
+        <CardFooter className="justify-end border-t border-neutral-200 dark:border-neutral-700 pt-4">
           <Button 
             onClick={handleSaveSettings}
-            className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
+            className="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
           >
             Salvar Configurações
           </Button>

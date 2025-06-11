@@ -58,20 +58,19 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
   };
 
   return (
-    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80 dark:border-neutral-700 dark:border-opacity-20">
+    <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
+        <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
           <Download size={20} />
           Exportação e Relatórios
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Format Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Formato de Exportação</label>
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Formato de Exportação</label>
             <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-              <SelectTrigger className="bg-white dark:bg-neutral-800">
+              <SelectTrigger className="bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                 <SelectValue placeholder="Selecionar formato" />
               </SelectTrigger>
               <SelectContent className="bg-white dark:bg-neutral-800">
@@ -83,9 +82,8 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
             </Select>
           </div>
 
-          {/* Data Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Dados para Exportar</label>
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Dados para Exportar</label>
             <div className="space-y-2">
               {dataOptions.map((option) => (
                 <div key={option.id} className="flex items-center space-x-2">
@@ -94,13 +92,12 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
                     checked={selectedData.includes(option.id)}
                     onCheckedChange={(checked) => handleDataSelection(option.id, !!checked)}
                   />
-                  <label htmlFor={option.id} className="text-sm text-gray-700 dark:text-gray-300">{option.label}</label>
+                  <label htmlFor={option.id} className="text-sm text-neutral-700 dark:text-neutral-300">{option.label}</label>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Export Actions */}
           <div className="flex flex-col sm:flex-row gap-2">
             <Button onClick={handleExport} className="flex items-center gap-2">
               <Download size={16} />
@@ -112,22 +109,21 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
             </Button>
           </div>
 
-          {/* Auto Report Settings */}
-          <div className="pt-4 border-t border-gray-200 dark:border-neutral-700">
+          <div className="pt-4 border-t border-neutral-200 dark:border-neutral-700">
             <div className="flex items-center space-x-2 mb-2">
               <Checkbox
                 id="auto-report"
                 checked={autoReport}
                 onCheckedChange={(checked) => setAutoReport(!!checked)}
               />
-              <label htmlFor="auto-report" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="auto-report" className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                 Relatórios Automáticos
               </label>
             </div>
             {autoReport && (
               <div className="ml-6 space-y-2">
                 <Select>
-                  <SelectTrigger className="w-full bg-white dark:bg-neutral-800">
+                  <SelectTrigger className="w-full bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                     <SelectValue placeholder="Frequência" />
                   </SelectTrigger>
                   <SelectContent className="bg-white dark:bg-neutral-800">
@@ -136,7 +132,7 @@ const ExportControls: React.FC<ExportControlsProps> = ({ onExport }) => {
                     <SelectItem value="monthly">Mensal</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
                   <Mail size={14} />
                   <span>Enviado por email para stakeholders</span>
                 </div>

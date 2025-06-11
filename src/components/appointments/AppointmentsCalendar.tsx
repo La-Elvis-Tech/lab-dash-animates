@@ -28,11 +28,11 @@ const AppointmentsCalendar: React.FC<AppointmentsCalendarProps> = ({
       }}
       modifiersStyles={{
         hasAppointment: {
-          color: 'red',
+          color: '#dc2626',
           fontWeight: 'bold',
         }
       }}
-      className="pointer-events-auto"
+      className="pointer-events-auto bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-md"
     />
   );
 };

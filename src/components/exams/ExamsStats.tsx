@@ -41,53 +41,53 @@ const ExamsStats: React.FC<ExamsStatsProps> = ({ exams }) => {
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80">
+      <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Exames</CardTitle>
-          <Calendar className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Exames</CardTitle>
+          <Calendar className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{recentExams.length}</div>
-          <p className="text-xs pt-2 text-muted-foreground">
+          <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{recentExams.length}</div>
+          <p className="text-xs pt-2 text-neutral-500 dark:text-neutral-400">
             {completedExams.length} concluídos
           </p>
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80">
+      <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Gasto Total</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Gasto Total</CardTitle>
+          <DollarSign className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">R$ {totalCost.toFixed(2)}</div>
-          <p className="text-xs pt-2 text-muted-foreground">
+          <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">R$ {totalCost.toFixed(2)}</div>
+          <p className="text-xs pt-2 text-neutral-500 dark:text-neutral-400">
             Últimos 30 dias
           </p>
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80">
+      <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Custo Médio</CardTitle>
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Custo Médio</CardTitle>
+          <TrendingUp className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">R$ {averageCost.toFixed(2)}</div>
-          <p className="text-xs pt-2 text-muted-foreground">
+          <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">R$ {averageCost.toFixed(2)}</div>
+          <p className="text-xs pt-2 text-neutral-500 dark:text-neutral-400">
             Por exame
           </p>
         </CardContent>
       </Card>
 
-      <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80">
+      <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Mais Comum</CardTitle>
-          <Activity className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Mais Comum</CardTitle>
+          <Activity className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
         </CardHeader>
         <CardContent>
-          <div className="text-lg font-bold">{mostCommonExam}</div>
-          <p className="text-xs pt-2 text-muted-foreground">
+          <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100">{mostCommonExam}</div>
+          <p className="text-xs pt-2 text-neutral-500 dark:text-neutral-400">
             {examTypeCounts[mostCommonExam] || 0} realizados
           </p>
         </CardContent>

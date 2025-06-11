@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,7 +21,7 @@ import {
   startOfDay
 } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Component imports
 import AppointmentsCalendar from "@/components/appointments/AppointmentsCalendar";
@@ -32,125 +33,49 @@ import {
   getUnitsSummary
 } from "@/utils/appointments";
 
-// Mock data for appointments
-const mockAppointments = [
-  {
-    id: "A001",
-    patient: "João Silva",
-    type: "Coleta de Sangue",
-    date: new Date(2024, 4, 15, 9, 30),
-    doctor: "Dra. Ana Souza",
-    unit: "Unidade Centro",
-    cost: 120.0,
-    status: "Concluído",
-  },
-  {
-    id: "A002",
-    patient: "Maria Santos",
-    type: "Entrega de Resultado",
-    date: new Date(2024, 4, 16, 10, 45),
-    doctor: "Dr. Carlos Mendes",
-    unit: "Unidade Norte",
-    cost: 0,
-    status: "Cancelado",
-  },
-  {
-    id: "A003",
-    patient: "Pedro Oliveira",
-    type: "Colonoscopia",
-    date: new Date(2024, 4, 22, 8, 0),
-    doctor: "Dra. Lucia Freitas",
-    unit: "Unidade Sul",
-    cost: 550.0,
-    status: "Confirmado",
-  },
-  {
-    id: "A004",
-    patient: "Ana Pereira",
-    type: "Ultrassom",
-    date: new Date(2024, 4, 23, 14, 15),
-    doctor: "Dr. Roberto Castro",
-    unit: "Unidade Leste",
-    cost: 280.0,
-    status: "Confirmado",
-  },
-  {
-    id: "A005",
-    patient: "Carlos Ribeiro",
-    type: "Raio-X",
-    date: new Date(2024, 4, 24, 11, 0),
-    doctor: "Dra. Fernanda Lima",
-    unit: "Unidade Centro",
-    cost: 180.0,
-    status: "Confirmado",
-  },
-  {
-    id: "A006",
-    patient: "Luiza Martins",
-    type: "Eletrocardiograma",
-    date: new Date(2024, 4, 25, 15, 30),
-    doctor: "Dr. Paulo Vieira",
-    unit: "Unidade Norte",
-    cost: 220.0,
-    status: "Agendado",
-  },
-  {
-    id: "A007",
-    patient: "Paulo Costa",
-    type: "Coleta de Sangue",
-    date: new Date(2024, 4, 19, 9, 0),
-    doctor: "Dra. Ana Souza",
-    unit: "Unidade Sul",
-    cost: 120.0,
-    status: "Agendado",
-  },
-  {
-    id: "A008",
-    patient: "Mariana Lima",
-    type: "Densitometria",
-    date: new Date(2024, 4, 20, 13, 45),
-    doctor: "Dr. José Santos",
-    unit: "Unidade Leste",
-    cost: 320.0,
-    status: "Agendado",
-  },
-  {
-    id: "A009",
-    patient: "Ricardo Alves",
-    type: "Tomografia",
-    date: new Date(2024, 4, 28, 10, 30),
-    doctor: "Dra. Carla Mendes",
-    unit: "Unidade Centro",
-    cost: 850.0,
-    status: "Agendado",
-  },
-  {
-    id: "A010",
-    patient: "Camila Ferreira",
-    type: "Mamografia",
-    date: new Date(2024, 4, 30, 11, 15),
-    doctor: "Dr. André Oliveira",
-    unit: "Unidade Norte",
-    cost: 380.0,
-    status: "Agendado",
-  },
-];
+// Data imports
+import { 
+  getAppointments, 
+  updateAppointmentStatus,
+  type Appointment 
+} from "@/data/appointments";
 
 const Orders: React.FC = () => {
   const today = startOfDay(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [appointments, setAppointments] = useState(mockAppointments);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Load appointments on component mount
+  useEffect(() => {
+    const loadAppointments = async () => {
+      try {
+        const appointmentsData = await getAppointments();
+        setAppointments(appointmentsData);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error loading appointments:", error);
+      }
+    };
+
+    loadAppointments();
+  }, []);
 
   // Função para atualizar status do agendamento
-  const handleUpdateAppointmentStatus = (appointmentId: string, newStatus: string) => {
-    setAppointments(prevAppointments => 
-      prevAppointments.map(appointment => 
-        appointment.id === appointmentId 
-          ? { ...appointment, status: newStatus }
-          : appointment
-      )
-    );
+  const handleUpdateAppointmentStatus = async (appointmentId: string, newStatus: string) => {
+    try {
+      await updateAppointmentStatus(appointmentId, newStatus);
+      setAppointments(prevAppointments => 
+        prevAppointments.map(appointment => 
+          appointment.id === appointmentId 
+            ? { ...appointment, status: newStatus }
+            : appointment
+        )
+      );
+    } catch (error) {
+      console.error("Error updating appointment status:", error);
+    }
   };
 
   // Date calculations
@@ -196,17 +121,33 @@ const Orders: React.FC = () => {
   // Units summary
   const unitsList = getUnitsSummary(appointments);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900 dark:border-neutral-100 mx-auto"></div>
+          <p className="mt-4 text-neutral-500 dark:text-neutral-400">Carregando agendamentos...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between flex-wrap items-center">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          Agendamentos
-        </h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+            Agendamentos
+          </h1>
+          <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+            Gerencie seus agendamentos de forma eficiente
+          </p>
+        </div>
         <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 dark:from-gray-800 dark:to-gray-700 dark:hover:from-gray-700 dark:hover:to-gray-600 dark:border-none mt-4 xs:mt-2 md:mt-0"
+              className="bg-white hover:bg-neutral-50 dark:bg-neutral-800 dark:hover:bg-neutral-700 border-neutral-200 dark:border-neutral-700 mt-4 xs:mt-2 md:mt-0"
             >
               <CalendarIcon className="h-4 w-4 mr-2" />
               Calendário
@@ -224,12 +165,12 @@ const Orders: React.FC = () => {
       </div>
 
       <div>
-        <Card className="dark:bg-gray-800 dark:text-gray-100 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 dark:border-none">
+        <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
           <CardHeader>
-            <CardTitle className="text-xl text-gray-900 dark:text-gray-100">
+            <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
               Agendamentos Gerais
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-neutral-600 dark:text-neutral-300">
               Visualize seus agendamentos recentes e futuros
             </CardDescription>
           </CardHeader>

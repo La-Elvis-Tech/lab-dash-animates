@@ -47,12 +47,12 @@ const LaboratoryProfile = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+      <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl text-gray-900 dark:text-gray-100">
+          <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
             Perfil do Laboratório
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-neutral-600 dark:text-neutral-300">
             Gerencie as informações do seu laboratório
           </CardDescription>
         </CardHeader>
@@ -61,45 +61,45 @@ const LaboratoryProfile = () => {
           <div className="flex items-center space-x-4">
             <Avatar className="h-24 w-24">
               <AvatarImage src={laboratoryData.logo || ""} alt={laboratoryData.name} />
-              <AvatarFallback className="bg-gradient-to-br from-purple-600 to-indigo-600 text-white text-xl">
+              <AvatarFallback className="bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-xl">
                 {laboratoryData.name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             
             {isEditing && (
               <div>
-                <Button variant="outline" size="sm">Alterar Logo</Button>
+                <Button variant="outline" size="sm" className="border-neutral-200 dark:border-neutral-700">Alterar Logo</Button>
               </div>
             )}
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome do Laboratório</Label>
+              <Label htmlFor="name" className="text-neutral-900 dark:text-neutral-100">Nome do Laboratório</Label>
               <Input 
                 id="name"
                 name="name"
                 value={laboratoryData.name}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={isEditing ? "" : "bg-gray-50 dark:bg-gray-700"}
+                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="cnpj">CNPJ</Label>
+              <Label htmlFor="cnpj" className="text-neutral-900 dark:text-neutral-100">CNPJ</Label>
               <Input 
                 id="cnpj"
                 name="cnpj"
                 value={laboratoryData.cnpj}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={isEditing ? "" : "bg-gray-50 dark:bg-gray-700"}
+                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-neutral-900 dark:text-neutral-100">Email</Label>
               <Input 
                 id="email"
                 name="email"
@@ -107,87 +107,87 @@ const LaboratoryProfile = () => {
                 value={laboratoryData.email}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={isEditing ? "" : "bg-gray-50 dark:bg-gray-700"}
+                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
+              <Label htmlFor="phone" className="text-neutral-900 dark:text-neutral-100">Telefone</Label>
               <Input 
                 id="phone"
                 name="phone"
                 value={laboratoryData.phone}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={isEditing ? "" : "bg-gray-50 dark:bg-gray-700"}
+                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
               />
             </div>
             
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="address">Endereço</Label>
+              <Label htmlFor="address" className="text-neutral-900 dark:text-neutral-100">Endereço</Label>
               <Input 
                 id="address"
                 name="address"
                 value={laboratoryData.address}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={isEditing ? "" : "bg-gray-50 dark:bg-gray-700"}
+                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
               />
             </div>
             
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="description">Descrição</Label>
+              <Label htmlFor="description" className="text-neutral-900 dark:text-neutral-100">Descrição</Label>
               <Textarea 
                 id="description"
                 name="description"
                 value={laboratoryData.description}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={isEditing ? "" : "bg-gray-50 dark:bg-gray-700"}
+                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
                 rows={3}
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="responsibleName">Responsável Técnico</Label>
+              <Label htmlFor="responsibleName" className="text-neutral-900 dark:text-neutral-100">Responsável Técnico</Label>
               <Input 
                 id="responsibleName"
                 name="responsibleName"
                 value={laboratoryData.responsibleName}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={isEditing ? "" : "bg-gray-50 dark:bg-gray-700"}
+                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="responsibleCRM">CRM</Label>
+              <Label htmlFor="responsibleCRM" className="text-neutral-900 dark:text-neutral-100">CRM</Label>
               <Input 
                 id="responsibleCRM"
                 name="responsibleCRM"
                 value={laboratoryData.responsibleCRM}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className={isEditing ? "" : "bg-gray-50 dark:bg-gray-700"}
+                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
               />
             </div>
           </div>
         </CardContent>
         
-        <CardFooter className="flex justify-end gap-2 border-t border-gray-100 dark:border-gray-700 pt-4">
+        <CardFooter className="flex justify-end gap-2 border-t border-neutral-200 dark:border-neutral-700 pt-4">
           {!isEditing ? (
             <Button 
               onClick={() => setIsEditing(true)}
-              className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
+              className="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
             >
               Editar Perfil
             </Button>
           ) : (
             <>
-              <Button variant="outline" onClick={handleCancel}>Cancelar</Button>
+              <Button variant="outline" onClick={handleCancel} className="border-neutral-200 dark:border-neutral-700">Cancelar</Button>
               <Button 
                 onClick={handleSave}
-                className="bg-gradient-to-r from-gray-800 to-gray-600 hover:opacity-90 dark:from-white dark:to-gray-100 transition-colors duration-400 dark:hover:from-gray-200 dark:hover:to-gray-300"
+                className="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
               >
                 Salvar Alterações
               </Button>

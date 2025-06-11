@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import DashboardChart from "@/components/DashboardChart.tsx";
 import { Card, CardContent } from "../components/ui/card";
@@ -17,15 +17,32 @@ import ForecastPerformanceCard from "@/components/dashboard/ForecastPerformanceC
 import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
 import UnitSelectorCard from "@/components/dashboard/UnitSelectorCard";
 
-interface ConsumptionData {
-  name: string;
-  value: number;
-}
+// Data imports
+import { getDashboardConsumption, type ConsumptionData } from "@/data/dashboard";
 
 const Dashboard: React.FC = () => {
   const dashboardRef = useRef<HTMLDivElement>(null);
+  const [consumptionData, setConsumptionData] = useState<ConsumptionData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const consumption = await getDashboardConsumption();
+        setConsumptionData(consumption);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".dashboard-card",
@@ -54,22 +71,23 @@ const Dashboard: React.FC = () => {
     }, dashboardRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading]);
 
-  const consumptionData: ConsumptionData[] = [
-    { name: "Jan", value: 23 },
-    { name: "Fev", value: 34 },
-    { name: "Mar", value: 45 },
-    { name: "Abr", value: 31 },
-    { name: "Mai", value: 42 },
-    { name: "Jun", value: 52 },
-    { name: "Jul", value: 49 },
-  ];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       ref={dashboardRef}
-      className="space-y-4 md:space-y-6 dark:text-gray-100"
+      className="space-y-6 dark:text-gray-100"
     >
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
@@ -80,63 +98,68 @@ const Dashboard: React.FC = () => {
         </p>
       </div>
 
-      {/* Unit Selector */}
-      <div className="dashboard-card">
-        <UnitSelectorCard />
+      {/* Grid principal com layout mais equilibrado */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        {/* Coluna da esquerda - Unidades e métricas principais */}
+        <div className="xl:col-span-4 space-y-6">
+          <div className="dashboard-card">
+            <UnitSelectorCard />
+          </div>
+          
+          <div className="dashboard-card">
+            <DashboardStats />
+          </div>
+          
+          <div className="dashboard-card">
+            <InventoryGauges />
+          </div>
+        </div>
+
+        {/* Coluna central - Analytics avançados */}
+        <div className="xl:col-span-5 space-y-6">
+          <div className="grid grid-cols-1 gap-6">
+            <div className="dashboard-card">
+              <DemandForecastCard />
+            </div>
+            
+            <div className="dashboard-card">
+              <ForecastPerformanceCard />
+            </div>
+          </div>
+
+          {/* Gráfico principal */}
+          <div className="dashboard-chart">
+            <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950">
+              <CardContent className="p-6">
+                <DashboardChart
+                  type="bar"
+                  data={consumptionData}
+                  title="Consumo de Itens"
+                  description="Itens consumidos nos últimos 7 meses"
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Coluna da direita - Ações e alertas */}
+        <div className="xl:col-span-3 space-y-6">
+          <div className="dashboard-card">
+            <QuickActionsCard />
+          </div>
+          
+          <div className="dashboard-card">
+            <RecentActivities />
+          </div>
+        </div>
       </div>
 
-      {/* Advanced Analytics Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-        <div className="dashboard-card">
-          <DemandForecastCard />
-        </div>
-        <div className="dashboard-card">
-          <ForecastPerformanceCard />
-        </div>
-        <div className="dashboard-card">
-          <QuickActionsCard />
-        </div>
-      </div>
-
-      {/* Risk Alerts Section */}
+      {/* Seção de alertas de risco - largura total */}
       <div className="dashboard-card">
         <RiskAlertsCard />
       </div>
 
-      {/* Key metrics and charts section */}
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex w-full xl:w-[55%] 2xl:w-[65%]">
-          <div className="flex-row w-full">
-            <div className="dashboard-chart 2xl:w-[100%] border-none">
-              <DashboardStats />
-            </div>
-            <InventoryGauges />
-          </div>
-        </div>
-        
-        {/* Recent Activity */}
-        <div className="dashboard-chart max-h-auto w-full xl:w-[45%] 2xl:w-[35%]">
-          <RecentActivities />
-        </div>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Charts section */}
-        <div className="dashboard-chart flex w-full border-none">
-          <Card className="dashboard h-auto border-none w-full xl:w-[100%] bg-white bg-opacity-0 shadow-none">
-            <CardContent className="dashboard-chart p-0">
-              <DashboardChart
-                type="bar"
-                data={consumptionData}
-                title="Consumo de Itens"
-                description="Itens consumidos nos últimos 7 meses"
-              />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Items running low table */}
+      {/* Tabela de estoque baixo - largura total */}
       <div className="dashboard-chart">
         <LowStockTable />
       </div>

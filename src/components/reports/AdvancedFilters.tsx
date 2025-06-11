@@ -35,7 +35,6 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
 
   const examTypes = ["Coleta de Sangue", "Ultrassom", "Raio-X", "Tomografia", "Mamografia"];
   const units = ["Unidade Centro", "Unidade Norte", "Unidade Sul", "Unidade Leste"];
-  const items = ["Etanol Absoluto", "Luvas Nitrila", "Reagente X", "Pipetas"];
 
   const handleExamTypeChange = (examType: string, checked: boolean) => {
     const newExamTypes = checked 
@@ -70,21 +69,20 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
   };
 
   return (
-    <Card className="mb-6 bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80 dark:border-neutral-700 dark:border-opacity-20">
+    <Card className="mb-6 bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-white">
+        <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
           <Filter size={20} />
           Filtros Avançados
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Date Range */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Período</label>
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Período</label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left bg-white dark:bg-neutral-800">
+                <Button variant="outline" className="w-full justify-start text-left bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {filters.dateRange?.from ? (
                     filters.dateRange.to ? (
@@ -116,9 +114,8 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
             </Popover>
           </div>
 
-          {/* Exam Types */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tipos de Exame</label>
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Tipos de Exame</label>
             <div className="space-y-2 max-h-32 overflow-y-auto">
               {examTypes.map((examType) => (
                 <div key={examType} className="flex items-center space-x-2">
@@ -127,15 +124,14 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
                     checked={filters.examTypes.includes(examType)}
                     onCheckedChange={(checked) => handleExamTypeChange(examType, !!checked)}
                   />
-                  <label htmlFor={examType} className="text-sm text-gray-700 dark:text-gray-300">{examType}</label>
+                  <label htmlFor={examType} className="text-sm text-neutral-700 dark:text-neutral-300">{examType}</label>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Units */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Unidades</label>
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Unidades</label>
             <div className="space-y-2">
               {units.map((unit) => (
                 <div key={unit} className="flex items-center space-x-2">
@@ -144,15 +140,14 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
                     checked={filters.units.includes(unit)}
                     onCheckedChange={(checked) => handleUnitChange(unit, !!checked)}
                   />
-                  <label htmlFor={unit} className="text-sm text-gray-700 dark:text-gray-300">{unit}</label>
+                  <label htmlFor={unit} className="text-sm text-neutral-700 dark:text-neutral-300">{unit}</label>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Cost Range */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
               Faixa de Custo: R$ {filters.costRange[0]} - R$ {filters.costRange[1]}
             </label>
             <Slider
@@ -170,9 +165,8 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
           </div>
         </div>
 
-        {/* Active Filters */}
         <div className="mt-4 flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtros ativos:</span>
+          <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Filtros ativos:</span>
           {filters.examTypes.map((type) => (
             <Badge key={type} variant="secondary" className="flex items-center gap-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
               {type}
@@ -180,13 +174,13 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
             </Badge>
           ))}
           {filters.units.map((unit) => (
-            <Badge key={unit} variant="secondary" className="flex items-center gap-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
+            <Badge key={unit} variant="secondary" className="flex items-center gap-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200">
               {unit}
               <X size={12} className="cursor-pointer" onClick={() => handleUnitChange(unit, false)} />
             </Badge>
           ))}
           {(filters.examTypes.length > 0 || filters.units.length > 0) && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-600 dark:text-gray-400">
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-600 dark:text-neutral-400">
               Limpar filtros
             </Button>
           )}

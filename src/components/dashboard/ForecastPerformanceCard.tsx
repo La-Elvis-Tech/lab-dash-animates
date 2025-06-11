@@ -27,21 +27,21 @@ const ForecastPerformanceCard: React.FC = () => {
   const performance = getPerformanceLevel(mapeScore);
 
   return (
-    <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-blue-200 dark:border-blue-800">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center gap-2">
-          <Target size={16} />
+    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
+          <Target size={18} className="text-indigo-600 dark:text-indigo-400" />
           Performance de Previsão
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
             <div>
-              <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                 {mapeScore}%
               </span>
-              <p className="text-xs text-blue-600 dark:text-blue-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Erro médio (MAPE)
               </p>
             </div>
@@ -50,7 +50,7 @@ const ForecastPerformanceCard: React.FC = () => {
             </Badge>
           </div>
 
-          <div className="h-24">
+          <div className="h-24 px-3">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={performanceData}>
                 <XAxis dataKey="month" hide />
@@ -68,7 +68,7 @@ const ForecastPerformanceCard: React.FC = () => {
                 <Line 
                   type="monotone" 
                   dataKey="real" 
-                  stroke="#3B82F6" 
+                  stroke="#4F46E5" 
                   strokeWidth={2} 
                   dot={false} 
                   name="Real"
@@ -76,7 +76,7 @@ const ForecastPerformanceCard: React.FC = () => {
                 <Line 
                   type="monotone" 
                   dataKey="predicted" 
-                  stroke="#93C5FD" 
+                  stroke="#A5B4FC" 
                   strokeWidth={2} 
                   strokeDasharray="5 5"
                   dot={false} 
@@ -86,7 +86,7 @@ const ForecastPerformanceCard: React.FC = () => {
             </ResponsiveContainer>
           </div>
           
-          <div className="text-xs text-blue-600 dark:text-blue-400">
+          <div className="text-sm text-gray-600 dark:text-gray-400 px-3">
             Real vs Previsto (últimos 6 meses)
           </div>
         </div>
