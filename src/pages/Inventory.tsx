@@ -247,9 +247,9 @@ const Inventory = () => {
         </p>
       </div>
 
-      {/* Dashboard de Saúde do Estoque */}
+      {/* Dashboard de Saúde do Estoque 
       <InventoryStockHealth items={items} expiringItems={expiringItems} />
-
+      */}
       {/* Filters */}
       <Card className="inventory-filters">
         <CardContent className="p-4 bg-neutral-100/80 dark:bg-neutral-800/80">

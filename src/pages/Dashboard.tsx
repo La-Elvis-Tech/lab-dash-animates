@@ -116,7 +116,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Coluna central - Analytics avançados */}
-        <div className="xl:col-span-5 space-y-6">
+        <div className="xl:col-span-4 space-y-6">
           <div className="grid grid-cols-1 gap-6">
             <div className="dashboard-card">
               <DemandForecastCard />
@@ -129,21 +129,12 @@ const Dashboard: React.FC = () => {
 
           {/* Gráfico principal */}
           <div className="dashboard-chart">
-            <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950">
-              <CardContent className="p-6">
-                <DashboardChart
-                  type="bar"
-                  data={consumptionData}
-                  title="Consumo de Itens"
-                  description="Itens consumidos nos últimos 7 meses"
-                />
-              </CardContent>
-            </Card>
+            <RiskAlertsCard />
           </div>
         </div>
 
         {/* Coluna da direita - Ações e alertas */}
-        <div className="xl:col-span-3 space-y-6">
+        <div className="xl:col-span-4 space-y-6">
           <div className="dashboard-card">
             <QuickActionsCard />
           </div>
@@ -155,8 +146,18 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Seção de alertas de risco - largura total */}
+      
       <div className="dashboard-card">
-        <RiskAlertsCard />
+        <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950">
+              <CardContent className="p-6">
+                <DashboardChart
+                  type="area"
+                  data={consumptionData}
+                  title="Consumo de Itens"
+                  description="Itens consumidos nos últimos 7 meses"
+                />
+              </CardContent>
+            </Card>
       </div>
 
       {/* Tabela de estoque baixo - largura total */}

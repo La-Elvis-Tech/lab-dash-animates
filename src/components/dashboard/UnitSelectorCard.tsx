@@ -59,20 +59,6 @@ const UnitSelectorCard: React.FC = () => {
     },
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "excellent":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      case "good":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
-      case "warning":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      case "critical":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
-    }
-  };
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -110,7 +96,7 @@ const UnitSelectorCard: React.FC = () => {
               Status por Unidade
             </div>
 
-            <div className="max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
+            <div className="max-h-[200px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
               {units
                 .filter((unit) => unit.id !== "all")
                 .map((unit) => (
@@ -137,7 +123,7 @@ const UnitSelectorCard: React.FC = () => {
                       <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
                         {unit.healthPercent}%
                       </span>
-                      <Badge className={getStatusColor(unit.status)}>
+                      <Badge className="text-xs px-2 py-1 rounded-lg bg-neutral-500/40 dark:bg-neutral-100/90">
                         {getStatusText(unit.status)}
                       </Badge>
                     </div>

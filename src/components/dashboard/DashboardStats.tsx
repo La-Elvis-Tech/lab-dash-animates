@@ -54,11 +54,11 @@ const DashboardStats: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 pb-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4">
       {stats.map((stat, index) => (
         <Card key={index} className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/80 dark:to-neutral-950/80 border-neutral-300/60 border-opacity-80 dark:border-neutral-700 dark:border-opacity-20">
           <CardContent className="pt-4 sm:pt-5 p-3 md:p-4">
-            <div className="flex items-center justify-between px-2">
+            <div className="flex items-center justify-between p-2">
               <div>
                 <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
                   {stat.title}

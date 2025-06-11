@@ -44,7 +44,7 @@ const Settings = () => {
 
       <div className="">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-8 p-1 bg-neutral-100/80 dark:bg-neutral-800/30 shadow-sm border border-neutral-200 dark:border-neutral-700">
+          <TabsList className="grid grid-cols-3 mb-8 py-0 bg-neutral-200/70 dark:bg-neutral-800/30 shadow-sm border border-none">
             <TabsTrigger value="profile" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-700">
               <User className="hidden xl:block h-4 w-4" /> Perfil
             </TabsTrigger>

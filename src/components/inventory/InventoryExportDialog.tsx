@@ -19,77 +19,74 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import * as XLSX from "xlsx"; // Adicione esta importação
 
-interface InventoryExportDialogProps {
-  items: any[];
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-}
+// ... restante do código ...
 
 const InventoryExportDialog: React.FC<InventoryExportDialogProps> = ({
   items,
   isOpen,
   setIsOpen,
 }) => {
-  const [exportFormat, setExportFormat] = useState("csv");
+  const [exportFormat, setExportFormat] = useState("xlsx"); // Mude o padrão para XLSX
   const { toast } = useToast();
 
-  const exportToCSV = (data: any[]) => {
+  // ... funções existentes ...
+
+  // Adicione esta nova função
+  const exportToXLSX = (data: any[]) => {
     const headers = [
       "Nome",
-      "Categoria", 
-      "Quantidade",
+      "Categoria",
       "Unidade",
       "Localização",
       "Tamanho",
       "Validade",
       "Último Uso",
       "Status",
+      "Quantidade",
       "Estoque Mínimo",
       "Estoque Máximo",
       "Reservadas"
     ];
 
-    const csvContent = [
-      headers.join(","),
+    const worksheetData = [
+      headers,
       ...data.map(item => [
-        `"${item.name}"`,
-        `"${item.category}"`,
+        item.name,
+        item.category,
+        item.unit,
+        item.location,
+        item.size || '',
+        item.expiryDate || '',
+        item.lastUsed,
+        item.status,
         item.stock,
-        `"${item.unit}"`,
-        `"${item.location}"`,
-        `"${item.size || ''}"`,
-        `"${item.expiryDate || ''}"`,
-        `"${item.lastUsed}"`,
-        `"${item.status}"`,
         item.minStock || 0,
         item.maxStock || 0,
         item.reservedForAppointments || 0
-      ].join(","))
-    ].join("\n");
+      ])
+    ];
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Inventário");
+
+    // Gerar arquivo binário
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { 
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+    });
+
+    // Criar link de download
     const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `inventario_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = "hidden";
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `inventario_${new Date().toISOString().split('T')[0]}.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
-
-  const exportToJSON = (data: any[]) => {
-    const jsonContent = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonContent], { type: "application/json" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `inventario_${new Date().toISOString().split('T')[0]}.json`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleExport = () => {
@@ -102,10 +99,16 @@ const InventoryExportDialog: React.FC<InventoryExportDialogProps> = ({
       return;
     }
 
-    if (exportFormat === "csv") {
-      exportToCSV(items);
-    } else if (exportFormat === "json") {
-      exportToJSON(items);
+    switch (exportFormat) {
+      case "csv":
+        exportToCSV(items);
+        break;
+      case "json":
+        exportToJSON(items);
+        break;
+      case "xlsx": // Novo caso
+        exportToXLSX(items);
+        break;
     }
 
     toast({
@@ -115,7 +118,6 @@ const InventoryExportDialog: React.FC<InventoryExportDialogProps> = ({
 
     setIsOpen(false);
   };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -140,6 +142,7 @@ const InventoryExportDialog: React.FC<InventoryExportDialogProps> = ({
                 <SelectValue placeholder="Selecione o formato" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="xlsx">XLSX (Excel)</SelectItem> 
                 <SelectItem value="csv">CSV (Excel compatível)</SelectItem>
                 <SelectItem value="json">JSON (Dados estruturados)</SelectItem>
               </SelectContent>
@@ -147,7 +150,8 @@ const InventoryExportDialog: React.FC<InventoryExportDialogProps> = ({
           </div>
 
           <div className="text-sm text-gray-500 space-y-1">
-            <p><strong>CSV:</strong> Ideal para análise em Excel ou Google Sheets</p>
+            <p><strong>XLSX:</strong> Formato nativo do Excel (recomendado)</p> 
+            <p><strong>CSV:</strong> Ideal para análise no Google Sheets</p>
             <p><strong>JSON:</strong> Formato estruturado para sistemas de terceiros</p>
           </div>
         </div>

@@ -28,7 +28,7 @@ const QuickActionsCard: React.FC = () => {
       title: "Agendamentos Hoje",
       description: "8 sessões programadas",
       icon: Calendar,
-      link: "/appointments",
+      link: "/orders",
       urgency: "medium"
     },
     {
@@ -39,15 +39,6 @@ const QuickActionsCard: React.FC = () => {
       urgency: "low"
     }
   ];
-
-  const getUrgencyIndicator = (urgency: string) => {
-    switch (urgency) {
-      case "high": return "border-l-4 border-red-500";
-      case "medium": return "border-l-4 border-yellow-500";
-      case "low": return "border-l-4 border-indigo-500";
-      default: return "";
-    }
-  };
 
   return (
     <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800">
@@ -73,7 +64,7 @@ const QuickActionsCard: React.FC = () => {
             <Link
               key={index}
               to={action.link}
-              className={`block p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl hover:bg-gray-300/80 dark:hover:bg-gray-800 transition-colors border border-gray-200 dark:border-neutral-900 ${getUrgencyIndicator(action.urgency)}`}
+              className={`block p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl hover:bg-gray-300/80 dark:hover:bg-gray-800 transition-colors border-l border-gray-200 dark:border-neutral-900`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

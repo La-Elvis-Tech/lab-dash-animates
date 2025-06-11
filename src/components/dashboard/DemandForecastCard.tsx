@@ -43,7 +43,7 @@ const DemandForecastCard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
+            <div className="flex items-center justify-between p-3 my-2 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
               <div>
                 <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                   {forecastData.nextMonth}
@@ -64,13 +64,13 @@ const DemandForecastCard: React.FC = () => {
               </div>
             </div>
             
-            <div className="text-sm text-gray-600 dark:text-gray-400 px-3">
+            <div className="text-sm text-gray-600 dark:text-gray-400 px-3 py-2">
               Intervalo: {forecastData.confidence.min} - {forecastData.confidence.max} itens
             </div>
 
             <Dialog open={isSimulationOpen} onOpenChange={setIsSimulationOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full text-indigo-700 border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20">
+                <Button variant="outline" size="sm" className="w-full text-indigo-700 dark:text-indigo-50 bg-indigo-100 dark:bg-neutral-800 border-transparent hover:bg-indigo-50 dark:hover:bg-neutral-700/40 rounded-xl">
                   Simular Cenário
                 </Button>
               </DialogTrigger>

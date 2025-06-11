@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { ChevronRight } from "lucide-react";
-import { CalendarCheck, Stethoscope, Pill } from "lucide-react";
+import { CalendarCheck, Stethoscope, Pill, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { recentActivity } from "@/data/recentActivity";
 
@@ -40,17 +40,18 @@ const RecentActivities: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 rounded-lg shadow-lg p-8">
+      <div className="flex items-center mb-6">
+        <Clock 
+          size={18}
+          className="text-indigo-600 dark:text-indigo-400"
+        />
+        <h2 className="ml-2 text-lg font-bold text-gray-800 dark:text-gray-100">
           Recentes
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">
-          Atividades recentes
-        </p>
       </div>
 
-      <div className="md:max-h-[800px] xl:max-h-[510px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+      <div className="md:max-h-[600px] xl:max-h-[660px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
         <div className="space-y-3">
           {activities.map((activity, index) => (
             <div

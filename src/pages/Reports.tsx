@@ -163,22 +163,22 @@ const Reports = () => {
         </p>
       </div>
 
-      <AdvancedFilters onFiltersChange={handleFiltersChange} />
+      
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="overflow-x-auto mx-1 xl:-mx-3 px-1 sm:px-2">
           <TabsList className="mb-4 sm:mb-6 w-full sm:w-auto bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
             <TabsTrigger value="overview" className="text-xs sm:text-sm">
-              Visão Geral
+              Geral
             </TabsTrigger>
             <TabsTrigger value="performance" className="text-xs sm:text-sm">
               Performance
             </TabsTrigger>
             <TabsTrigger value="cost-analysis" className="text-xs sm:text-sm">
-              Análise de Custos
+              Análises
             </TabsTrigger>
             <TabsTrigger value="export" className="text-xs sm:text-sm">
-              Exportação
+              Exportar
             </TabsTrigger>
           </TabsList>
         </div>
