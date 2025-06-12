@@ -286,28 +286,28 @@ const Simulations = () => {
   return (
     <div ref={containerRef} className="space-y-6 simulation-container">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
           Simulações de Estoque
         </h1>
-        <p className="text-gray-600 dark:text-gray-300 mt-1">
+        <p className="text-neutral-600 dark:text-neutral-400 mt-1">
           Modele cenários e otimize políticas de reabastecimento
         </p>
       </div>
 
       <Tabs defaultValue="parameters" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-gray-800">
-          <TabsTrigger value="parameters" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">Parâmetros</TabsTrigger>
-          <TabsTrigger value="results" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">Resultados</TabsTrigger>
-          <TabsTrigger value="scenarios" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">Cenários Salvos</TabsTrigger>
-          <TabsTrigger value="comparison" className="data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700">Comparação</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 bg-neutral-100 dark:bg-neutral-800">
+          <TabsTrigger value="parameters" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Parâmetros</TabsTrigger>
+          <TabsTrigger value="results" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Resultados</TabsTrigger>
+          <TabsTrigger value="scenarios" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Cenários Salvos</TabsTrigger>
+          <TabsTrigger value="comparison" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Comparação</TabsTrigger>
         </TabsList>
 
         <TabsContent value="parameters" className="space-y-6">
           {/* Templates */}
-          <Card className="border-gray-200 dark:border-gray-700">
-            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-              <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                <Settings2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+                <Settings2 className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
                 Templates de Cenário
               </CardTitle>
             </CardHeader>
@@ -316,7 +316,7 @@ const Simulations = () => {
                 setSelectedTemplate(value);
                 applyTemplate(value);
               }}>
-                <SelectTrigger className="border-gray-300 dark:border-gray-600">
+                <SelectTrigger className="border-neutral-300 dark:border-neutral-600">
                   <SelectValue placeholder="Selecione um template" />
                 </SelectTrigger>
                 <SelectContent>
@@ -332,16 +332,16 @@ const Simulations = () => {
           {/* Parâmetros de Entrada */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Demanda */}
-            <Card className="border-gray-200 dark:border-gray-700">
-              <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20">
-                <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                  <TrendingUp className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+                  <TrendingUp className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
                   Variação de Demanda
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6 pt-6">
                 <div>
-                  <Label className="text-gray-700 dark:text-gray-300">Nome do Cenário</Label>
+                  <Label className="text-neutral-700 dark:text-neutral-300">Nome do Cenário</Label>
                   <Input
                     value={currentScenario.name}
                     onChange={(e) => setCurrentScenario(prev => ({
@@ -349,12 +349,12 @@ const Simulations = () => {
                       name: e.target.value
                     }))}
                     placeholder="Ex: Cenário COVID-19"
-                    className="mt-2 border-gray-300 dark:border-gray-600"
+                    className="mt-2 border-neutral-300 dark:border-neutral-600"
                   />
                 </div>
                 
                 <div>
-                  <Label className="text-gray-700 dark:text-gray-300">Mudança na Demanda (%)</Label>
+                  <Label className="text-neutral-700 dark:text-neutral-300">Mudança na Demanda (%)</Label>
                   <div className="px-3 mt-3">
                     <Slider
                       value={[currentScenario.demandChange]}
@@ -368,7 +368,7 @@ const Simulations = () => {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
                     <span>-30%</span>
                     <Badge variant={currentScenario.demandChange > 0 ? "default" : currentScenario.demandChange < 0 ? "destructive" : "secondary"}>
                       {currentScenario.demandChange > 0 ? '+' : ''}{currentScenario.demandChange}%
@@ -378,7 +378,7 @@ const Simulations = () => {
                 </div>
 
                 <div>
-                  <Label className="text-gray-700 dark:text-gray-300">Fator de Sazonalidade</Label>
+                  <Label className="text-neutral-700 dark:text-neutral-300">Fator de Sazonalidade</Label>
                   <div className="px-3 mt-3">
                     <Slider
                       value={[currentScenario.seasonalityFactor]}
@@ -392,7 +392,7 @@ const Simulations = () => {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
                     <span>0.5x</span>
                     <Badge variant="outline">{currentScenario.seasonalityFactor}x</Badge>
                     <span>2.0x</span>
@@ -402,16 +402,16 @@ const Simulations = () => {
             </Card>
 
             {/* Lead Time e Fornecedores */}
-            <Card className="border-gray-200 dark:border-gray-700">
-              <CardHeader className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
-                <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                  <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+                  <Calendar className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
                   Lead Time & Fornecedores
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6 pt-6">
                 <div>
-                  <Label className="text-gray-700 dark:text-gray-300">Variabilidade do Lead Time (%)</Label>
+                  <Label className="text-neutral-700 dark:text-neutral-300">Variabilidade do Lead Time (%)</Label>
                   <div className="px-3 mt-3">
                     <Slider
                       value={[currentScenario.leadTimeVariability]}
@@ -425,7 +425,7 @@ const Simulations = () => {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
                     <span>5%</span>
                     <Badge variant={currentScenario.leadTimeVariability > 35 ? "destructive" : "default"}>
                       {currentScenario.leadTimeVariability}%
@@ -435,7 +435,7 @@ const Simulations = () => {
                 </div>
 
                 <div>
-                  <Label className="text-gray-700 dark:text-gray-300">Safety Stock (dias)</Label>
+                  <Label className="text-neutral-700 dark:text-neutral-300">Safety Stock (dias)</Label>
                   <div className="px-3 mt-3">
                     <Slider
                       value={[currentScenario.safetyStock]}
@@ -449,7 +449,7 @@ const Simulations = () => {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
                     <span>3 dias</span>
                     <Badge variant="outline">{currentScenario.safetyStock} dias</Badge>
                     <span>21 dias</span>
@@ -457,7 +457,7 @@ const Simulations = () => {
                 </div>
 
                 <div>
-                  <Label className="text-gray-700 dark:text-gray-300">Tolerância a Risco (%)</Label>
+                  <Label className="text-neutral-700 dark:text-neutral-300">Tolerância a Risco (%)</Label>
                   <div className="px-3 mt-3">
                     <Slider
                       value={[currentScenario.riskTolerance]}
@@ -471,7 +471,7 @@ const Simulations = () => {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
                     <span>1%</span>
                     <Badge variant={currentScenario.riskTolerance > 8 ? "destructive" : "default"}>
                       {currentScenario.riskTolerance}%
@@ -483,16 +483,16 @@ const Simulations = () => {
             </Card>
 
             {/* Orçamento e SLA */}
-            <Card className="border-gray-200 dark:border-gray-700">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
-                <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                  <DollarSign className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+                  <DollarSign className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
                   Orçamento & SLA
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6 pt-6">
                 <div>
-                  <Label className="text-gray-700 dark:text-gray-300">Orçamento Mensal (R$)</Label>
+                  <Label className="text-neutral-700 dark:text-neutral-300">Orçamento Mensal (R$)</Label>
                   <Input
                     type="number"
                     value={currentScenario.budgetLimit}
@@ -501,12 +501,12 @@ const Simulations = () => {
                       budgetLimit: parseFloat(e.target.value) || 0
                     }))}
                     placeholder="50000"
-                    className="mt-2 border-gray-300 dark:border-gray-600"
+                    className="mt-2 border-neutral-300 dark:border-neutral-600"
                   />
                 </div>
 
                 <div>
-                  <Label className="text-gray-700 dark:text-gray-300">Nível de Serviço Target (%)</Label>
+                  <Label className="text-neutral-700 dark:text-neutral-300">Nível de Serviço Target (%)</Label>
                   <div className="px-3 mt-3">
                     <Slider
                       value={[currentScenario.serviceLevel]}
@@ -520,7 +520,7 @@ const Simulations = () => {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
                     <span>85%</span>
                     <Badge variant={currentScenario.serviceLevel >= 95 ? "default" : "secondary"}>
                       {currentScenario.serviceLevel}%
@@ -532,10 +532,10 @@ const Simulations = () => {
             </Card>
 
             {/* Ações */}
-            <Card className="border-gray-200 dark:border-gray-700">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20">
-                <CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                  <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+                  <Zap className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
                   Executar Simulação
                 </CardTitle>
               </CardHeader>
@@ -543,7 +543,7 @@ const Simulations = () => {
                 <Button
                   onClick={runSimulation}
                   disabled={isRunning}
-                  className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
+                  className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900"
                   size="lg"
                 >
                   {isRunning ? (
@@ -561,7 +561,7 @@ const Simulations = () => {
 
                 {isRunning && (
                   <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400">
                       <span>Processando Monte Carlo...</span>
                       <span>65%</span>
                     </div>
@@ -570,11 +570,11 @@ const Simulations = () => {
                 )}
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={saveScenario} className="flex-1 border-gray-300 dark:border-gray-600">
+                  <Button variant="outline" onClick={saveScenario} className="flex-1 border-neutral-300 dark:border-neutral-600">
                     <Save className="mr-2 h-4 w-4" />
                     Salvar
                   </Button>
-                  <Button variant="outline" onClick={exportResults} className="flex-1 border-gray-300 dark:border-gray-600">
+                  <Button variant="outline" onClick={exportResults} className="flex-1 border-neutral-300 dark:border-neutral-600">
                     <Download className="mr-2 h-4 w-4" />
                     Exportar
                   </Button>
@@ -586,13 +586,13 @@ const Simulations = () => {
 
         <TabsContent value="results" className="space-y-6">
           {results.length === 0 ? (
-            <Card className="border-gray-200 dark:border-gray-700">
+            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
               <CardContent className="text-center py-16">
-                <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                <BarChart3 className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
+                <p className="text-neutral-500 dark:text-neutral-400 text-lg">
                   Nenhuma simulação executada ainda
                 </p>
-                <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+                <p className="text-neutral-400 dark:text-neutral-500 text-sm mt-2">
                   Execute uma simulação na aba Parâmetros para ver os resultados.
                 </p>
               </CardContent>
@@ -600,14 +600,14 @@ const Simulations = () => {
           ) : (
             <div className="space-y-6">
               {results.map((result, index) => (
-                <Card key={result.id} className="border-gray-200 dark:border-gray-700 shadow-sm">
-                  <CardHeader className="bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-800/50 dark:to-slate-800/50">
+                <Card key={result.id} className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+                  <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-gray-800 dark:text-gray-200">
+                        <CardTitle className="text-neutral-900 dark:text-neutral-100">
                           Resultado da Simulação #{results.length - index}
                         </CardTitle>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">
                           Executado em {result.runAt.toLocaleString()}
                         </p>
                       </div>
@@ -621,41 +621,41 @@ const Simulations = () => {
                   </CardHeader>
                   <CardContent className="pt-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                      <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                        <div className="text-3xl font-bold text-red-600 dark:text-red-400">
+                      <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                        <div className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
                           {result.stockoutProbability}%
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Prob. Ruptura</div>
+                        <div className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Prob. Ruptura</div>
                       </div>
-                      <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                      <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                        <div className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
                           {result.averageStockLevel}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Estoque Médio</div>
+                        <div className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Estoque Médio</div>
                       </div>
-                      <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                        <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                      <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                        <div className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
                           R$ {result.totalCost.toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Custo Total</div>
+                        <div className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Custo Total</div>
                       </div>
-                      <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                        <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                      <div className="text-center p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                        <div className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
                           {result.serviceLevel.toFixed(1)}%
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Nível Serviço</div>
+                        <div className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">Nível Serviço</div>
                       </div>
                     </div>
 
                     {result.recommendations.length > 0 && (
-                      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <h4 className="font-semibold mb-3 flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                          <Target className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                      <div className="mb-6 p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                        <h4 className="font-semibold mb-3 flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+                          <Target className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                           Recomendações
                         </h4>
                         <ul className="space-y-2">
                           {result.recommendations.map((rec, i) => (
-                            <li key={i} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                            <li key={i} className="text-sm text-neutral-700 dark:text-neutral-300 flex items-start gap-2">
                               <span className="text-green-500 mt-1">•</span>
                               {rec}
                             </li>
@@ -665,14 +665,14 @@ const Simulations = () => {
                     )}
 
                     {result.risks.length > 0 && (
-                      <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                        <h4 className="font-semibold mb-3 flex items-center gap-2 text-gray-800 dark:text-gray-200">
-                          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                      <div className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                        <h4 className="font-semibold mb-3 flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
+                          <AlertTriangle className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
                           Riscos Identificados
                         </h4>
                         <ul className="space-y-2">
                           {result.risks.map((risk, i) => (
-                            <li key={i} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                            <li key={i} className="text-sm text-neutral-700 dark:text-neutral-300 flex items-start gap-2">
                               <span className="text-red-500 mt-1">•</span>
                               {risk}
                             </li>
@@ -689,13 +689,13 @@ const Simulations = () => {
 
         <TabsContent value="scenarios" className="space-y-6">
           {scenarios.length === 0 ? (
-            <Card className="border-gray-200 dark:border-gray-700">
+            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
               <CardContent className="text-center py-16">
-                <Save className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                <Save className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
+                <p className="text-neutral-500 dark:text-neutral-400 text-lg">
                   Nenhum cenário salvo ainda
                 </p>
-                <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+                <p className="text-neutral-400 dark:text-neutral-500 text-sm mt-2">
                   Salve cenários na aba Parâmetros para acessá-los aqui.
                 </p>
               </CardContent>
@@ -705,15 +705,15 @@ const Simulations = () => {
               {scenarios.map((scenario) => (
                 <Card 
                   key={scenario.id} 
-                  className={`cursor-pointer hover:shadow-lg transition-all duration-200 border-gray-200 dark:border-gray-700 
-                    ${selectedScenariosForComparison.includes(scenario.id) ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''}`}
+                  className={`cursor-pointer hover:shadow-lg transition-all duration-200 bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800
+                    ${selectedScenariosForComparison.includes(scenario.id) ? 'ring-2 ring-neutral-400 dark:ring-neutral-600' : ''}`}
                   onClick={() => setCurrentScenario(scenario)}
                 >
-                  <CardHeader className="bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-800/50 dark:to-slate-800/50">
+                  <CardHeader>
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <CardTitle className="text-lg text-gray-800 dark:text-gray-200">{scenario.name}</CardTitle>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <CardTitle className="text-lg text-neutral-900 dark:text-neutral-100">{scenario.name}</CardTitle>
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">
                           Criado em {scenario.createdAt.toLocaleDateString()}
                         </p>
                       </div>
@@ -726,7 +726,7 @@ const Simulations = () => {
                         }}
                         className={`ml-2 ${
                           selectedScenariosForComparison.includes(scenario.id) 
-                            ? 'bg-blue-100 border-blue-300 text-blue-700 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-400' 
+                            ? 'bg-neutral-100 border-neutral-300 text-neutral-700 dark:bg-neutral-800 dark:border-neutral-600 dark:text-neutral-300' 
                             : ''
                         }`}
                       >
@@ -737,34 +737,34 @@ const Simulations = () => {
                   <CardContent className="pt-4">
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 dark:text-gray-400">Demanda:</span>
+                        <span className="text-neutral-600 dark:text-neutral-400">Demanda:</span>
                         <div className="flex items-center gap-1">
                           {scenario.demandChange > 0 ? (
                             <ArrowUpCircle className="h-4 w-4 text-green-500" />
                           ) : scenario.demandChange < 0 ? (
                             <ArrowDownCircle className="h-4 w-4 text-red-500" />
                           ) : (
-                            <Minus className="h-4 w-4 text-gray-500" />
+                            <Minus className="h-4 w-4 text-neutral-500" />
                           )}
                           <span className={scenario.demandChange > 0 ? "text-green-600 dark:text-green-400" : 
                                          scenario.demandChange < 0 ? "text-red-600 dark:text-red-400" : 
-                                         "text-gray-600 dark:text-gray-400"}>
+                                         "text-neutral-600 dark:text-neutral-400"}>
                             {scenario.demandChange > 0 ? '+' : ''}{scenario.demandChange}%
                           </span>
                         </div>
                       </div>
                       <Separator />
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Safety Stock:</span>
-                        <span className="text-gray-800 dark:text-gray-200">{scenario.safetyStock} dias</span>
+                        <span className="text-neutral-600 dark:text-neutral-400">Safety Stock:</span>
+                        <span className="text-neutral-900 dark:text-neutral-100">{scenario.safetyStock} dias</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">SLA Target:</span>
-                        <span className="text-gray-800 dark:text-gray-200">{scenario.serviceLevel}%</span>
+                        <span className="text-neutral-600 dark:text-neutral-400">SLA Target:</span>
+                        <span className="text-neutral-900 dark:text-neutral-100">{scenario.serviceLevel}%</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 dark:text-gray-400">Orçamento:</span>
-                        <span className="text-gray-800 dark:text-gray-200">R$ {scenario.budgetLimit.toLocaleString()}</span>
+                        <span className="text-neutral-600 dark:text-neutral-400">Orçamento:</span>
+                        <span className="text-neutral-900 dark:text-neutral-100">R$ {scenario.budgetLimit.toLocaleString()}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -776,13 +776,13 @@ const Simulations = () => {
 
         <TabsContent value="comparison" className="space-y-6">
           {selectedScenariosForComparison.length === 0 ? (
-            <Card className="border-gray-200 dark:border-gray-700">
+            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
               <CardContent className="text-center py-16">
-                <GitCompare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                <GitCompare className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
+                <p className="text-neutral-500 dark:text-neutral-400 text-lg">
                   Selecione cenários para comparar
                 </p>
-                <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+                <p className="text-neutral-400 dark:text-neutral-500 text-sm mt-2">
                   Vá para "Cenários Salvos" e clique no ícone de comparação para adicionar cenários.
                 </p>
               </CardContent>
@@ -790,30 +790,30 @@ const Simulations = () => {
           ) : (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
                   Comparando {selectedScenariosForComparison.length} cenário(s)
                 </h3>
                 <Button 
                   variant="outline" 
                   onClick={clearComparison}
-                  className="border-gray-300 dark:border-gray-600"
+                  className="border-neutral-300 dark:border-neutral-600"
                 >
                   Limpar Seleção
                 </Button>
               </div>
 
               {/* Tabela de Comparação */}
-              <Card className="border-gray-200 dark:border-gray-700">
-                <CardHeader className="bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-800/50 dark:to-slate-800/50">
-                  <CardTitle className="text-gray-800 dark:text-gray-200">Comparação de Parâmetros</CardTitle>
+              <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+                <CardHeader>
+                  <CardTitle className="text-neutral-900 dark:text-neutral-100">Comparação de Parâmetros</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="text-gray-700 dark:text-gray-300">Parâmetro</TableHead>
+                        <TableHead className="text-neutral-700 dark:text-neutral-300">Parâmetro</TableHead>
                         {getSelectedScenariosData().map(({ scenario }) => (
-                          <TableHead key={scenario?.id} className="text-center text-gray-700 dark:text-gray-300">
+                          <TableHead key={scenario?.id} className="text-center text-neutral-700 dark:text-neutral-300">
                             {scenario?.name}
                           </TableHead>
                         ))}
@@ -821,7 +821,7 @@ const Simulations = () => {
                     </TableHeader>
                     <TableBody>
                       <TableRow>
-                        <TableCell className="font-medium text-gray-700 dark:text-gray-300">Mudança na Demanda</TableCell>
+                        <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Mudança na Demanda</TableCell>
                         {getSelectedScenariosData().map(({ scenario }) => (
                           <TableCell key={scenario?.id} className="text-center">
                             <Badge variant={
@@ -834,39 +834,39 @@ const Simulations = () => {
                         ))}
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium text-gray-700 dark:text-gray-300">Variabilidade Lead Time</TableCell>
+                        <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Variabilidade Lead Time</TableCell>
                         {getSelectedScenariosData().map(({ scenario }) => (
-                          <TableCell key={scenario?.id} className="text-center text-gray-800 dark:text-gray-200">
+                          <TableCell key={scenario?.id} className="text-center text-neutral-900 dark:text-neutral-100">
                             {scenario?.leadTimeVariability}%
                           </TableCell>
                         ))}
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium text-gray-700 dark:text-gray-300">Safety Stock</TableCell>
+                        <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Safety Stock</TableCell>
                         {getSelectedScenariosData().map(({ scenario }) => (
-                          <TableCell key={scenario?.id} className="text-center text-gray-800 dark:text-gray-200">
+                          <TableCell key={scenario?.id} className="text-center text-neutral-900 dark:text-neutral-100">
                             {scenario?.safetyStock} dias
                           </TableCell>
                         ))}
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium text-gray-700 dark:text-gray-300">Orçamento</TableCell>
+                        <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Orçamento</TableCell>
                         {getSelectedScenariosData().map(({ scenario }) => (
-                          <TableCell key={scenario?.id} className="text-center text-gray-800 dark:text-gray-200">
+                          <TableCell key={scenario?.id} className="text-center text-neutral-900 dark:text-neutral-100">
                             R$ {scenario?.budgetLimit?.toLocaleString()}
                           </TableCell>
                         ))}
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium text-gray-700 dark:text-gray-300">Nível de Serviço</TableCell>
+                        <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Nível de Serviço</TableCell>
                         {getSelectedScenariosData().map(({ scenario }) => (
-                          <TableCell key={scenario?.id} className="text-center text-gray-800 dark:text-gray-200">
+                          <TableCell key={scenario?.id} className="text-center text-neutral-900 dark:text-neutral-100">
                             {scenario?.serviceLevel}%
                           </TableCell>
                         ))}
                       </TableRow>
                       <TableRow>
-                        <TableCell className="font-medium text-gray-700 dark:text-gray-300">Tolerância a Risco</TableCell>
+                        <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Tolerância a Risco</TableCell>
                         {getSelectedScenariosData().map(({ scenario }) => (
                           <TableCell key={scenario?.id} className="text-center">
                             <Badge variant={(scenario?.riskTolerance || 0) > 8 ? "destructive" : "default"}>
@@ -882,17 +882,17 @@ const Simulations = () => {
 
               {/* Resultados da Comparação */}
               {getSelectedScenariosData().some(({ result }) => result) && (
-                <Card className="border-gray-200 dark:border-gray-700">
-                  <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-                    <CardTitle className="text-gray-800 dark:text-gray-200">Resultados das Simulações</CardTitle>
+                <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+                  <CardHeader>
+                    <CardTitle className="text-neutral-900 dark:text-neutral-100">Resultados das Simulações</CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="text-gray-700 dark:text-gray-300">Métrica</TableHead>
+                          <TableHead className="text-neutral-700 dark:text-neutral-300">Métrica</TableHead>
                           {getSelectedScenariosData().map(({ scenario, result }) => (
-                            <TableHead key={scenario?.id} className="text-center text-gray-700 dark:text-gray-300">
+                            <TableHead key={scenario?.id} className="text-center text-neutral-700 dark:text-neutral-300">
                               {scenario?.name}
                             </TableHead>
                           ))}
@@ -900,7 +900,7 @@ const Simulations = () => {
                       </TableHeader>
                       <TableBody>
                         <TableRow>
-                          <TableCell className="font-medium text-gray-700 dark:text-gray-300">Prob. Ruptura</TableCell>
+                          <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Prob. Ruptura</TableCell>
                           {getSelectedScenariosData().map(({ scenario, result }) => (
                             <TableCell key={scenario?.id} className="text-center">
                               {result ? (
@@ -908,31 +908,31 @@ const Simulations = () => {
                                   {result.stockoutProbability}%
                                 </Badge>
                               ) : (
-                                <span className="text-gray-400 dark:text-gray-500">N/A</span>
+                                <span className="text-neutral-400 dark:text-neutral-500">N/A</span>
                               )}
                             </TableCell>
                           ))}
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-gray-700 dark:text-gray-300">Estoque Médio</TableCell>
+                          <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Estoque Médio</TableCell>
                           {getSelectedScenariosData().map(({ scenario, result }) => (
-                            <TableCell key={scenario?.id} className="text-center text-gray-800 dark:text-gray-200">
+                            <TableCell key={scenario?.id} className="text-center text-neutral-900 dark:text-neutral-100">
                               {result ? result.averageStockLevel : "N/A"}
                             </TableCell>
                           ))}
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-gray-700 dark:text-gray-300">Custo Total</TableCell>
+                          <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Custo Total</TableCell>
                           {getSelectedScenariosData().map(({ scenario, result }) => (
-                            <TableCell key={scenario?.id} className="text-center text-gray-800 dark:text-gray-200">
+                            <TableCell key={scenario?.id} className="text-center text-neutral-900 dark:text-neutral-100">
                               {result ? `R$ ${result.totalCost.toLocaleString()}` : "N/A"}
                             </TableCell>
                           ))}
                         </TableRow>
                         <TableRow>
-                          <TableCell className="font-medium text-gray-700 dark:text-gray-300">Nível de Serviço</TableCell>
+                          <TableCell className="font-medium text-neutral-700 dark:text-neutral-300">Nível de Serviço</TableCell>
                           {getSelectedScenariosData().map(({ scenario, result }) => (
-                            <TableCell key={scenario?.id} className="text-center text-gray-800 dark:text-gray-200">
+                            <TableCell key={scenario?.id} className="text-center text-neutral-900 dark:text-neutral-100">
                               {result ? `${result.serviceLevel.toFixed(1)}%` : "N/A"}
                             </TableCell>
                           ))}

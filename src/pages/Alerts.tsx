@@ -148,10 +148,10 @@ const Alerts = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "critical": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      case "high": return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-      case "medium": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
+      case "critical": return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200";
+      case "high": return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200";
+      case "medium": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200";
+      default: return "bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200";
     }
   };
 
@@ -188,26 +188,26 @@ const Alerts = () => {
   return (
     <div ref={pageRef} className="space-y-6">
       <div className="rounded-lg mb-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100">
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
           Alertas & Notificações
         </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-neutral-600 dark:text-neutral-400 mt-1">
           Gerencie alertas críticos e acompanhe o histórico de atividades
         </p>
       </div>
 
       {/* Filtros e Busca */}
-      <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800">
+      <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={16} />
                 <Input
                   placeholder="Buscar alertas, itens ou usuários..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 border-neutral-300 dark:border-neutral-600"
                 />
               </div>
             </div>
@@ -216,6 +216,7 @@ const Alerts = () => {
                 variant={filterPriority === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilterPriority("all")}
+                className="border-neutral-300 dark:border-neutral-600"
               >
                 Todos
               </Button>
@@ -223,7 +224,7 @@ const Alerts = () => {
                 variant={filterPriority === "critical" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilterPriority("critical")}
-                className="text-red-600"
+                className="text-red-600 border-neutral-300 dark:border-neutral-600"
               >
                 Crítico
               </Button>
@@ -231,7 +232,7 @@ const Alerts = () => {
                 variant={filterPriority === "high" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilterPriority("high")}
-                className="text-orange-600"
+                className="text-orange-600 border-neutral-300 dark:border-neutral-600"
               >
                 Alto
               </Button>
@@ -242,16 +243,16 @@ const Alerts = () => {
 
       {/* Tabs principais */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="alerts" className="flex items-center gap-2">
+        <TabsList className="mb-6 bg-neutral-100 dark:bg-neutral-800">
+          <TabsTrigger value="alerts" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">
             <Bell size={16} />
             Alertas Ativos
           </TabsTrigger>
-          <TabsTrigger value="resolved" className="flex items-center gap-2">
+          <TabsTrigger value="resolved" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">
             <CheckCircle size={16} />
             Histórico
           </TabsTrigger>
-          <TabsTrigger value="logs" className="flex items-center gap-2">
+          <TabsTrigger value="logs" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">
             <User size={16} />
             Log de Serviços
           </TabsTrigger>
@@ -261,16 +262,16 @@ const Alerts = () => {
         <TabsContent value="alerts" className="mt-0">
           <div className="space-y-4">
             {filteredAlerts.map((alert) => (
-              <Card key={alert.id} className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800">
+              <Card key={alert.id} className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3 flex-1">
-                      <div className="mt-1">
+                      <div className="mt-1 text-neutral-600 dark:text-neutral-400">
                         {getTypeIcon(alert.type)}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                          <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
                             {alert.title}
                           </h3>
                           <Badge className={getPriorityColor(alert.priority)}>
@@ -278,10 +279,10 @@ const Alerts = () => {
                              alert.priority === "high" ? "Alto" : "Médio"}
                           </Badge>
                         </div>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
+                        <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-2">
                           {alert.description}
                         </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400">
                           <span className="flex items-center gap-1">
                             <Calendar size={12} />
                             {format(alert.createdAt, "dd/MM/yyyy HH:mm")}
@@ -291,13 +292,27 @@ const Alerts = () => {
                       </div>
                     </div>
                     <div className="flex flex-col gap-2 ml-4">
-                      <Button size="sm" onClick={() => handleQuickAction(alert.id, "Repor")}>
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleQuickAction(alert.id, "Repor")}
+                        className="bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900"
+                      >
                         Repor
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleQuickAction(alert.id, "Reservar")}>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleQuickAction(alert.id, "Reservar")}
+                        className="border-neutral-300 dark:border-neutral-600"
+                      >
                         Reservar
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleQuickAction(alert.id, "Abrir Ticket")}>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => handleQuickAction(alert.id, "Abrir Ticket")}
+                        className="border-neutral-300 dark:border-neutral-600"
+                      >
                         <ShoppingCart size={14} />
                       </Button>
                     </div>
@@ -310,9 +325,9 @@ const Alerts = () => {
 
         {/* Histórico de Alertas Resolvidos */}
         <TabsContent value="resolved" className="mt-0">
-          <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800">
+          <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
             <CardHeader>
-              <CardTitle>Alertas Resolvidos</CardTitle>
+              <CardTitle className="text-neutral-900 dark:text-neutral-100">Alertas Resolvidos</CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[500px]">
@@ -321,13 +336,13 @@ const Alerts = () => {
                     <div key={alert.id} className="border-l-4 border-green-500 pl-4 py-3 bg-green-50 dark:bg-green-900/20 rounded-r-lg">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h4 className="font-medium text-gray-800 dark:text-gray-100">
+                          <h4 className="font-medium text-neutral-900 dark:text-neutral-100">
                             {alert.title}
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
                             {alert.action}
                           </p>
-                          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mt-2">
+                          <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400 mt-2">
                             <span className="flex items-center gap-1">
                               <User size={12} />
                               {alert.resolvedBy}
@@ -338,7 +353,7 @@ const Alerts = () => {
                             </span>
                           </div>
                         </div>
-                        <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200">
                           Resolvido
                         </Badge>
                       </div>
@@ -352,32 +367,32 @@ const Alerts = () => {
 
         {/* Log de Serviços */}
         <TabsContent value="logs" className="mt-0">
-          <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800">
+          <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
             <CardHeader>
-              <CardTitle>Log de Atividades do Sistema</CardTitle>
+              <CardTitle className="text-neutral-900 dark:text-neutral-100">Log de Atividades do Sistema</CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[500px]">
                 <div className="space-y-4">
                   {filteredLogs.map((log) => (
-                    <div key={log.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <div key={log.id} className="border border-neutral-200 dark:border-neutral-700 rounded-lg p-4 bg-neutral-50 dark:bg-neutral-800/50">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs border-neutral-300 dark:border-neutral-600">
                               {log.module}
                             </Badge>
-                            <span className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                            <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                               {log.action}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
                             <span className="font-medium">Item:</span> {log.item}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
                             {log.details}
                           </p>
-                          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                          <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400">
                             <span className="flex items-center gap-1">
                               <User size={12} />
                               {log.user}
