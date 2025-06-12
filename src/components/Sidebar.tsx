@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
@@ -10,7 +11,9 @@ import {
   Settings, 
   ChevronsLeft,
   ChevronsRight,
-  LogOut
+  LogOut,
+  AlertTriangle,
+  TrendingUp
 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -163,6 +166,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
     { id: 'inventory', name: 'Inventário', icon: Beaker, path: '/inventory' },
     { id: 'requests', name: 'Exames', icon: ClipboardList, path: '/requests' },
     { id: 'orders', name: 'Agendamentos', icon: Calendar, path: '/orders' },
+    { id: 'alerts', name: 'Alertas', icon: AlertTriangle, path: '/alerts' },
+    { id: 'simulations', name: 'Simulações', icon: TrendingUp, path: '/simulations' },
     { id: 'reports', name: 'Relatórios', icon: BarChart3, path: '/reports' },
     { id: 'settings', name: 'Configurações', icon: Settings, path: '/settings' }
   ];

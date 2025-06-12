@@ -12,6 +12,7 @@ import Orders from "./pages/Orders";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Alerts from "./pages/Alerts";
+import Simulations from "./pages/Simulations";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -38,8 +39,9 @@ const App = () => (
                   <Route path="/inventory" element={<Inventory />} />
                   <Route path="/requests" element={<Requests />} />
                   <Route path="/orders" element={<Orders />} />
-                  <Route path="/reports" element={<Reports />} />
                   <Route path="/alerts" element={<Alerts />} />
+                  <Route path="/simulations" element={<Simulations />} />
+                  <Route path="/reports" element={<Reports />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>

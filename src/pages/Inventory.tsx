@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,6 +45,9 @@ import {
   type InventoryCategory 
 } from "@/data/inventory";
 
+// Hooks
+import { useServiceLogs } from "@/hooks/useServiceLogs";
+
 const Inventory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -57,6 +59,7 @@ const Inventory = () => {
   const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
   const { toast } = useToast();
+  const { addLog } = useServiceLogs();
 
   // Load data on component mount
   useEffect(() => {
@@ -168,11 +171,23 @@ const Inventory = () => {
   const handleUpdateItem = async (itemId: number, updatedData: any) => {
     try {
       await updateInventoryItem(itemId, updatedData);
+      const item = items.find(i => i.id === itemId);
+      
       setItems(prevItems => 
         prevItems.map(item => 
           item.id === itemId ? { ...item, ...updatedData } : item
         )
       );
+      
+      // Log da ação
+      addLog({
+        type: "update",
+        action: "Atualização de item",
+        item: item?.name || `Item #${itemId}`,
+        details: `Estoque atualizado para ${updatedData.stock || 'N/A'} unidades`,
+        user: "Usuário Atual",
+        module: "inventory"
+      });
       
       toast({
         title: "Item atualizado",
@@ -191,6 +206,8 @@ const Inventory = () => {
   const handleReserveItem = async (itemId: number, quantity: number) => {
     try {
       await reserveInventoryItem(itemId, quantity);
+      const item = items.find(i => i.id === itemId);
+      
       setItems(prevItems => 
         prevItems.map(item => 
           item.id === itemId 
@@ -202,6 +219,16 @@ const Inventory = () => {
             : item
         )
       );
+      
+      // Log da ação
+      addLog({
+        type: "reserve",
+        action: "Reserva de item",
+        item: item?.name || `Item #${itemId}`,
+        details: `${quantity} unidades reservadas para agendamentos`,
+        user: "Usuário Atual",
+        module: "inventory"
+      });
       
       toast({
         title: "Item reservado",
@@ -219,6 +246,17 @@ const Inventory = () => {
 
   const handleRequestRestock = (itemId: number) => {
     const item = items.find(i => i.id === itemId);
+    
+    // Log da ação
+    addLog({
+      type: "request",
+      action: "Solicitação de reposição",
+      item: item?.name || `Item #${itemId}`,
+      details: "Solicitação enviada ao departamento de compras",
+      user: "Usuário Atual",
+      module: "inventory"
+    });
+    
     toast({
       title: "Solicitação enviada",
       description: `Solicitação de reposição para ${item?.name} foi enviada ao responsável.`,
@@ -308,7 +346,19 @@ const Inventory = () => {
                   setIsOpen={setIsAddDialogOpen}
                   categories={categories.filter(c => c.id !== "all" && c.id !== "expiring")}
                   onAddItem={(newItem) => {
-                    setItems(prev => [...prev, { ...newItem, id: Date.now() }]);
+                    const addedItem = { ...newItem, id: Date.now() };
+                    setItems(prev => [...prev, addedItem]);
+                    
+                    // Log da ação
+                    addLog({
+                      type: "create",
+                      action: "Novo item adicionado",
+                      item: newItem.name,
+                      details: `Item criado com estoque inicial de ${newItem.stock} unidades`,
+                      user: "Usuário Atual",
+                      module: "inventory"
+                    });
+                    
                     toast({
                       title: "Item adicionado",
                       description: `${newItem.name} foi adicionado ao inventário.`,
