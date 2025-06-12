@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,12 +11,14 @@ import Requests from "./pages/Requests";
 import Orders from "./pages/Orders";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Alerts from "./pages/Alerts";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Login } from "./pages/Login";
 import { ThemeProvider } from "./hooks/use-theme";
-import { PageLoaderLogin } from "./components/PageLoaderLogin";  // 
+import { PageLoaderLogin } from "./components/PageLoaderLogin";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -36,6 +39,7 @@ const App = () => (
                   <Route path="/requests" element={<Requests />} />
                   <Route path="/orders" element={<Orders />} />
                   <Route path="/reports" element={<Reports />} />
+                  <Route path="/alerts" element={<Alerts />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>

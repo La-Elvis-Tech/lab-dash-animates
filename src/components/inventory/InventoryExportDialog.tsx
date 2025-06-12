@@ -1,167 +1,141 @@
 
 import React, { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import * as XLSX from "xlsx"; // Adicione esta importação
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { FileText, Download } from "lucide-react";
 
-// ... restante do código ...
+interface InventoryExportDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
-const InventoryExportDialog: React.FC<InventoryExportDialogProps> = ({
-  items,
-  isOpen,
-  setIsOpen,
-}) => {
-  const [exportFormat, setExportFormat] = useState("xlsx"); // Mude o padrão para XLSX
-  const { toast } = useToast();
+const InventoryExportDialog: React.FC<InventoryExportDialogProps> = ({ open, onOpenChange }) => {
+  const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
+  const [selectedData, setSelectedData] = useState<string[]>([]);
 
-  // ... funções existentes ...
+  const exportFormats = [
+    { id: "csv", label: "CSV", description: "Arquivo separado por vírgulas" },
+    { id: "excel", label: "Excel", description: "Planilha Excel (.xlsx)" },
+    { id: "pdf", label: "PDF", description: "Documento PDF" },
+    { id: "json", label: "JSON", description: "Dados estruturados" }
+  ];
 
-  // Adicione esta nova função
-  const exportToXLSX = (data: any[]) => {
-    const headers = [
-      "Nome",
-      "Categoria",
-      "Unidade",
-      "Localização",
-      "Tamanho",
-      "Validade",
-      "Último Uso",
-      "Status",
-      "Quantidade",
-      "Estoque Mínimo",
-      "Estoque Máximo",
-      "Reservadas"
-    ];
+  const dataTypes = [
+    { id: "inventory", label: "Inventário Completo", description: "Todos os itens do estoque" },
+    { id: "low-stock", label: "Baixo Estoque", description: "Itens com estoque crítico" },
+    { id: "expiring", label: "Próximo ao Vencimento", description: "Itens com vencimento em 30 dias" },
+    { id: "movements", label: "Movimentações", description: "Histórico de entradas e saídas" }
+  ];
 
-    const worksheetData = [
-      headers,
-      ...data.map(item => [
-        item.name,
-        item.category,
-        item.unit,
-        item.location,
-        item.size || '',
-        item.expiryDate || '',
-        item.lastUsed,
-        item.status,
-        item.stock,
-        item.minStock || 0,
-        item.maxStock || 0,
-        item.reservedForAppointments || 0
-      ])
-    ];
+  const exportToCSV = (data: any[]) => {
+    console.log("Exporting to CSV:", data);
+    // Implementation would go here
+  };
 
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Inventário");
+  const exportToJSON = (data: any[]) => {
+    console.log("Exporting to JSON:", data);
+    // Implementation would go here
+  };
 
-    // Gerar arquivo binário
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { 
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
-    });
+  const handleFormatChange = (formatId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedFormats([...selectedFormats, formatId]);
+    } else {
+      setSelectedFormats(selectedFormats.filter(id => id !== formatId));
+    }
+  };
 
-    // Criar link de download
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `inventario_${new Date().toISOString().split('T')[0]}.xlsx`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  const handleDataChange = (dataId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedData([...selectedData, dataId]);
+    } else {
+      setSelectedData(selectedData.filter(id => id !== dataId));
+    }
   };
 
   const handleExport = () => {
-    if (items.length === 0) {
-      toast({
-        title: "Nenhum item para exportar",
-        description: "Não há itens disponíveis com os filtros aplicados.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    switch (exportFormat) {
-      case "csv":
-        exportToCSV(items);
-        break;
-      case "json":
-        exportToJSON(items);
-        break;
-      case "xlsx": // Novo caso
-        exportToXLSX(items);
-        break;
-    }
-
-    toast({
-      title: "Exportação concluída",
-      description: `${items.length} itens exportados em formato ${exportFormat.toUpperCase()}.`,
-    });
-
-    setIsOpen(false);
+    console.log("Exporting:", { formats: selectedFormats, data: selectedData });
+    // Implementation would handle the actual export
+    onOpenChange(false);
   };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
-          <Download size={18} />
-          <span className="hidden sm:inline">Exportar</span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-md">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Exportar Inventário</DialogTitle>
-          <DialogDescription>
-            Exporte os dados do inventário atual ({items.length} itens) para análise externa.
-          </DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <Download size={20} />
+            Exportar Dados do Inventário
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Formato de exportação</label>
-            <Select value={exportFormat} onValueChange={setExportFormat}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o formato" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="xlsx">XLSX (Excel)</SelectItem> 
-                <SelectItem value="csv">CSV (Excel compatível)</SelectItem>
-                <SelectItem value="json">JSON (Dados estruturados)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-6">
+          {/* Format Selection */}
+          <Card>
+            <CardContent className="p-4">
+              <h3 className="font-semibold mb-3">Formatos de Exportação</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {exportFormats.map((format) => (
+                  <div key={format.id} className="flex items-start space-x-2">
+                    <Checkbox
+                      id={format.id}
+                      checked={selectedFormats.includes(format.id)}
+                      onCheckedChange={(checked) => handleFormatChange(format.id, !!checked)}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor={format.id} className="font-medium">
+                        {format.label}
+                      </Label>
+                      <p className="text-xs text-gray-500">{format.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="text-sm text-gray-500 space-y-1">
-            <p><strong>XLSX:</strong> Formato nativo do Excel (recomendado)</p> 
-            <p><strong>CSV:</strong> Ideal para análise no Google Sheets</p>
-            <p><strong>JSON:</strong> Formato estruturado para sistemas de terceiros</p>
+          {/* Data Selection */}
+          <Card>
+            <CardContent className="p-4">
+              <h3 className="font-semibold mb-3">Tipos de Dados</h3>
+              <div className="space-y-3">
+                {dataTypes.map((dataType) => (
+                  <div key={dataType.id} className="flex items-start space-x-2">
+                    <Checkbox
+                      id={dataType.id}
+                      checked={selectedData.includes(dataType.id)}
+                      onCheckedChange={(checked) => handleDataChange(dataType.id, !!checked)}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor={dataType.id} className="font-medium">
+                        {dataType.label}
+                      </Label>
+                      <p className="text-xs text-gray-500">{dataType.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Export Button */}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleExport}
+              disabled={selectedFormats.length === 0 || selectedData.length === 0}
+              className="gap-2"
+            >
+              <FileText size={16} />
+              Exportar
+            </Button>
           </div>
         </div>
-
-        <DialogFooter>
-          <Button onClick={handleExport} className="w-full">
-            <Download size={16} className="mr-2" />
-            Exportar {items.length} itens
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
