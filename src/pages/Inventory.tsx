@@ -294,11 +294,14 @@ const Inventory = () => {
               </div>
 
               <div className="flex gap-2">
-                <InventoryExportDialog 
-                  items={filteredItems}
-                  isOpen={isExportDialogOpen}
-                  setIsOpen={setIsExportDialogOpen}
-                />
+                <Button
+                  variant="outline"
+                  onClick={() => setIsExportDialogOpen(true)}
+                  className="gap-2"
+                >
+                  <Download size={16} />
+                  Exportar
+                </Button>
                 
                 <InventoryAddItemDialog 
                   isOpen={isAddDialogOpen}
@@ -338,6 +341,11 @@ const Inventory = () => {
           </p>
         </div>
       )}
+
+      <InventoryExportDialog 
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+      />
     </div>
   );
 };
