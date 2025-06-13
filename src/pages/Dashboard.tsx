@@ -102,7 +102,7 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         {/* Coluna da esquerda - Unidades e métricas principais */}
         <div className="xl:col-span-4 space-y-6">
-          <div className="dashboard-card">
+          <div className="dashboard-card h-[400px]">
             <UnitSelectorCard />
           </div>
           
@@ -135,11 +135,11 @@ const Dashboard: React.FC = () => {
 
         {/* Coluna da direita - Ações e alertas */}
         <div className="xl:col-span-4 space-y-6">
-          <div className="dashboard-card">
+          <div className="dashboard-card h-[400px]">
             <QuickActionsCard />
           </div>
           
-          <div className="dashboard-card">
+          <div className="dashboard-card h-[400px]">
             <RecentActivities />
           </div>
         </div>

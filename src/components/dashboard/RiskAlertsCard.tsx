@@ -27,8 +27,14 @@ const RiskAlertsCard: React.FC = () => {
     }
   };
 
+  const getExpiryUrgencyColor = (days: number) => {
+    if (days <= 7) return "text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-300";
+    if (days <= 15) return "text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-300";
+    return "text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-300";
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 gap-4 h-full">
       {/* Rupturas Imediatas */}
       <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
         <CardHeader className="pb-3">
@@ -39,13 +45,13 @@ const RiskAlertsCard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
+            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-red-50/80 to-orange-50/80 dark:from-red-950/40 dark:to-orange-950/40 rounded-xl border border-red-200 dark:border-red-900/50">
               <span className="text-2xl font-bold text-red-600 dark:text-red-400">
                 {criticalItems.length}
               </span>
               <Link 
                 to="/inventory?filter=critical" 
-                className="text-sm text-red-600 hover:underline"
+                className="text-sm text-red-600 hover:underline font-medium"
               >
                 Ver Críticos
               </Link>
@@ -69,19 +75,19 @@ const RiskAlertsCard: React.FC = () => {
       <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
-            <Clock size={18} className="text-amber-600 dark:text-amber-400" />
+            <Clock size={18} className="text-purple-600 dark:text-purple-400" />
             Vencimentos (30 dias)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-900/60 rounded-xl border border-gray-200 dark:border-neutral-900">
-              <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/80 to-pink-50/80 dark:from-purple-950/40 dark:to-pink-950/40 rounded-xl border border-purple-200 dark:border-purple-900/50">
+              <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                 {expiringItems.length}
               </span>
               <Link 
                 to="/inventory?filter=expiring" 
-                className="text-sm text-amber-600 hover:underline"
+                className="text-sm text-purple-600 hover:underline font-medium"
               >
                 Ver Todos
               </Link>
@@ -91,7 +97,7 @@ const RiskAlertsCard: React.FC = () => {
               {expiringItems.map((item, index) => (
                 <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg text-sm">
                   <span className="truncate text-gray-800 dark:text-gray-200">{item.name}</span>
-                  <Badge variant="outline" className="text-amber-700 border-amber-300">
+                  <Badge className={getExpiryUrgencyColor(item.days)}>
                     {item.days}d
                   </Badge>
                 </div>

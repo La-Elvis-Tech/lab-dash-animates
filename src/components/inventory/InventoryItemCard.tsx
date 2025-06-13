@@ -17,6 +17,7 @@ import {
   Save,
   X,
   Info,
+  Minus,
 } from "lucide-react";
 import {
   HoverCard,
@@ -56,6 +57,7 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
     expiryDate: item.expiryDate,
   });
   const [reserveQuantity, setReserveQuantity] = useState(1);
+  const [stockOutQuantity, setStockOutQuantity] = useState(1);
 
   const getStockLevel = () => {
     if (item.stock <= item.minStock) return "low";
@@ -99,6 +101,11 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
   const handleCancelEdit = (field: string) => {
     setEditValues({ ...editValues, [field]: item[field] });
     setIsEditing({ ...isEditing, [field]: false });
+  };
+
+  const handleStockOut = (quantity: number) => {
+    const newStock = Math.max(0, item.stock - quantity);
+    onUpdateItem(item.id, { stock: newStock });
   };
 
   const stockLevel = getStockLevel();
@@ -292,7 +299,7 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
         )}
 
         {/* Ações */}
-        <div className="grid grid-cols-2 gap-2 mt-auto">
+        <div className="grid grid-cols-3 gap-2 mt-auto">
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -327,6 +334,45 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
               <DialogFooter>
                 <Button onClick={() => onReserveItem(item.id, reserveQuantity)}>
                   Confirmar
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                size="sm"
+                className="text-xs h-8 bg-red-500 hover:bg-red-600 text-white"
+              >
+                <Minus size={12} className="mr-1" />
+                Baixa
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Registrar Baixa</DialogTitle>
+                <DialogDescription>
+                  Dar baixa no estoque de {item.name}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label>Quantidade</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max={item.stock}
+                    value={stockOutQuantity}
+                    onChange={(e) =>
+                      setStockOutQuantity(parseInt(e.target.value))
+                    }
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button onClick={() => handleStockOut(stockOutQuantity)}>
+                  Confirmar Baixa
                 </Button>
               </DialogFooter>
             </DialogContent>

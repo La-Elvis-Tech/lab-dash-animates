@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -75,8 +76,23 @@ const UnitSelectorCard: React.FC = () => {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "excellent":
+        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300";
+      case "good":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
+      case "warning":
+        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300";
+      case "critical":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300";
+    }
+  };
+
   return (
-    <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
+    <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg h-full">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
           <Building2
@@ -87,11 +103,11 @@ const UnitSelectorCard: React.FC = () => {
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
-        <div className="space-y-5">
+      <CardContent className="h-full">
+        <div className="space-y-5 h-full flex flex-col">
           
 
-          <div className="space-y-3">
+          <div className="space-y-3 flex-1">
             <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Status por Unidade
             </div>
@@ -102,15 +118,15 @@ const UnitSelectorCard: React.FC = () => {
                 .map((unit) => (
                   <div
                     key={unit.id}
-                    className="flex items-center justify-between p-3 bg-gray-300/40 dark:bg-neutral-950/60 rounded-xl mb-2 last:mb-0 border border-gray-200 dark:border-neutral-900 transition-colors hover:bg-gray-300/80 dark:hover:bg-gray-800"
+                    className="flex items-center justify-between p-3 bg-gradient-to-r from-indigo-50/80 to-blue-50/80 dark:from-indigo-950/40 dark:to-blue-950/40 rounded-xl mb-2 last:mb-0 border border-indigo-100 dark:border-indigo-900/50 transition-all hover:shadow-md hover:scale-[1.02]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gray-50 dark:bg-neutral-700 rounded-lg text-indigo-600 dark:text-indigo-300">
+                      <div className="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg text-white shadow-sm">
                         <MapPin size={14} />
                       </div>
 
                       <div>
-                        <div className="text-sm font-medium text-gray-800 dark:text-neutral-300">
+                        <div className="text-sm font-semibold text-gray-800 dark:text-neutral-200">
                           {unit.name}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -123,7 +139,7 @@ const UnitSelectorCard: React.FC = () => {
                       <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
                         {unit.healthPercent}%
                       </span>
-                      <Badge className="text-xs px-2 py-1 rounded-lg bg-neutral-500/40 dark:bg-neutral-100/90">
+                      <Badge className={getStatusColor(unit.status)}>
                         {getStatusText(unit.status)}
                       </Badge>
                     </div>
