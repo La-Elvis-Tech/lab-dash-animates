@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,7 +18,12 @@ import {
   BarChart3,
   Target,
   AlertTriangle,
-  GitCompare
+  GitCompare,
+  Save,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Minus,
+  Separator
 } from "lucide-react";
 import {
   Table,
