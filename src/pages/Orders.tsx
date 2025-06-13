@@ -26,7 +26,7 @@ import React, { useState, useEffect } from "react";
 // Component imports
 import AppointmentsCalendar from "@/components/appointments/AppointmentsCalendar";
 import AppointmentsTabs from "@/components/appointments/AppointmentsTabs";
-import AppointmentStats from "@/components/appointments/AppointmentStats";
+import CreateAppointmentForm from "@/components/appointments/CreateAppointmentForm";
 
 // Types and utilities
 import {
@@ -166,9 +166,6 @@ const Orders: React.FC = () => {
           </Popover>
         </div>
 
-        {/* Estatísticas dos Agendamentos */}
-        <AppointmentStats appointments={appointments} />
-
         <div>
           <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 shadow-sm">
             <CardHeader>
@@ -195,6 +192,13 @@ const Orders: React.FC = () => {
               />
             </CardContent>
           </Card>
+        </div>
+
+        {/* Nova funcionalidade - Criar Agendamento */}
+        <div>
+          <CreateAppointmentForm onAppointmentCreated={(newAppointment) => {
+            setAppointments(prev => [...prev, newAppointment]);
+          }} />
         </div>
       </div>
     </div>
