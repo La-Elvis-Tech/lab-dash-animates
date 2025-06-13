@@ -31,11 +31,13 @@ import {
   Bell
 } from "lucide-react";
 
+type FrequencyType = 'daily' | 'weekly' | 'monthly';
+
 interface ScheduledSimulation {
   id: string;
   name: string;
   scenarioId: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
+  frequency: FrequencyType;
   isActive: boolean;
   lastRun?: Date;
   nextRun: Date;
@@ -58,7 +60,7 @@ const ScheduledSimulations: React.FC<ScheduledSimulationsProps> = ({
   const [newSchedule, setNewSchedule] = useState({
     name: '',
     scenarioId: '',
-    frequency: 'weekly' as const,
+    frequency: 'weekly' as FrequencyType,
     alertThreshold: 15,
     notifyOnCritical: true
   });
@@ -205,7 +207,7 @@ const ScheduledSimulations: React.FC<ScheduledSimulationsProps> = ({
                   <Label className="text-neutral-700 dark:text-neutral-300">Frequência</Label>
                   <Select 
                     value={newSchedule.frequency} 
-                    onValueChange={(value: any) => setNewSchedule(prev => ({ ...prev, frequency: value }))}
+                    onValueChange={(value: FrequencyType) => setNewSchedule(prev => ({ ...prev, frequency: value }))}
                   >
                     <SelectTrigger className="mt-2 bg-white dark:bg-neutral-800 border-neutral-300 dark:border-neutral-600">
                       <SelectValue />

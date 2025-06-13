@@ -33,7 +33,7 @@ interface SimulationScenario {
 
 interface SimulationParametersProps {
   currentScenario: SimulationScenario;
-  setCurrentScenario: (scenario: SimulationScenario) => void;
+  setCurrentScenario: (scenario: SimulationScenario | ((prev: SimulationScenario) => SimulationScenario)) => void;
   selectedTemplate: string;
   setSelectedTemplate: (template: string) => void;
   applyTemplate: (templateKey: string) => void;
