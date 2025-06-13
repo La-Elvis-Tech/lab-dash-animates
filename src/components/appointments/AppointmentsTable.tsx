@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from 'date-fns';
 import { Clock, MapPin, CheckCircle, XCircle } from 'lucide-react';
@@ -20,7 +21,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 interface AppointmentsTableProps {
@@ -50,46 +50,46 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
   };
 
   return (
-    <div className="w-full border border-hidden rounded-xl ">
-      <ScrollArea className="h-[400px] w-full rounded-lg ">
+    <div className="w-full border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-900/50 shadow-sm">
+      <ScrollArea className="h-[400px] w-full rounded-lg">
         <div className="min-w-[1000px]">
-          <Table >
-            <TableHeader className="sticky top-0 bg-background z-10 whitespace-nowrap">
+          <Table>
+            <TableHeader className="sticky top-0 bg-neutral-50 dark:bg-neutral-800 z-10 whitespace-nowrap border-b border-neutral-200 dark:border-neutral-700">
               <TableRow>
-                <TableHead className="w-[60px]">ID</TableHead>
-                <TableHead className="min-w-[120px]">Paciente</TableHead>
-                <TableHead className="min-w-[120px]">Tipo</TableHead>
-                <TableHead className="w-[90px]">Data</TableHead>
-                <TableHead className="w-[80px]">Horário</TableHead>
-                <TableHead className="min-w-[120px]">Médico</TableHead>
-                <TableHead className="min-w-[120px]">Unidade</TableHead>
-                <TableHead className="w-[80px]">Custo (R$)</TableHead>
-                <TableHead className="w-[90px]">Status</TableHead>
-                <TableHead className="w-[100px]">Ações</TableHead>
+                <TableHead className="w-[60px] font-semibold text-neutral-700 dark:text-neutral-300">ID</TableHead>
+                <TableHead className="min-w-[120px] font-semibold text-neutral-700 dark:text-neutral-300">Paciente</TableHead>
+                <TableHead className="min-w-[120px] font-semibold text-neutral-700 dark:text-neutral-300">Tipo</TableHead>
+                <TableHead className="w-[90px] font-semibold text-neutral-700 dark:text-neutral-300">Data</TableHead>
+                <TableHead className="w-[80px] font-semibold text-neutral-700 dark:text-neutral-300">Horário</TableHead>
+                <TableHead className="min-w-[120px] font-semibold text-neutral-700 dark:text-neutral-300">Médico</TableHead>
+                <TableHead className="min-w-[120px] font-semibold text-neutral-700 dark:text-neutral-300">Unidade</TableHead>
+                <TableHead className="w-[80px] font-semibold text-neutral-700 dark:text-neutral-300">Custo (R$)</TableHead>
+                <TableHead className="w-[90px] font-semibold text-neutral-700 dark:text-neutral-300">Status</TableHead>
+                <TableHead className="w-[100px] font-semibold text-neutral-700 dark:text-neutral-300">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {appointments.length > 0 ? (
                 appointments.map((appointment) => (
-                  <TableRow key={appointment.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium text-xs">{appointment.id}</TableCell>
-                    <TableCell className="text-sm">{appointment.patient}</TableCell>
-                    <TableCell className="text-sm">{appointment.type}</TableCell>
-                    <TableCell className="text-sm">{format(new Date(appointment.date), "dd/MM/yyyy")}</TableCell>
-                    <TableCell className="text-sm">
+                  <TableRow key={appointment.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 border-b border-neutral-100 dark:border-neutral-800">
+                    <TableCell className="font-medium text-xs text-neutral-600 dark:text-neutral-400">{appointment.id}</TableCell>
+                    <TableCell className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{appointment.patient}</TableCell>
+                    <TableCell className="text-sm text-neutral-700 dark:text-neutral-300">{appointment.type}</TableCell>
+                    <TableCell className="text-sm text-neutral-700 dark:text-neutral-300">{format(new Date(appointment.date), "dd/MM/yyyy")}</TableCell>
+                    <TableCell className="text-sm text-neutral-700 dark:text-neutral-300">
                       <div className="flex items-center">
-                        <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <Clock className="h-3 w-3 mr-1 flex-shrink-0 text-neutral-500" />
                         {format(new Date(appointment.date), "HH:mm")}
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm">{appointment.doctor}</TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm text-neutral-700 dark:text-neutral-300">{appointment.doctor}</TableCell>
+                    <TableCell className="text-sm text-neutral-700 dark:text-neutral-300">
                       <div className="flex items-center">
-                        <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+                        <MapPin className="h-3 w-3 mr-1 flex-shrink-0 text-neutral-500" />
                         {appointment.unit}
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium text-sm">
+                    <TableCell className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
                       {appointment.cost.toFixed(2)}
                     </TableCell>
                     <TableCell>
@@ -103,25 +103,25 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 border-green-200 hover:bg-green-50 dark:border-green-700 dark:hover:bg-green-900/20"
                             onClick={() => {
                               setSelectedAppointment(appointment.id);
                               setDialogAction('complete');
                             }}
                           >
-                            <CheckCircle className="h-3 w-3 text-green-600" />
+                            <CheckCircle className="h-3 w-3 text-green-600 dark:text-green-400" />
                           </Button>
                           
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 border-red-200 hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900/20"
                             onClick={() => {
                               setSelectedAppointment(appointment.id);
                               setDialogAction('cancel');
                             }}
                           >
-                            <XCircle className="h-3 w-3 text-red-600" />
+                            <XCircle className="h-3 w-3 text-red-600 dark:text-red-400" />
                           </Button>
                         </div>
                       )}
@@ -130,8 +130,11 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-6 text-muted-foreground">
-                    Nenhum agendamento encontrado para este período.
+                  <TableCell colSpan={10} className="text-center py-8 text-neutral-500 dark:text-neutral-400">
+                    <div className="flex flex-col items-center gap-2">
+                      <Clock className="h-8 w-8 text-neutral-300 dark:text-neutral-600" />
+                      <span>Nenhum agendamento encontrado para este período.</span>
+                    </div>
                   </TableCell>
                 </TableRow>
               )}
@@ -142,14 +145,14 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
 
       {/* Diálogos unificados */}
       <Dialog open={!!dialogAction} onOpenChange={(open) => !open && setDialogAction(null)}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-neutral-900 dark:text-neutral-100">
               {dialogAction === 'complete' 
                 ? "Confirmar Conclusão" 
                 : "Confirmar Cancelamento"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-neutral-600 dark:text-neutral-400">
               {dialogAction === 'complete'
                 ? "Tem certeza que deseja marcar este agendamento como concluído?"
                 : "Tem certeza que deseja cancelar este agendamento?"}
@@ -166,6 +169,7 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
             <Button
               variant="outline"
               onClick={() => setDialogAction(null)}
+              className="border-neutral-200 dark:border-neutral-700"
             >
               {dialogAction === 'complete' ? "Cancelar" : "Voltar"}
             </Button>
@@ -174,9 +178,8 @@ const AppointmentsTable: React.FC<AppointmentsTableProps> = ({
                 dialogAction === 'complete' ? 'Concluído' : 'Cancelado'
               )}
               className={dialogAction === 'complete' 
-                ? "bg-green-600 hover:bg-green-700" 
-                : ""}
-              variant={dialogAction === 'cancel' ? "destructive" : "default"}
+                ? "bg-green-600 hover:bg-green-700 text-white" 
+                : "bg-red-600 hover:bg-red-700 text-white"}
             >
               {dialogAction === 'complete' 
                 ? "Confirmar Conclusão" 

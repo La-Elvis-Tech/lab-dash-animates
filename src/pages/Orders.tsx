@@ -26,6 +26,7 @@ import React, { useState, useEffect } from "react";
 // Component imports
 import AppointmentsCalendar from "@/components/appointments/AppointmentsCalendar";
 import AppointmentsTabs from "@/components/appointments/AppointmentsTabs";
+import AppointmentStats from "@/components/appointments/AppointmentStats";
 
 // Types and utilities
 import {
@@ -133,63 +134,68 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between flex-wrap items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-            Agendamentos
-          </h1>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-            Gerencie seus agendamentos de forma eficiente
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800 p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex justify-between flex-wrap items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+              Agendamentos
+            </h1>
+            <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+              Gerencie seus agendamentos de forma eficiente
+            </p>
+          </div>
+          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="bg-white hover:bg-neutral-50 dark:bg-neutral-800 dark:hover:bg-neutral-700 border-neutral-200 dark:border-neutral-700 mt-4 xs:mt-2 md:mt-0 shadow-sm"
+              >
+                <CalendarIcon className="h-4 w-4 mr-2" />
+                Calendário
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <AppointmentsCalendar
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                setIsCalendarOpen={setIsCalendarOpen}
+                appointmentDates={appointmentDates}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
-        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="bg-white hover:bg-neutral-50 dark:bg-neutral-800 dark:hover:bg-neutral-700 border-neutral-200 dark:border-neutral-700 mt-4 xs:mt-2 md:mt-0"
-            >
-              <CalendarIcon className="h-4 w-4 mr-2" />
-              Calendário
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="end">
-            <AppointmentsCalendar
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              setIsCalendarOpen={setIsCalendarOpen}
-              appointmentDates={appointmentDates}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
 
-      <div>
-        <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-          <CardHeader>
-            <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
-              Agendamentos Gerais
-            </CardTitle>
-            <CardDescription className="text-neutral-600 dark:text-neutral-300">
-              Visualize seus agendamentos recentes e futuros
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="overflow-x-auto whitespace-nowrap grid ">
-            <AppointmentsTabs
-              recentAppointments={recentAppointments}
-              next7DaysAppointments={next7DaysAppointments}
-              restOfMonthAppointments={restOfMonthAppointments}
-              selectedDate={selectedDate}
-              selectedDateAppointments={selectedDateAppointments}
-              unitsList={unitsList}
-              today={today}
-              sevenDaysFromNow={sevenDaysFromNow}
-              endOfCurrentMonth={endOfCurrentMonth}
-              getStatusColor={getStatusColor}
-              onUpdateStatus={handleUpdateAppointmentStatus}
-            />
-          </CardContent>
-        </Card>
+        {/* Estatísticas dos Agendamentos */}
+        <AppointmentStats appointments={appointments} />
+
+        <div>
+          <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
+                Agendamentos Gerais
+              </CardTitle>
+              <CardDescription className="text-neutral-600 dark:text-neutral-300">
+                Visualize seus agendamentos recentes e futuros
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="overflow-x-auto whitespace-nowrap grid">
+              <AppointmentsTabs
+                recentAppointments={recentAppointments}
+                next7DaysAppointments={next7DaysAppointments}
+                restOfMonthAppointments={restOfMonthAppointments}
+                selectedDate={selectedDate}
+                selectedDateAppointments={selectedDateAppointments}
+                unitsList={unitsList}
+                today={today}
+                sevenDaysFromNow={sevenDaysFromNow}
+                endOfCurrentMonth={endOfCurrentMonth}
+                getStatusColor={getStatusColor}
+                onUpdateStatus={handleUpdateAppointmentStatus}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

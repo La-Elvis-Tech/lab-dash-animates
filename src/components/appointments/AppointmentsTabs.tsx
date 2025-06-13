@@ -36,23 +36,51 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
 }) => {
   return (
     <Tabs defaultValue="next7days">
-      <TabsList className="mb-4 bg-gradient-to-r from-gray-100 to-white dark:from-gray-700 dark:to-gray-800 dark:border-none">
-        <TabsTrigger value="recent">Recentes</TabsTrigger>
-        <TabsTrigger value="next7days">Próximos 7 dias</TabsTrigger>
-        <TabsTrigger value="restOfMonth">Resto do mês</TabsTrigger>
-        <TabsTrigger value="units">
+      <TabsList className="mb-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm">
+        <TabsTrigger 
+          value="recent"
+          className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
+        >
+          Recentes
+        </TabsTrigger>
+        <TabsTrigger 
+          value="next7days"
+          className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
+        >
+          Próximos 7 dias
+        </TabsTrigger>
+        <TabsTrigger 
+          value="restOfMonth"
+          className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
+        >
+          Resto do mês
+        </TabsTrigger>
+        <TabsTrigger 
+          value="units"
+          className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
+        >
           <Building className="h-4 w-4 mr-1" />
           Unidades
         </TabsTrigger>
         {selectedDate && (
-          <TabsTrigger value="selectedDate">
+          <TabsTrigger 
+            value="selectedDate"
+            className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
+          >
             {format(selectedDate, "dd/MM/yyyy")}
           </TabsTrigger>
         )}
       </TabsList>
       
       <TabsContent value="recent" className="mt-0">
-        <h3 className="text-lg font-medium mb-4">Agendamentos recentes</h3>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+            Agendamentos recentes
+          </h3>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            Visualize os agendamentos anteriores à data atual
+          </p>
+        </div>
         <AppointmentsTable 
           appointments={recentAppointments} 
           getStatusColor={getStatusColor}
@@ -61,9 +89,14 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="next7days" className="mt-0">
-        <h3 className="text-lg font-medium mb-4">
-          Próximos 7 dias ({format(today, "dd/MM")} - {format(sevenDaysFromNow, "dd/MM")})
-        </h3>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+            Próximos 7 dias ({format(today, "dd/MM")} - {format(sevenDaysFromNow, "dd/MM")})
+          </h3>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            Agendamentos da semana atual incluindo hoje
+          </p>
+        </div>
         <AppointmentsTable 
           appointments={next7DaysAppointments} 
           getStatusColor={getStatusColor}
@@ -72,9 +105,14 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
       </TabsContent>
       
       <TabsContent value="restOfMonth" className="mt-0">
-        <h3 className="text-lg font-medium mb-4">
-          Resto do mês ({format(new Date(sevenDaysFromNow.getTime() + 86400000), "dd/MM")} - {format(endOfCurrentMonth, "dd/MM")})
-        </h3>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+            Resto do mês ({format(new Date(sevenDaysFromNow.getTime() + 86400000), "dd/MM")} - {format(endOfCurrentMonth, "dd/MM")})
+          </h3>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            Agendamentos restantes do mês atual
+          </p>
+        </div>
         <AppointmentsTable 
           appointments={restOfMonthAppointments} 
           getStatusColor={getStatusColor}
@@ -83,17 +121,27 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
       </TabsContent>
 
       <TabsContent value="units" className="mt-0">
-        <h3 className="text-lg font-medium mb-4">
-          Unidades e seus agendamentos
-        </h3>
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+            Unidades e seus agendamentos
+          </h3>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            Resumo dos agendamentos por unidade
+          </p>
+        </div>
         <UnitsTable units={unitsList} />
       </TabsContent>
       
       {selectedDate && (
         <TabsContent value="selectedDate" className="mt-0">
-          <h3 className="text-lg font-medium mb-4">
-            Agendamentos em {format(selectedDate, "dd/MM/yyyy")}
-          </h3>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+              Agendamentos em {format(selectedDate, "dd/MM/yyyy")}
+            </h3>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              Todos os agendamentos para a data selecionada
+            </p>
+          </div>
           <AppointmentsTable 
             appointments={selectedDateAppointments} 
             getStatusColor={getStatusColor}
