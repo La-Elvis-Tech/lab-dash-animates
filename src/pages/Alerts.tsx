@@ -1,66 +1,21 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
 import { 
   Bell, 
-  AlertTriangle, 
-  Clock, 
-  Package, 
-  ShoppingCart, 
   CheckCircle, 
   User, 
-  Calendar,
-  Search,
-  Filter
+  Calendar
 } from "lucide-react";
 import { format } from "date-fns";
 import { gsap } from "gsap";
 import { toast } from "@/hooks/use-toast";
-
-// Mock data para alertas
-const mockAlerts = [
-  {
-    id: "A001",
-    type: "stock",
-    priority: "critical",
-    title: "Estoque Crítico - Etanol Absoluto",
-    description: "Apenas 2L restantes (mínimo: 5L)",
-    item: "Etanol Absoluto",
-    currentStock: 2,
-    minStock: 5,
-    unit: "L",
-    createdAt: new Date(2024, 5, 10, 14, 30),
-    status: "active"
-  },
-  {
-    id: "A002",
-    type: "expiry",
-    priority: "high",
-    title: "Vencimento Próximo - Reagente X",
-    description: "Vence em 3 dias (Lote: LT-2024-001)",
-    item: "Reagente X",
-    expiryDate: new Date(2024, 5, 15),
-    lot: "LT-2024-001",
-    createdAt: new Date(2024, 5, 10, 9, 15),
-    status: "active"
-  },
-  {
-    id: "A003",
-    type: "prediction",
-    priority: "medium",
-    title: "Predição de Ruptura - Luvas Nitrila",
-    description: "Estoque pode esgotar em 7 dias baseado no consumo atual",
-    item: "Luvas Nitrila",
-    predictedDate: new Date(2024, 5, 19),
-    createdAt: new Date(2024, 5, 10, 16, 45),
-    status: "active"
-  }
-];
+import { useAlerts } from "@/hooks/useAlerts";
+import { AlertCard } from "@/components/alerts/AlertCard";
+import { AlertFilters } from "@/components/alerts/AlertFilters";
 
 // Mock data para histórico de alertas resolvidos
 const mockResolvedAlerts = [
@@ -133,6 +88,14 @@ const Alerts = () => {
   const [activeTab, setActiveTab] = useState("alerts");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPriority, setFilterPriority] = useState("all");
+  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+
+  const {
+    alerts,
+    markAsRead,
+    markAllAsRead,
+    getUnreadCount
+  } = useAlerts();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -146,24 +109,6 @@ const Alerts = () => {
     return () => ctx.revert();
   }, []);
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "critical": return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200";
-      case "high": return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200";
-      case "medium": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200";
-      default: return "bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200";
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "stock": return <Package size={16} />;
-      case "expiry": return <Clock size={16} />;
-      case "prediction": return <AlertTriangle size={16} />;
-      default: return <Bell size={16} />;
-    }
-  };
-
   const handleQuickAction = (alertId: string, action: string) => {
     console.log(`Ação: ${action} para alerta: ${alertId}`);
     toast({
@@ -172,11 +117,13 @@ const Alerts = () => {
     });
   };
 
-  const filteredAlerts = mockAlerts.filter(alert => {
+  const filteredAlerts = alerts.filter(alert => {
     const matchesSearch = alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         alert.item.toLowerCase().includes(searchTerm.toLowerCase());
+                         alert.item.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         alert.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPriority = filterPriority === "all" || alert.priority === filterPriority;
-    return matchesSearch && matchesPriority;
+    const matchesReadStatus = !showUnreadOnly || !alert.isRead;
+    return matchesSearch && matchesPriority && matchesReadStatus && alert.status === "active";
   });
 
   const filteredLogs = mockServiceLogs.filter(log =>
@@ -188,58 +135,34 @@ const Alerts = () => {
   return (
     <div ref={pageRef} className="space-y-6">
       <div className="rounded-lg mb-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-          Alertas & Notificações
-        </h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-1">
-          Gerencie alertas críticos e acompanhe o histórico de atividades
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+              Alertas & Notificações
+            </h1>
+            <p className="text-neutral-600 dark:text-neutral-400 mt-1">
+              Gerencie alertas críticos e acompanhe o histórico de atividades
+            </p>
+          </div>
+          {getUnreadCount() > 0 && (
+            <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">
+              {getUnreadCount()} pendentes
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Filtros e Busca */}
-      <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400" size={16} />
-                <Input
-                  placeholder="Buscar alertas, itens ou usuários..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-neutral-300 dark:border-neutral-600"
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant={filterPriority === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterPriority("all")}
-                className="border-neutral-300 dark:border-neutral-600"
-              >
-                Todos
-              </Button>
-              <Button
-                variant={filterPriority === "critical" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterPriority("critical")}
-                className="text-red-600 border-neutral-300 dark:border-neutral-600"
-              >
-                Crítico
-              </Button>
-              <Button
-                variant={filterPriority === "high" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterPriority("high")}
-                className="text-orange-600 border-neutral-300 dark:border-neutral-600"
-              >
-                Alto
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <AlertFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        filterPriority={filterPriority}
+        setFilterPriority={setFilterPriority}
+        showUnreadOnly={showUnreadOnly}
+        setShowUnreadOnly={setShowUnreadOnly}
+        unreadCount={getUnreadCount()}
+        onMarkAllAsRead={markAllAsRead}
+      />
 
       {/* Tabs principais */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -247,6 +170,11 @@ const Alerts = () => {
           <TabsTrigger value="alerts" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">
             <Bell size={16} />
             Alertas Ativos
+            {getUnreadCount() > 0 && (
+              <Badge className="ml-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+                {getUnreadCount()}
+              </Badge>
+            )}
           </TabsTrigger>
           <TabsTrigger value="resolved" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">
             <CheckCircle size={16} />
@@ -261,65 +189,27 @@ const Alerts = () => {
         {/* Alertas Ativos */}
         <TabsContent value="alerts" className="mt-0">
           <div className="space-y-4">
-            {filteredAlerts.map((alert) => (
-              <Card key={alert.id} className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className="mt-1 text-neutral-600 dark:text-neutral-400">
-                        {getTypeIcon(alert.type)}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
-                            {alert.title}
-                          </h3>
-                          <Badge className={getPriorityColor(alert.priority)}>
-                            {alert.priority === "critical" ? "Crítico" : 
-                             alert.priority === "high" ? "Alto" : "Médio"}
-                          </Badge>
-                        </div>
-                        <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-2">
-                          {alert.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400">
-                          <span className="flex items-center gap-1">
-                            <Calendar size={12} />
-                            {format(alert.createdAt, "dd/MM/yyyy HH:mm")}
-                          </span>
-                          <span>Item: {alert.item}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-2 ml-4">
-                      <Button 
-                        size="sm" 
-                        onClick={() => handleQuickAction(alert.id, "Repor")}
-                        className="bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900"
-                      >
-                        Repor
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        onClick={() => handleQuickAction(alert.id, "Reservar")}
-                        className="border-neutral-300 dark:border-neutral-600"
-                      >
-                        Reservar
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        onClick={() => handleQuickAction(alert.id, "Abrir Ticket")}
-                        className="border-neutral-300 dark:border-neutral-600"
-                      >
-                        <ShoppingCart size={14} />
-                      </Button>
-                    </div>
+            {filteredAlerts.length === 0 ? (
+              <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+                <CardContent className="p-8 text-center">
+                  <div className="text-neutral-500 dark:text-neutral-400">
+                    {showUnreadOnly 
+                      ? "Nenhum alerta não lido encontrado" 
+                      : "Nenhum alerta encontrado com os filtros aplicados"
+                    }
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            ) : (
+              filteredAlerts.map((alert) => (
+                <AlertCard
+                  key={alert.id}
+                  alert={alert}
+                  onQuickAction={handleQuickAction}
+                  onMarkAsRead={markAsRead}
+                />
+              ))
+            )}
           </div>
         </TabsContent>
 
