@@ -16,13 +16,13 @@ const RecentActivities: React.FC = () => {
   const getIcon = (title: string) => {
     switch (title) {
       case "Agendamento":
-        return <CalendarCheck className="w-5 h-5" />;
+        return <CalendarCheck size={18} />;
       case "Exame":
-        return <Stethoscope className="w-5 h-5" />;
+        return <Stethoscope size={18} />;
       case "Reposição":
-        return <Pill className="w-5 h-5" />;
+        return <Pill size={18} />;
       default:
-        return <CalendarCheck className="w-5 h-5" />;
+        return <CalendarCheck size={18} />;
     }
   };
 
@@ -51,27 +51,27 @@ const RecentActivities: React.FC = () => {
         </h2>
       </div>
 
-      <div className="md:max-h-[600px] xl:max-h-[660px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+      <div className="md:max-h-[600px] xl:max-h-[600px] overflow-y-auto pr-3 xl:pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
         <div className="space-y-3">
           {activities.map((activity, index) => (
             <div
               key={index}
-              className="rounded-xl bg-gray-300/40 dark:bg-neutral-950/60 overflow-hidden"
+              className="rounded-xl bg-gradient-to-r from-blue-50 to-indigo-100/80 hover:to-indigo-200 dark:from-blue-950/30 dark:to-blue-950/10 dark:hover:to-indigo-950/40 transition-colors duration-300 overflow-hidden"
             >
               <button
                 onClick={() => toggleAccordion(index)}
-                className="w-full p-4 flex items-center justify-between gap-4 hover:bg-gray-300/80 dark:hover:bg-gray-800 transition-colors"
+                className="w-full p-4 flex items-center justify-between gap-4 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-gray-50 dark:bg-neutral-700 rounded-lg text-blue-600 dark:text-blue-300">
+                  <div className="p-2 bg-gradient-to-br from-indigo-800/80 to-blue-600/80 rounded-lg text-white shadow-lg">
                     {getIcon(activity.title)}
                   </div>
 
                   <div className="text-left">
-                    <h3 className="font-semibold text-gray-800 dark:text-neutral-300">
+                    <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200">
                       {activity.title}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {formatDateLabel(activity.date)} • {activity.time}
                     </p>
                   </div>
@@ -98,10 +98,10 @@ const RecentActivities: React.FC = () => {
                     <div className="pl-2 xl:pl-4 pb-4 space-y-2 overflow-x-auto whitespace-nowrap">
                       {activity.description && (
                         <div className="flex gap-2">
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
                             Descrição:
                           </span>
-                          <span className="text-gray-700 dark:text-gray-200">
+                          <span className="text-sm text-gray-700 dark:text-gray-200">
                             {activity.description}
                           </span>
                         </div>
@@ -109,10 +109,10 @@ const RecentActivities: React.FC = () => {
 
                       {activity.paciente && (
                         <div className="flex gap-2">
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
                             Paciente:
                           </span>
-                          <span className="text-gray-700 dark:text-gray-200">
+                          <span className="text-sm text-gray-700 dark:text-gray-200">
                             {activity.paciente}
                           </span>
                         </div>
@@ -120,20 +120,20 @@ const RecentActivities: React.FC = () => {
 
                       {activity.responsavel && (
                         <div className="flex gap-2">
-                          <span className="text-gray-500 dark:text-gray-400">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
                             Responsável:
                           </span>
-                          <span className="text-gray-700 dark:text-gray-200">
+                          <span className="text-sm text-gray-700 dark:text-gray-200">
                             {activity.responsavel}
                           </span>
                         </div>
                       )}
 
                       <div className="flex gap-2">
-                        <span className="text-gray-500 dark:text-gray-400">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           Dia:
                         </span>
-                        <span className="text-gray-700 dark:text-gray-200">
+                        <span className="text-sm text-gray-700 dark:text-gray-200">
                           {activity.date}
                         </span>
                       </div>

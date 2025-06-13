@@ -44,7 +44,7 @@ const LowStockTable: React.FC = () => {
   ];
 
   return (
-    <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950/90">
+    <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
       <div className="p-3 sm:p-4 md:p-6">
         <div className="flex items-center justify-between mb-3 md:mb-4">
           <h2 className="p-2 text-lg md:text-xl font-semibold text-gray-800 dark:text-white">

@@ -299,7 +299,7 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
         )}
 
         {/* Ações */}
-        <div className="grid grid-cols-3 gap-2 mt-auto">
+        <div className="grid grid-cols-2 gap-2 mt-auto">
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -310,7 +310,7 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
                 Reservar
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-lg h-auto bg-white dark:bg-neutral-900">
               <DialogHeader>
                 <DialogTitle>Reservar Item</DialogTitle>
                 <DialogDescription>
@@ -319,7 +319,7 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label>Quantidade</Label>
+                  <Label className="">Quantidade</Label>
                   <Input
                     type="number"
                     min="1"
@@ -328,6 +328,7 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
                     onChange={(e) =>
                       setReserveQuantity(parseInt(e.target.value))
                     }
+                    className="mt-2"
                   />
                 </div>
               </div>
@@ -339,17 +340,30 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
             </DialogContent>
           </Dialog>
 
+          
+
+          <Button
+            onClick={() => onRequestRestock(item.id)}
+            size="sm"
+            className="text-xs h-8 bg-neutral-500 hover:bg-neutral-600 text-white"
+          >
+            <ShoppingCart size={12} className="mr-1" />
+            Repor
+          </Button>
+        </div>
+        {/* Ação de esgotamento */}
+        <div className="mt-3">
           <Dialog>
             <DialogTrigger asChild>
               <Button
                 size="sm"
-                className="text-xs h-8 bg-red-500 hover:bg-red-600 text-white"
+                className="text-xs w-full bg-red-500 hover:bg-red-600 text-white"
               >
                 <Minus size={12} className="mr-1" />
                 Baixa
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-md bg-white dark:bg-neutral-900">
               <DialogHeader>
                 <DialogTitle>Registrar Baixa</DialogTitle>
                 <DialogDescription>
@@ -367,6 +381,7 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
                     onChange={(e) =>
                       setStockOutQuantity(parseInt(e.target.value))
                     }
+                    className="mt-2"
                   />
                 </div>
               </div>
@@ -377,17 +392,7 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-
-          <Button
-            onClick={() => onRequestRestock(item.id)}
-            size="sm"
-            className="text-xs h-8 bg-neutral-500 hover:bg-neutral-600 text-white"
-          >
-            <ShoppingCart size={12} className="mr-1" />
-            Repor
-          </Button>
         </div>
-
         {/* HoverCard para detalhes */}
         <div className="mt-3">
           <Dialog>

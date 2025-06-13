@@ -57,9 +57,9 @@ const RiskAlertsCard: React.FC = () => {
               </Link>
             </div>
             
-            <div className="space-y-2 max-h-32 overflow-y-auto">
+            <div className="space-y-2 max-h-40 overflow-y-auto">
               {criticalItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg text-sm">
+                <div key={index} className="flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-neutral-950/80 rounded-lg text-sm">
                   <span className="truncate text-gray-800 dark:text-gray-200">{item.name}</span>
                   <Badge className={getUrgencyColor(item.urgency)}>
                     {item.current}/{item.min} {item.unit}
@@ -93,9 +93,9 @@ const RiskAlertsCard: React.FC = () => {
               </Link>
             </div>
             
-            <div className="space-y-2 max-h-32 overflow-y-auto">
+            <div className="space-y-2 max-h-40 overflow-y-auto">
               {expiringItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg text-sm">
+                <div key={index} className="flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-neutral-950/80 rounded-lg text-sm">
                   <span className="truncate text-gray-800 dark:text-gray-200">{item.name}</span>
                   <Badge className={getExpiryUrgencyColor(item.days)}>
                     {item.days}d

@@ -112,17 +112,17 @@ const UnitSelectorCard: React.FC = () => {
               Status por Unidade
             </div>
 
-            <div className="max-h-[200px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
+            <div className="max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-700 dark:scrollbar-track-gray-900">
               {units
                 .filter((unit) => unit.id !== "all")
                 .map((unit) => (
                   <div
                     key={unit.id}
-                    className="flex items-center justify-between p-3 bg-gradient-to-r from-indigo-50/80 to-blue-50/80 dark:from-indigo-950/40 dark:to-blue-950/40 rounded-xl mb-2 last:mb-0 border border-indigo-100 dark:border-indigo-900/50 transition-all hover:shadow-md hover:scale-[1.02]"
+                    className="flex items-center justify-between p-3 bg-gradient-to-br from-indigo-100/50 to-blue-100/50 dark:from-neutral-700/60 dark:to-neutral-800/70 rounded-xl mb-2 last:mb-0 border border-none transition-all shadow-sm"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg text-white shadow-sm">
-                        <MapPin size={14} />
+                      <div className="p-2 bg-gradient-to-br from-indigo-800/80 to-blue-600/80 rounded-lg text-white shadow-lg">
+                        <MapPin size={16} />
                       </div>
 
                       <div>
@@ -136,12 +136,10 @@ const UnitSelectorCard: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                      <span className=" text-sm font-bold text-indigo-600 dark:text-indigo-300 bg-gradient-to-bl from-neutral-50 to-blue-50 dark:from-neutral-500/40 dark:to-neutral-700/80 px-2 py-1 border-2 border-neutral-600/80 rounded-full shadow-md">
                         {unit.healthPercent}%
                       </span>
-                      <Badge className={getStatusColor(unit.status)}>
-                        {getStatusText(unit.status)}
-                      </Badge>
+                      
                     </div>
                   </div>
                 ))}

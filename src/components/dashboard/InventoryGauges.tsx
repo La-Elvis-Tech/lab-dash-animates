@@ -35,7 +35,7 @@ const InventoryGauges: React.FC = () => {
   }
 
   return (
-    <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+    <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
       <h1 className="px-6 pt-6 text-xl sm:text-lg md:text-xl font-semibold text-neutral-900 dark:text-neutral-100">
         Estoque Geral
       </h1>
@@ -45,7 +45,7 @@ const InventoryGauges: React.FC = () => {
       <CardContent className="grid grid-cols-2 gap-4 md:gap-6 my-0 md:my-3 mt-2 md:mt-0">
         {inventoryData.map((item) => (
           <div key={item.name}>
-            <div className="block sm:inline md:hidden">
+            <div className="block sm:inline lg:hidden">
               <div className="flex flex-col justify-center items-center md:my-0 p-4 rounded-md">
                 <GaugeChart
                   title={item.name}
@@ -54,7 +54,7 @@ const InventoryGauges: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="hidden md:inline xl:hidden">
+            <div className="hidden lg:inline xl:hidden">
               <div className="flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
                 <GaugeChart
                   title={item.name}
@@ -64,11 +64,11 @@ const InventoryGauges: React.FC = () => {
               </div>
             </div>
             <div className="hidden xl:inline">
-              <div className="flex flex-col justify-center items-center my-4 md:my-0 p-4 rounded-md">
+              <div className="flex flex-col justify-center items-center my-4 md:my-0 px-2 py-6 rounded-md">
                 <GaugeChart
                   title={item.name}
                   value={item.value}
-                  size={200}
+                  size={180}
                 />
               </div>
             </div>

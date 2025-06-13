@@ -1,4 +1,4 @@
-
+import  { Card, CardContent } from '@/components/ui/Card';
 import React, { useRef, useEffect } from 'react';
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, RadialBar,
   PolarAngleAxis,
@@ -11,8 +11,8 @@ import { Progress } from '@/components/ui/progress';
 import GaugeChart from '@/components/ui/GaugeChart';
 
 // Define a consistent color palette for all charts
-// eslint-disable-next-line react-refresh/only-export-components
-export const CHART_COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981', '#6366F1', '#EC4899', '#F59E0B'];
+
+const CHART_COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981', '#6366F1', '#EC4899', '#F59E0B'];
 
 const DashboardChart = ({ type, data, title, description }) => {
   const chartRef = useRef(null);
@@ -300,16 +300,16 @@ const DashboardChart = ({ type, data, title, description }) => {
   };
 
   return (
-    <div 
+    <Card 
       ref={chartRef}
-      className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950 p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 "
+      className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 p-3 sm:p-4 md:p-6 rounded-xl shadow-lg transition-colors duration-300 "
     >
-      <div className="mb-3 sm:mb-6 p-3">
+      <CardContent className="mb-3 sm:mb-6 p-3">
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
         <p className=" sm:text-base text-gray-600 dark:text-gray-300">{description}</p>
-      </div>
+      </CardContent>
       {renderChart()}
-    </div>
+    </Card>
   );
 };
 

@@ -23,7 +23,8 @@ import {
   Save,
   ArrowUpCircle,
   ArrowDownCircle,
-  Minus
+  Minus,
+  Calendar
 } from "lucide-react";
 import {
   Table,
@@ -303,16 +304,16 @@ const Simulations = () => {
 
       <Tabs defaultValue="parameters" className="w-full">
         <TabsList className="grid w-full grid-cols-5 bg-neutral-100 dark:bg-neutral-800">
-          <TabsTrigger value="parameters" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Parâmetros</TabsTrigger>
-          <TabsTrigger value="results" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Resultados</TabsTrigger>
-          <TabsTrigger value="scenarios" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Cenários Salvos</TabsTrigger>
-          <TabsTrigger value="scheduled" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Agendadas</TabsTrigger>
-          <TabsTrigger value="comparison" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Comparação</TabsTrigger>
+          <TabsTrigger value="parameters" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900"><Target className="inline md:hidden" /><p className="hidden md:inline">Parâmetros</p></TabsTrigger>
+          <TabsTrigger value="results" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900"><BarChart3 className="inline md:hidden" /><p className="hidden md:inline">Resultados</p></TabsTrigger>
+          <TabsTrigger value="scenarios" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900"><Save className="inline md:hidden" /><p className="hidden md:inline">Cenários Salvos</p></TabsTrigger>
+          <TabsTrigger value="scheduled" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900"><Calendar className="inline md:hidden" /><p className="hidden md:inline">Agendadas</p></TabsTrigger>
+          <TabsTrigger value="comparison" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900"><GitCompare className="inline md:hidden" /><p className="hidden md:inline">Comparação</p></TabsTrigger>
         </TabsList>
 
         <TabsContent value="parameters" className="space-y-6">
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-            <div className="xl:col-span-3">
+          <div className="grid grid-cols-1  gap-6">
+            <div className="">
               <SimulationParameters
                 currentScenario={currentScenario}
                 setCurrentScenario={setCurrentScenario}

@@ -59,17 +59,17 @@ const QuickActionsCard: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="h-full">
-        <div className="space-y-3 h-full flex flex-col">
+        <div className="space-y-4 h-full flex flex-col mt-2">
           {quickActions.map((action, index) => (
             <Link
               key={index}
               to={action.link}
-              className={`block p-3 bg-gradient-to-r from-indigo-50/80 to-blue-50/80 dark:from-indigo-950/40 dark:to-blue-950/40 rounded-xl hover:shadow-md hover:scale-[1.02] transition-all border border-indigo-100 dark:border-indigo-900/50`}
+              className={`block p-3 bg-gradient-to-r from-indigo-50/80 to-blue-50/80 dark:from-indigo-950/40 dark:to-blue-950/40 dark:hover:to-blue-950/60 transition-all duration-500 rounded-xl hover:shadow-sm border-none`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg text-white shadow-sm">
-                    <action.icon size={14} />
+                  <div className="p-2 bg-gradient-to-br from-indigo-500/80 to-blue-800/80 rounded-lg text-white shadow-sm">
+                    <action.icon size={16} />
                   </div>
                   <div>
                     <div className="font-semibold text-sm text-gray-800 dark:text-gray-200">
@@ -94,9 +94,9 @@ const QuickActionsCard: React.FC = () => {
               </span>
             </div>
             <div className="space-y-1 text-xs text-red-600 dark:text-red-400">
-              <div>⚠️ Etanol Absoluto: 3L / Min 5L</div>
-              <div>⚠️ Luvas Nitrila: Estoque baixo</div>
-              <div>⚠️ Reagente X: Vence em 5 dias</div>
+              <div> Etanol Absoluto: 3L / Min 5L</div>
+              <div> Luvas Nitrila: Estoque baixo</div>
+              <div> Reagente X: Vence em 5 dias</div>
             </div>
           </div>
         </div>

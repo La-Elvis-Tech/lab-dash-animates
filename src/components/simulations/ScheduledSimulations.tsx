@@ -150,7 +150,7 @@ const ScheduledSimulations: React.FC<ScheduledSimulationsProps> = ({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
             <Clock className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-            Simulações Agendadas
+            <p className='text-sm xl:text-xl'>Simulações Agendadas</p>
           </CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>

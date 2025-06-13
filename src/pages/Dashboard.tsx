@@ -135,11 +135,11 @@ const Dashboard: React.FC = () => {
 
         {/* Coluna da direita - Ações e alertas */}
         <div className="xl:col-span-4 space-y-6">
-          <div className="dashboard-card h-[400px]">
+          <div className="dashboard-card">
             <QuickActionsCard />
           </div>
           
-          <div className="dashboard-card h-[400px]">
+          <div className="dashboard-card">
             <RecentActivities />
           </div>
         </div>
@@ -148,16 +148,14 @@ const Dashboard: React.FC = () => {
       {/* Seção de alertas de risco - largura total */}
       
       <div className="dashboard-card">
-        <Card className="border-none shadow-lg bg-gradient-to-br from-white to-gray-50 dark:from-neutral-950/70 dark:to-neutral-950">
-              <CardContent className="p-6">
+        
                 <DashboardChart
                   type="area"
                   data={consumptionData}
                   title="Consumo de Itens"
                   description="Itens consumidos nos últimos 7 meses"
                 />
-              </CardContent>
-            </Card>
+              
       </div>
 
       {/* Tabela de estoque baixo - largura total */}
