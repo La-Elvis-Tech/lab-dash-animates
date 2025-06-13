@@ -1,41 +1,22 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+
+// Import refactored components
+import SimulationParameters from "@/components/simulations/SimulationParameters";
+import SimulationActions from "@/components/simulations/SimulationActions";
+import ScheduledSimulations from "@/components/simulations/ScheduledSimulations";
+
+// Keep existing imports for other components
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { 
-  Play, 
-  Save, 
-  Download, 
-  RefreshCw, 
-  AlertTriangle, 
-  TrendingUp, 
-  TrendingDown,
-  Target,
-  DollarSign,
-  Calendar,
-  Zap,
   BarChart3,
-  Settings2,
-  ArrowUpCircle,
-  ArrowDownCircle,
-  Minus,
-  Plus,
+  Target,
+  AlertTriangle,
   GitCompare
 } from "lucide-react";
 import {
@@ -72,6 +53,39 @@ interface SimulationResult {
   runAt: Date;
 }
 
+const templates = {
+  "seasonal-growth": {
+    name: "Crescimento Sazonal",
+    demandChange: 25,
+    leadTimeVariability: 15,
+    safetyStock: 10,
+    budgetLimit: 75000,
+    serviceLevel: 98,
+    seasonalityFactor: 1.3,
+    riskTolerance: 3
+  },
+  "supplier-crisis": {
+    name: "Crise de Fornecimento",
+    demandChange: -10,
+    leadTimeVariability: 45,
+    safetyStock: 14,
+    budgetLimit: 40000,
+    serviceLevel: 90,
+    seasonalityFactor: 1,
+    riskTolerance: 8
+  },
+  "new-exam-demand": {
+    name: "Novo Exame em Alta",
+    demandChange: 40,
+    leadTimeVariability: 25,
+    safetyStock: 12,
+    budgetLimit: 60000,
+    serviceLevel: 96,
+    seasonalityFactor: 1.1,
+    riskTolerance: 4
+  }
+};
+
 const Simulations = () => {
   const [scenarios, setScenarios] = useState<SimulationScenario[]>([]);
   const [results, setResults] = useState<SimulationResult[]>([]);
@@ -92,39 +106,6 @@ const Simulations = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("custom");
   const containerRef = useRef(null);
   const { toast } = useToast();
-
-  const templates = {
-    "seasonal-growth": {
-      name: "Crescimento Sazonal",
-      demandChange: 25,
-      leadTimeVariability: 15,
-      safetyStock: 10,
-      budgetLimit: 75000,
-      serviceLevel: 98,
-      seasonalityFactor: 1.3,
-      riskTolerance: 3
-    },
-    "supplier-crisis": {
-      name: "Crise de Fornecimento",
-      demandChange: -10,
-      leadTimeVariability: 45,
-      safetyStock: 14,
-      budgetLimit: 40000,
-      serviceLevel: 90,
-      seasonalityFactor: 1,
-      riskTolerance: 8
-    },
-    "new-exam-demand": {
-      name: "Novo Exame em Alta",
-      demandChange: 40,
-      leadTimeVariability: 25,
-      safetyStock: 12,
-      budgetLimit: 60000,
-      serviceLevel: 96,
-      seasonalityFactor: 1.1,
-      riskTolerance: 4
-    }
-  };
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -191,10 +172,19 @@ const Simulations = () => {
     setResults(prev => [newResult, ...prev]);
     setIsRunning(false);
     
-    toast({
-      title: "Simulação concluída",
-      description: `Probabilidade de ruptura: ${newResult.stockoutProbability}%`,
-    });
+    // Verificar se resultado é crítico e notificar
+    if (newResult.stockoutProbability > 15) {
+      toast({
+        title: "⚠️ Resultado Crítico",
+        description: `Probabilidade de ruptura elevada: ${newResult.stockoutProbability}%`,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Simulação concluída",
+        description: `Probabilidade de ruptura: ${newResult.stockoutProbability}%`,
+      });
+    }
   };
 
   const generateRecommendations = (stockoutProb: number, avgStock: number, scenario: SimulationScenario): string[] => {
@@ -254,6 +244,13 @@ const Simulations = () => {
     });
   };
 
+  const scheduleSimulation = () => {
+    toast({
+      title: "Funcionalidade disponível",
+      description: "Acesse a aba 'Simulações Agendadas' para configurar execuções automáticas.",
+    });
+  };
+
   const toggleScenarioForComparison = (scenarioId: string) => {
     setSelectedScenariosForComparison(prev => {
       if (prev.includes(scenarioId)) {
@@ -283,6 +280,10 @@ const Simulations = () => {
     setSelectedScenariosForComparison([]);
   };
 
+  const handleScheduleCreate = (schedule: any) => {
+    console.log("Nova simulação agendada:", schedule);
+  };
+
   return (
     <div ref={containerRef} className="space-y-6 simulation-container">
       <div>
@@ -295,293 +296,42 @@ const Simulations = () => {
       </div>
 
       <Tabs defaultValue="parameters" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-neutral-100 dark:bg-neutral-800">
+        <TabsList className="grid w-full grid-cols-5 bg-neutral-100 dark:bg-neutral-800">
           <TabsTrigger value="parameters" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Parâmetros</TabsTrigger>
           <TabsTrigger value="results" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Resultados</TabsTrigger>
           <TabsTrigger value="scenarios" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Cenários Salvos</TabsTrigger>
+          <TabsTrigger value="scheduled" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Agendadas</TabsTrigger>
           <TabsTrigger value="comparison" className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-900">Comparação</TabsTrigger>
         </TabsList>
 
         <TabsContent value="parameters" className="space-y-6">
-          {/* Templates */}
-          <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
-                <Settings2 className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-                Templates de Cenário
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <Select value={selectedTemplate} onValueChange={(value) => {
-                setSelectedTemplate(value);
-                applyTemplate(value);
-              }}>
-                <SelectTrigger className=" bg-gray-300 dark:bg-neutral-700 border-none">
-                  <SelectValue placeholder="Selecione um template" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="custom">Cenário Personalizado</SelectItem>
-                  <SelectItem value="seasonal-growth">Crescimento Sazonal</SelectItem>
-                  <SelectItem value="supplier-crisis">Crise de Fornecimento</SelectItem>
-                  <SelectItem value="new-exam-demand">Novo Exame em Alta</SelectItem>
-                </SelectContent>
-              </Select>
-            </CardContent>
-          </Card>
-
-          {/* Parâmetros de Entrada */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Demanda */}
-            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
-                  <TrendingUp className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-                  Variação de Demanda
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6 pt-6">
-                <div>
-                  <Label className="text-neutral-700 dark:text-neutral-300">Nome do Cenário</Label>
-                  <Input
-                    value={currentScenario.name}
-                    onChange={(e) => setCurrentScenario(prev => ({
-                      ...prev,
-                      name: e.target.value
-                    }))}
-                    placeholder="Ex: Cenário COVID-19"
-                    className="mt-2 border-neutral-300 dark:border-neutral-600"
-                  />
-                </div>
-                
-                <div>
-                  <Label className="text-neutral-700 dark:text-neutral-300">Mudança na Demanda (%)</Label>
-                  <div className="px-3 mt-3">
-                    <Slider
-                      value={[currentScenario.demandChange]}
-                      onValueChange={([value]) => setCurrentScenario(prev => ({
-                        ...prev,
-                        demandChange: value
-                      }))}
-                      max={50}
-                      min={-30}
-                      step={1}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-                    <span>-30%</span>
-                    <Badge variant={currentScenario.demandChange > 0 ? "default" : currentScenario.demandChange < 0 ? "destructive" : "secondary"}>
-                      {currentScenario.demandChange > 0 ? '+' : ''}{currentScenario.demandChange}%
-                    </Badge>
-                    <span>+50%</span>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-neutral-700 dark:text-neutral-300">Fator de Sazonalidade</Label>
-                  <div className="px-3 mt-3">
-                    <Slider
-                      value={[currentScenario.seasonalityFactor]}
-                      onValueChange={([value]) => setCurrentScenario(prev => ({
-                        ...prev,
-                        seasonalityFactor: value
-                      }))}
-                      max={2}
-                      min={0.5}
-                      step={0.1}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-                    <span>0.5x</span>
-                    <Badge variant="outline">{currentScenario.seasonalityFactor}x</Badge>
-                    <span>2.0x</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Lead Time e Fornecedores */}
-            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
-                  <Calendar className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-                  Lead Time & Fornecedores
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6 pt-6">
-                <div>
-                  <Label className="text-neutral-700 dark:text-neutral-300">Variabilidade do Lead Time (%)</Label>
-                  <div className="px-3 mt-3">
-                    <Slider
-                      value={[currentScenario.leadTimeVariability]}
-                      onValueChange={([value]) => setCurrentScenario(prev => ({
-                        ...prev,
-                        leadTimeVariability: value
-                      }))}
-                      max={60}
-                      min={5}
-                      step={5}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-                    <span>5%</span>
-                    <Badge variant={currentScenario.leadTimeVariability > 35 ? "destructive" : "default"}>
-                      {currentScenario.leadTimeVariability}%
-                    </Badge>
-                    <span>60%</span>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-neutral-700 dark:text-neutral-300">Safety Stock (dias)</Label>
-                  <div className="px-3 mt-3">
-                    <Slider
-                      value={[currentScenario.safetyStock]}
-                      onValueChange={([value]) => setCurrentScenario(prev => ({
-                        ...prev,
-                        safetyStock: value
-                      }))}
-                      max={21}
-                      min={3}
-                      step={1}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-                    <span>3 dias</span>
-                    <Badge variant="outline">{currentScenario.safetyStock} dias</Badge>
-                    <span>21 dias</span>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-neutral-700 dark:text-neutral-300">Tolerância a Risco (%)</Label>
-                  <div className="px-3 mt-3">
-                    <Slider
-                      value={[currentScenario.riskTolerance]}
-                      onValueChange={([value]) => setCurrentScenario(prev => ({
-                        ...prev,
-                        riskTolerance: value
-                      }))}
-                      max={15}
-                      min={1}
-                      step={1}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-                    <span>1%</span>
-                    <Badge variant={currentScenario.riskTolerance > 8 ? "destructive" : "default"}>
-                      {currentScenario.riskTolerance}%
-                    </Badge>
-                    <span>15%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Orçamento e SLA */}
-            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
-                  <DollarSign className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-                  Orçamento & SLA
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6 pt-6">
-                <div>
-                  <Label className="text-neutral-700 dark:text-neutral-300">Orçamento Mensal (R$)</Label>
-                  <Input
-                    type="number"
-                    value={currentScenario.budgetLimit}
-                    onChange={(e) => setCurrentScenario(prev => ({
-                      ...prev,
-                      budgetLimit: parseFloat(e.target.value) || 0
-                    }))}
-                    placeholder="50000"
-                    className="mt-2 border-neutral-300 dark:border-neutral-600"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-neutral-700 dark:text-neutral-300">Nível de Serviço Target (%)</Label>
-                  <div className="px-3 mt-3">
-                    <Slider
-                      value={[currentScenario.serviceLevel]}
-                      onValueChange={([value]) => setCurrentScenario(prev => ({
-                        ...prev,
-                        serviceLevel: value
-                      }))}
-                      max={99}
-                      min={85}
-                      step={1}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-                    <span>85%</span>
-                    <Badge variant={currentScenario.serviceLevel >= 95 ? "default" : "secondary"}>
-                      {currentScenario.serviceLevel}%
-                    </Badge>
-                    <span>99%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Ações */}
-            <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
-                  <Zap className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
-                  Executar Simulação
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                <Button
-                  onClick={runSimulation}
-                  disabled={isRunning}
-                  className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900"
-                  size="lg"
-                >
-                  {isRunning ? (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      Processando...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="mr-2 h-4 w-4" />
-                      Executar Simulação
-                    </>
-                  )}
-                </Button>
-
-                {isRunning && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400">
-                      <span>Processando Monte Carlo...</span>
-                      <span>65%</span>
-                    </div>
-                    <Progress value={65} className="w-full" />
-                  </div>
-                )}
-
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={saveScenario} className="flex-1 border-neutral-300 dark:border-neutral-600">
-                    <Save className="mr-2 h-4 w-4" />
-                    Salvar
-                  </Button>
-                  <Button variant="outline" onClick={exportResults} className="flex-1 border-neutral-300 dark:border-neutral-600">
-                    <Download className="mr-2 h-4 w-4" />
-                    Exportar
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <div className="xl:col-span-3">
+              <SimulationParameters
+                currentScenario={currentScenario}
+                setCurrentScenario={setCurrentScenario}
+                selectedTemplate={selectedTemplate}
+                setSelectedTemplate={setSelectedTemplate}
+                applyTemplate={applyTemplate}
+              />
+            </div>
+            <div>
+              <SimulationActions
+                isRunning={isRunning}
+                onRunSimulation={runSimulation}
+                onSaveScenario={saveScenario}
+                onExportResults={exportResults}
+                onScheduleSimulation={scheduleSimulation}
+              />
+            </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="scheduled" className="space-y-6">
+          <ScheduledSimulations
+            scenarios={scenarios}
+            onScheduleCreate={handleScheduleCreate}
+          />
         </TabsContent>
 
         <TabsContent value="results" className="space-y-6">
