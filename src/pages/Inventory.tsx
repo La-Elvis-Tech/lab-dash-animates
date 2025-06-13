@@ -316,7 +316,7 @@ const Inventory = () => {
                         selectedCategory === category.id
                           ? "bg-lab-blue text-white dark:bg-lab-blue/80"
                           : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-700/80 dark:text-gray-300 dark:hover:bg-gray-700"
-                      } rounded-md border border-gray-200 dark:border-gray-700 transition-colors`}
+                      } rounded-md transition-colors`}
                       onClick={() => handleCategoryChange(category.id)}
                     >
                       {category.icon && <category.icon size={16} />}

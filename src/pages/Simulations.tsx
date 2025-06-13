@@ -316,7 +316,7 @@ const Simulations = () => {
                 setSelectedTemplate(value);
                 applyTemplate(value);
               }}>
-                <SelectTrigger className="border-neutral-300 dark:border-neutral-600">
+                <SelectTrigger className=" bg-gray-300 dark:bg-neutral-700 border-none">
                   <SelectValue placeholder="Selecione um template" />
                 </SelectTrigger>
                 <SelectContent>
