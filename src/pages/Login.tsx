@@ -1,11 +1,6 @@
-
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import SimpleLoader from '../components/SimpleLoader';
-
-// Lazy load the 3D background to improve initial page load
-const ThreeBackground = lazy(() => import('../components/ThreeBackground/ThreeBackground'));
 
 export const Login = () => {
   const [u, setU] = useState('');
@@ -32,13 +27,29 @@ export const Login = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden ">
-      {/* Background 3D - Load lazily */}
-      {show3D && (
-        <Suspense fallback={null}>
-          <ThreeBackground />
-        </Suspense>
-      )}
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+      </div>
+
+      {/* Floating Particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-white/10 rounded-full animate-bounce"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${2 + Math.random() * 2}s`
+            }}
+          ></div>
+        ))}
+      </div>
 
       {/* Login Form Container */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
