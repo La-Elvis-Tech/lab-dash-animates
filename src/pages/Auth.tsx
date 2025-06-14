@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -178,11 +177,16 @@ const Auth = () => {
 
     try {
       setLoading(true);
-      await resetPassword(resetEmail);
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: 'https://laelvistech.netlify.app/reset-password',
+      });
+
+      if (error) throw error;
       
       toast({
         title: 'Email enviado!',
-        description: 'Verifique seu email para redefinir a senha.',
+        description: 'Verifique seu email para redefinir a senha. O link será válido por 1 hora.',
       });
       
       setShowResetForm(false);
@@ -190,9 +194,15 @@ const Auth = () => {
     } catch (error: any) {
       console.error('Reset password error:', error);
       
+      let errorMessage = 'Não foi possível enviar o email de recuperação.';
+      
+      if (error.message?.includes('For security purposes')) {
+        errorMessage = 'Por segurança, aguarde alguns minutos antes de solicitar um novo email.';
+      }
+      
       toast({
         title: 'Erro',
-        description: 'Não foi possível enviar o email de recuperação.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
