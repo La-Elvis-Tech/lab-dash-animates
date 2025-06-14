@@ -1,8 +1,12 @@
+
 // src/pages/Login.jsx
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import ThreeBackground from '../components/ThreeBackground/ThreeBackground';
+import SimpleLoader from '../components/SimpleLoader';
+
+// Lazy load the 3D background to improve initial page load
+const ThreeBackground = lazy(() => import('../components/ThreeBackground/ThreeBackground'));
 
 export const Login = () => {
   const [u, setU] = useState('');
@@ -10,8 +14,17 @@ export const Login = () => {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [show3D, setShow3D] = useState(false);
   const { signin } = useContext(AuthContext);
   const nav = useNavigate();
+
+  // Load 3D background after a delay to prioritize form rendering
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setShow3D(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,8 +43,12 @@ export const Login = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden ">
-      {/* Background 3D */}
-      <ThreeBackground />
+      {/* Background 3D - Load lazily */}
+      {show3D && (
+        <Suspense fallback={null}>
+          <ThreeBackground />
+        </Suspense>
+      )}
 
       {/* Login Form Container */}
       <div className="relative z-10 min-h-screen bg-gradient-to-br from-gray-500/40 to to-indigo-500/70 dark:from-neutral-700/90 dark:to-black/25 flex items-center justify-center p-4 ">

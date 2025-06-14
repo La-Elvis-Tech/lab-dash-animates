@@ -1,75 +1,88 @@
 
-import React, { Suspense, useRef, useEffect } from 'react'
+import React, { Suspense, useRef, useEffect, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, useGLTF } from '@react-three/drei'
-import { Mesh, MeshStandardMaterial, Color, Group, Box3, Vector3 } from 'three'
+import { Mesh, MeshStandardMaterial, Color, Group } from 'three'
 import './ThreeBackground.css'
+
+// Preload the model for better performance
+useGLTF.preload('/models/base.glb')
 
 function Model() {
   const { scene } = useGLTF('/models/base.glb')
   const modelRef = useRef<Group>(null)
 
+  // Memoize the material to avoid recreating it on every render
+  const optimizedMaterial = useMemo(() => 
+    new MeshStandardMaterial({
+      color: new Color('#120fd1'),
+      metalness: 0.6,
+      roughness: 0.1,
+    }), []
+  )
+
   useFrame((state, delta) => {
     if (modelRef.current) {
-      modelRef.current.rotation.z += 1 * delta
-
+      // Reduce rotation speed and use more efficient animation
+      modelRef.current.rotation.z += 0.5 * delta
     }
   })
 
   useEffect(() => {
+    // Optimize the model once when it loads
     scene.traverse((child) => {
       if (child instanceof Mesh) {
-        child.material = new MeshStandardMaterial({
-          color: new Color('#120fd1'),
-          metalness: 0.6,  // Ajustado para melhor reflexo
-          roughness: 0.1,  // Ajustado para sombras mais definidas
-        })
-        child.castShadow = true  // Habilita sombra projetada
-        child.receiveShadow = true  // Habilita sombra recebida
+        child.material = optimizedMaterial
+        child.castShadow = true
+        child.receiveShadow = true
+        // Optimize geometry
+        if (child.geometry) {
+          child.geometry.computeBoundingSphere()
+        }
       }
     })
-  }, [scene])
+  }, [scene, optimizedMaterial])
 
   return (
-    <group ref={modelRef} position={[0, -1, 0.3]} scale={0.35}>
-      <primitive object={scene} rotation={[Math.PI / 2, -2, Math.PI / 1 ]} />
+    <group ref={modelRef} position={[0, -1, 0.3]} scale={0.3}>
+      <primitive object={scene} rotation={[Math.PI / 2, -2, Math.PI / 1]} />
     </group>
   )
 }
 
-export default function ThreeBackground() {
+// Memoize the entire component to prevent unnecessary re-renders
+export default React.memo(function ThreeBackground() {
   return (
     <div className="three-bg-container">
       <Canvas
-        gl={{ antialias: true }}
-        shadows // Habilita sistema de sombras
+        gl={{ 
+          antialias: false, // Disable antialiasing for better performance
+          alpha: true,
+          powerPreference: "high-performance"
+        }}
+        shadows={false} // Disable shadows for better performance
         camera={{ position: [0, 1, 0], fov: 60 }}
+        frameloop="demand" // Only render when needed
+        performance={{ min: 0.5 }} // Lower performance threshold
       >
-        {/* Luz ambiente reduzida para aumentar contraste */}
-        <ambientLight intensity={0.3} />
-        
-        {/* Luz direcional principal com sombras */}
-        <directionalLight 
-          position={[5, 10, 5]} 
-          intensity={1.5} 
-          castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-          shadow-camera-far={50}
-          shadow-camera-left={-10}
-          shadow-camera-right={10}
-          shadow-camera-top={10}
-          shadow-camera-bottom={-10}
-        />
+        {/* Simplified lighting for better performance */}
+        <ambientLight intensity={0.4} />
+        <directionalLight position={[5, 10, 5]} intensity={1.2} />
 
         <Suspense fallback={null}>
           <Model />
-          {/* Ambiente com maior intensidade */}
-          <Environment preset="city" />
+          {/* Use simpler environment */}
+          <Environment preset="dawn" />
         </Suspense>
         
-        <OrbitControls />
+        <OrbitControls 
+          enableDamping={true}
+          dampingFactor={0.05}
+          enableZoom={false}
+          enablePan={false}
+          enableRotate={false}
+        />
       </Canvas>
     </div>
   )
-}
+})
