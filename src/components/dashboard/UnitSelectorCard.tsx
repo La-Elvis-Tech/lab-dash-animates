@@ -136,7 +136,7 @@ const UnitSelectorCard: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className=" text-sm font-bold text-indigo-600 dark:text-indigo-300 bg-gradient-to-bl from-neutral-50 to-blue-50 dark:from-neutral-500/40 dark:to-neutral-700/80 px-2 py-1 border-2 border-neutral-600/80 rounded-full shadow-md">
+                      <span className=" text-sm font-bold text-indigo-600 dark:text-indigo-300 bg-gradient-to-bl from-neutral-50 to-blue-50 dark:from-neutral-500/40 dark:to-neutral-700/80 px-2 py-1 border-2 border-neutral-200 dark:border-neutral-600/80 rounded-full shadow-md">
                         {unit.healthPercent}%
                       </span>
                       

@@ -48,7 +48,7 @@ export const AlertCard: React.FC<AlertCardProps> = ({
   return (
     <Card className={`transition-all duration-200 hover:shadow-md ${
       !alert.isRead 
-        ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800' 
+        ? 'bg-blue-50/70 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800' 
         : 'bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800'
     }`}>
       <CardContent className="p-4">

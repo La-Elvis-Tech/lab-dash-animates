@@ -43,7 +43,7 @@ const DemandForecastCard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 my-2 bg-gray-300/40 dark:bg-neutral-800/60 rounded-xl border border-gray-200 dark:border-neutral-900">
+            <div className="flex items-center justify-between p-3 my-2 bg-gray-100/40 dark:bg-neutral-800/60 rounded-xl border border-gray-200 dark:border-neutral-900 shadow-sm">
               <div>
                 <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                   {forecastData.nextMonth}
