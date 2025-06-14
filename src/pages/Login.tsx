@@ -2,7 +2,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import ThreeBackground from '../components/ThreeBackground/ThreeBackground';
+  
 
 export const Login = () => {
   const [u, setU] = useState('');
@@ -31,7 +31,7 @@ export const Login = () => {
   return (
     <div className="relative min-h-screen overflow-hidden ">
       {/* Background 3D */}
-      <ThreeBackground />
+      
 
       {/* Login Form Container */}
       <div className="relative z-10 min-h-screen bg-gradient-to-br from-gray-500/40 to to-indigo-500/70 dark:from-neutral-700/90 dark:to-black/25 flex items-center justify-center p-4 ">
