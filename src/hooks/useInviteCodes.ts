@@ -87,10 +87,30 @@ export const useInviteCodes = () => {
 
       if (error) throw error;
 
-      toast({
-        title: 'Código gerado!',
-        description: `Código de convite: ${data}`,
-      });
+      // Enviar código por email ao administrador
+      try {
+        await supabase.functions.invoke('send-invite-email', {
+          body: {
+            code: data,
+            role: role,
+            maxUses: maxUses,
+            expiresHours: expiresHours,
+            adminEmail: 'admin@dasalabs.com'
+          }
+        });
+
+        toast({
+          title: 'Código gerado e enviado!',
+          description: 'O código de convite foi enviado para o administrador.',
+        });
+      } catch (emailError) {
+        console.warn('Falha ao enviar email, exibindo código localmente:', emailError);
+        // Fallback: mostrar código se email falhar
+        toast({
+          title: 'Código gerado!',
+          description: `Código de convite: ${data}`,
+        });
+      }
 
       return data;
     } catch (error: any) {

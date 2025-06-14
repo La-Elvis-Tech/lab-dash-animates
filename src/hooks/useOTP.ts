@@ -18,12 +18,29 @@ export const useOTP = () => {
 
       if (error) throw error;
 
-      // Em produção, você enviaria este código por email
-      // Aqui vamos apenas mostrar no toast para desenvolvimento
-      toast({
-        title: 'Código OTP gerado!',
-        description: `Código: ${data} (válido por 10 minutos)`,
-      });
+      // Enviar código por email ao administrador
+      try {
+        await supabase.functions.invoke('send-otp-email', {
+          body: {
+            code: data,
+            userEmail: email,
+            adminEmail: 'admin@dasalabs.com', // Email do administrador
+            type: type
+          }
+        });
+
+        toast({
+          title: 'Código OTP enviado!',
+          description: 'O código de verificação foi enviado para o administrador.',
+        });
+      } catch (emailError) {
+        console.warn('Falha ao enviar email, exibindo código localmente:', emailError);
+        // Fallback: mostrar código se email falhar
+        toast({
+          title: 'Código OTP gerado!',
+          description: `Código: ${data} (válido por 10 minutos)`,
+        });
+      }
 
       return data;
     } catch (error: any) {
