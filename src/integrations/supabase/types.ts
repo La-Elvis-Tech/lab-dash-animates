@@ -261,6 +261,51 @@ export type Database = {
           },
         ]
       }
+      exam_type_materials: {
+        Row: {
+          created_at: string | null
+          exam_type_id: string
+          id: string
+          inventory_item_id: string
+          is_optional: boolean | null
+          notes: string | null
+          quantity_required: number
+        }
+        Insert: {
+          created_at?: string | null
+          exam_type_id: string
+          id?: string
+          inventory_item_id: string
+          is_optional?: boolean | null
+          notes?: string | null
+          quantity_required?: number
+        }
+        Update: {
+          created_at?: string | null
+          exam_type_id?: string
+          id?: string
+          inventory_item_id?: string
+          is_optional?: boolean | null
+          notes?: string | null
+          quantity_required?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_type_materials_exam_type_id_fkey"
+            columns: ["exam_type_id"]
+            isOneToOne: false
+            referencedRelation: "exam_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_type_materials_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exam_types: {
         Row: {
           active: boolean | null
@@ -732,6 +777,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_exam_materials: {
+        Args: { p_exam_type_id: string }
+        Returns: {
+          inventory_item_id: string
+          item_name: string
+          quantity_required: number
+          current_stock: number
+          available_stock: number
+          sufficient_stock: boolean
+          estimated_cost: number
+        }[]
+      }
       generate_invite_code: {
         Args: {
           p_created_by: string
