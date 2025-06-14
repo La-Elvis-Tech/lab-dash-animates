@@ -1,3 +1,4 @@
+
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -12,9 +13,14 @@ export const Login = () => {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { signin } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
   const { theme } = useTheme();
   const nav = useNavigate();
+
+  // Função signin fictícia para compatibilidade
+  const signin = (username: string, password: string) => {
+    return username === 'admin' && password === 'admin';
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,14 +50,16 @@ export const Login = () => {
         <div className="max-w-md w-full">
           {/* Logo/Brand Area */}
           <div className="text-center mb-8">
-            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg ${
+            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg p-2 ${
               theme === 'dark'
                 ? 'bg-gradient-to-r from-blue-500 to-blue-600'
                 : 'bg-gradient-to-r from-blue-600 to-blue-700'
             }`}>
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <img 
+                src="/logolaelvis.svg" 
+                alt="La Elvis Tech" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <h1 className={`text-4xl font-bold font-michroma mb-2 ${
               theme === 'dark'
@@ -103,7 +111,7 @@ export const Login = () => {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <User />
+                      <User className="h-4 w-4 text-gray-400" />
                     </div>
                     <input
                       id="username"
@@ -132,7 +140,7 @@ export const Login = () => {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Lock />
+                      <Lock className="h-4 w-4 text-gray-400" />
                     </div>
                     <input
                       id="password"

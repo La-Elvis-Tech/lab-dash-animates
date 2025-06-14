@@ -45,6 +45,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (error) throw error;
   };
 
+  const updateProfile = async (updates: any) => {
+    const result = await supabaseAuth.updateProfile(updates);
+    return {
+      data: result.data || null,
+      error: result.error || null
+    };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -58,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         logout,
         resetPassword,
-        updateProfile: supabaseAuth.updateProfile,
+        updateProfile,
         hasRole: supabaseAuth.hasRole,
         isAdmin: supabaseAuth.isAdmin,
         isSupervisor: supabaseAuth.isSupervisor,
@@ -69,6 +77,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     </AuthContext.Provider>
   );
 };
+
+export { AuthContext };
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
