@@ -8,6 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Shield, CheckCircle } from 'lucide-react';
 import { useInviteCodes } from '@/hooks/useInviteCodes';
 
+interface ValidationResult {
+  valid: boolean;
+  role?: string;
+  message?: string;
+}
+
 interface InviteCodeStepProps {
   onValidCode: (code: string, role: string) => void;
   loading?: boolean;
@@ -15,16 +21,16 @@ interface InviteCodeStepProps {
 
 export const InviteCodeStep: React.FC<InviteCodeStepProps> = ({ onValidCode, loading = false }) => {
   const [code, setCode] = useState('');
-  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
   const { validateInviteCode, loading: validating } = useInviteCodes();
 
   const handleValidate = async () => {
     if (!code.trim()) return;
 
-    const result = await validateInviteCode(code.trim().toUpperCase());
+    const result = await validateInviteCode(code.trim().toUpperCase()) as ValidationResult;
     setValidationResult(result);
 
-    if (result.valid) {
+    if (result.valid && result.role) {
       onValidCode(code.trim().toUpperCase(), result.role);
     }
   };
@@ -73,14 +79,16 @@ export const InviteCodeStep: React.FC<InviteCodeStepProps> = ({ onValidCode, loa
                   <span className="text-green-800 dark:text-green-200 text-sm">
                     Código válido!
                   </span>
-                  <Badge variant="outline" className="ml-auto">
-                    {validationResult.role}
-                  </Badge>
+                  {validationResult.role && (
+                    <Badge variant="outline" className="ml-auto">
+                      {validationResult.role}
+                    </Badge>
+                  )}
                 </>
               ) : (
                 <>
                   <span className="text-red-800 dark:text-red-200 text-sm">
-                    {validationResult.message}
+                    {validationResult.message || 'Código inválido'}
                   </span>
                 </>
               )}

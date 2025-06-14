@@ -1,177 +1,106 @@
 
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Link, useLocation } from 'react-router-dom';
 import { 
-  LayoutDashboard, 
+  Home, 
   Package, 
-  ClipboardList, 
+  FileText, 
   ShoppingCart, 
-  AlertTriangle, 
-  FlaskConical, 
   BarChart3, 
   Settings, 
-  LogOut, 
-  Calendar,
-  Users
+  AlertTriangle, 
+  Play,
+  Users,
+  LogOut,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
 
-const Sidebar = () => {
+interface SidebarProps {
+  isCollapsed: boolean;
+  toggleSidebar: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, logout, isAuthenticated } = useAuth();
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/auth');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
+  const { logout, user } = useAuth();
 
   const menuItems = [
-    {
-      title: 'Dashboard',
-      icon: LayoutDashboard,
-      path: '/',
-      roles: ['admin', 'user', 'supervisor']
-    },
-    {
-      title: 'Agendamentos',
-      icon: Calendar,
-      path: '/appointments',
-      roles: ['admin', 'user', 'supervisor']
-    },
-    {
-      title: 'Estoque',
-      icon: Package,
-      path: '/inventory',
-      roles: ['admin', 'user', 'supervisor']
-    },
-    {
-      title: 'Solicitações',
-      icon: ClipboardList,
-      path: '/requests',
-      roles: ['admin', 'user', 'supervisor']
-    },
-    {
-      title: 'Pedidos',
-      icon: ShoppingCart,
-      path: '/orders',
-      roles: ['admin', 'supervisor']
-    },
-    {
-      title: 'Alertas',
-      icon: AlertTriangle,
-      path: '/alerts',
-      roles: ['admin', 'user', 'supervisor']
-    },
-    {
-      title: 'Simulações',
-      icon: FlaskConical,
-      path: '/simulations',
-      roles: ['admin', 'supervisor']
-    },
-    {
-      title: 'Relatórios',
-      icon: BarChart3,
-      path: '/reports',
-      roles: ['admin', 'supervisor']
-    },
-    {
-      title: 'Configurações',
-      icon: Settings,
-      path: '/settings',
-      roles: ['admin', 'supervisor']
-    },
-    {
-      title: 'Usuários',
-      icon: Users,
-      path: '/users',
-      roles: ['admin']
-    }
+    { icon: Home, label: 'Dashboard', path: '/' },
+    { icon: Package, label: 'Inventário', path: '/inventory' },
+    { icon: FileText, label: 'Solicitações', path: '/requests' },
+    { icon: ShoppingCart, label: 'Pedidos', path: '/orders' },
+    { icon: AlertTriangle, label: 'Alertas', path: '/alerts' },
+    { icon: Play, label: 'Simulações', path: '/simulations' },
+    { icon: BarChart3, label: 'Relatórios', path: '/reports' },
+    { icon: Users, label: 'Usuários', path: '/users' },
+    { icon: Settings, label: 'Configurações', path: '/settings' },
   ];
 
-  const filteredMenuItems = menuItems.filter(item => 
-    user?.role && item.roles.includes(user.role)
-  );
-
   return (
-    <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-xl font-bold text-lab-blue dark:text-blue-400">
-          DASA Labs
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Sistema de Gestão
-        </p>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {filteredMenuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-          
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                isActive
-                  ? 'bg-lab-blue text-white dark:bg-blue-600'
-                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
-              }`}
-            >
-              <Icon className="h-5 w-5" />
-              <span className="font-medium">{item.title}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* User Profile */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-3 mb-4">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src="" />
-            <AvatarFallback className="bg-lab-blue text-white">
-              {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-              {user?.name || user?.email}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
-              {user?.role || 'Usuário'}
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
+    <div className={`${isCollapsed ? 'w-16' : 'w-64'} bg-lab-blue text-white h-screen fixed left-0 top-0 z-50 transition-all duration-300 flex flex-col`}>
+      {/* Header */}
+      <div className="p-4 border-b border-lab-blue/20">
+        <div className="flex items-center justify-between">
+          {!isCollapsed && (
+            <h1 className="text-xl font-bold text-white">DASA Labs</h1>
+          )}
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            onClick={handleLogout}
-            className="flex-1"
+            onClick={toggleSidebar}
+            className="text-white hover:bg-lab-blue/20"
           >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sair
+            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </Button>
         </div>
       </div>
-    </aside>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
+        <ul className="space-y-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                    isActive 
+                      ? 'bg-white/20 text-white' 
+                      : 'text-lab-lightBlue hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <Icon size={20} />
+                  {!isCollapsed && <span>{item.label}</span>}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+
+      {/* User info and logout */}
+      <div className="p-4 border-t border-lab-blue/20">
+        {!isCollapsed && user && (
+          <div className="mb-3">
+            <p className="text-sm text-lab-lightBlue">{user.email}</p>
+          </div>
+        )}
+        <Button
+          variant="ghost"
+          onClick={logout}
+          className="w-full text-white hover:bg-red-500/20 hover:text-red-200 justify-start"
+        >
+          <LogOut size={20} />
+          {!isCollapsed && <span className="ml-3">Sair</span>}
+        </Button>
+      </div>
+    </div>
   );
 };
 
