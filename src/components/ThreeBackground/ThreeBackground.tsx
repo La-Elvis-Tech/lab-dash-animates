@@ -77,9 +77,6 @@ export default React.memo(function ThreeBackground() {
         
         <OrbitControls 
           enableDamping={true}
-          enableZoom={false}
-          enablePan={false}
-          enableRotate={false}
         />
       </Canvas>
     </div>
