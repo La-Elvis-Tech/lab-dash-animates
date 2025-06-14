@@ -77,7 +77,6 @@ export default React.memo(function ThreeBackground() {
         
         <OrbitControls 
           enableDamping={true}
-          dampingFactor={0.05}
           enableZoom={false}
           enablePan={false}
           enableRotate={false}
