@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useInviteCodes } from '@/hooks/useInviteCodes';
 import { useOTP } from '@/hooks/useOTP';
 import { InviteCodeStep } from '@/components/auth/InviteCodeStep';
+import { AdminEmailStep } from '@/components/auth/AdminEmailStep';
 import { OTPStep } from '@/components/auth/OTPStep';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Loader2, LogIn, UserPlus, Lock, Mail } from 'lucide-react';
@@ -18,7 +19,7 @@ import { Loader2, LogIn, UserPlus, Lock, Mail } from 'lucide-react';
 const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
-  const [step, setStep] = useState<'invite' | 'form' | 'otp'>('invite');
+  const [step, setStep] = useState<'invite' | 'admin-email' | 'form' | 'otp'>('invite');
   
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
@@ -31,6 +32,7 @@ const Auth = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [userRole, setUserRole] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
   
   // Reset password form
   const [resetEmail, setResetEmail] = useState('');
@@ -92,6 +94,11 @@ const Auth = () => {
   const handleInviteValidation = (code: string, role: string) => {
     setInviteCode(code);
     setUserRole(role);
+    setStep('admin-email');
+  };
+
+  const handleAdminEmailConfirmed = (email: string) => {
+    setAdminEmail(email);
     setStep('form');
   };
 
@@ -120,8 +127,8 @@ const Auth = () => {
     try {
       setLoading(true);
       
-      // Gerar OTP primeiro
-      await generateOTP(registerEmail, 'signup');
+      // Gerar OTP para o email do admin (que já foi validado)
+      await generateOTP(adminEmail, 'signup');
       setStep('otp');
     } catch (error: any) {
       console.error('Error generating OTP:', error);
@@ -193,7 +200,9 @@ const Auth = () => {
       
       let errorMessage = 'Não foi possível enviar o email de recuperação.';
       
-      if (error.message?.includes('For security purposes')) {
+      if (error.message?.includes('Email não encontrado')) {
+        errorMessage = 'Email não encontrado no sistema.';
+      } else if (error.message?.includes('For security purposes')) {
         errorMessage = 'Por segurança, aguarde alguns minutos antes de solicitar um novo email.';
       }
       
@@ -279,7 +288,6 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 p-4">
       <div className="w-full max-w-md">
-        {/* Header - altura fixa */}
         <div className="text-center mb-8 h-32">
           <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg p-2">
             <img 
@@ -315,7 +323,6 @@ const Auth = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Container com altura mínima fixa para evitar mudanças de layout */}
           <div className="min-h-[500px]">
             <TabsContent value="login">
               <Card className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl">
@@ -391,6 +398,15 @@ const Auth = () => {
                 <div className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl rounded-lg">
                   <InviteCodeStep 
                     onValidCode={handleInviteValidation}
+                    loading={loading}
+                  />
+                </div>
+              )}
+
+              {step === 'admin-email' && (
+                <div className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl rounded-lg">
+                  <AdminEmailStep 
+                    onAdminEmailConfirmed={handleAdminEmailConfirmed}
                     loading={loading}
                   />
                 </div>
@@ -490,7 +506,7 @@ const Auth = () => {
                           type="button"
                           variant="outline"
                           className="w-full h-12 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                          onClick={() => setStep('invite')}
+                          onClick={() => setStep('admin-email')}
                         >
                           Voltar
                         </Button>
@@ -503,10 +519,10 @@ const Auth = () => {
               {step === 'otp' && (
                 <div className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl rounded-lg">
                   <OTPStep
-                    email={registerEmail}
+                    email={adminEmail}
                     type="signup"
                     onVerified={handleOTPVerified}
-                    onResend={() => generateOTP(registerEmail, 'signup')}
+                    onResend={() => generateOTP(adminEmail, 'signup')}
                     loading={loading}
                   />
                 </div>

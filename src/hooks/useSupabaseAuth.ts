@@ -148,6 +148,17 @@ export const useSupabaseAuth = () => {
   };
 
   const resetPassword = async (email: string) => {
+    // Verificar se o email existe no banco de dados antes de enviar
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('email', email)
+      .single();
+
+    if (profileError || !profileData) {
+      throw new Error('Email não encontrado no sistema.');
+    }
+
     const redirectUrl = `https://laelvistech.netlify.app/reset-password`;
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {

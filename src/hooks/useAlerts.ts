@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
+import { useEmailAlerts } from "./useEmailAlerts";
 
 export interface Alert {
   id: string;
@@ -90,6 +91,7 @@ const mockAlertsData: Alert[] = [
 export const useAlerts = () => {
   const [alerts, setAlerts] = useState<Alert[]>(mockAlertsData);
   const [hasShownToast, setHasShownToast] = useState(false);
+  const { sendAlertEmail } = useEmailAlerts();
 
   const markAsRead = (alertId: string) => {
     setAlerts(prev => 
@@ -121,6 +123,23 @@ export const useAlerts = () => {
     );
   };
 
+  // Enviar alertas por email automaticamente
+  const sendEmailForAlert = async (alert: Alert) => {
+    await sendAlertEmail({
+      type: alert.type,
+      title: alert.title,
+      description: alert.description,
+      item: alert.item,
+      priority: alert.priority,
+      currentStock: alert.currentStock,
+      minStock: alert.minStock,
+      unit: alert.unit,
+      expiryDate: alert.expiryDate?.toISOString().split('T')[0],
+      lot: alert.lot,
+      predictedDate: alert.predictedDate?.toISOString().split('T')[0],
+    });
+  };
+
   // Mostrar toast com alertas não lidos ao carregar a página
   useEffect(() => {
     if (!hasShownToast) {
@@ -128,9 +147,14 @@ export const useAlerts = () => {
       const unreadCount = getUnreadCount();
       
       if (criticalAlerts.length > 0) {
+        // Enviar alertas críticos por email
+        criticalAlerts.forEach(alert => {
+          sendEmailForAlert(alert);
+        });
+
         toast({
           title: `${criticalAlerts.length} Alerta${criticalAlerts.length > 1 ? 's' : ''} Crítico${criticalAlerts.length > 1 ? 's' : ''}`,
-          description: `${unreadCount} notificação${unreadCount > 1 ? 'ões' : ''} não lida${unreadCount > 1 ? 's' : ''} no total. Verifique a seção de alertas.`,
+          description: `${unreadCount} notificação${unreadCount > 1 ? 'ões' : ''} não lida${unreadCount > 1 ? 's' : ''} no total. Alertas enviados por email.`,
           variant: "destructive",
         });
       } else if (unreadCount > 0) {
@@ -150,6 +174,7 @@ export const useAlerts = () => {
     markAllAsRead,
     getUnreadCount,
     getUnreadAlerts,
-    getCriticalUnreadAlerts
+    getCriticalUnreadAlerts,
+    sendEmailForAlert
   };
 };
