@@ -1,29 +1,13 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import GaugeChart from "@/components/ui/GaugeChart";
-import { getInventoryPercent, type InventoryPercentItem } from "@/data/InventoryPercent";
+import { useInventoryPercent } from "@/hooks/useDashboardData";
 
 const InventoryGauges: React.FC = () => {
-  const [inventoryData, setInventoryData] = useState<InventoryPercentItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: inventoryData, isLoading } = useInventoryPercent();
 
-  useEffect(() => {
-    const loadInventoryPercent = async () => {
-      try {
-        const data = await getInventoryPercent();
-        setInventoryData(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error loading inventory percent:", error);
-        setLoading(false);
-      }
-    };
-
-    loadInventoryPercent();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
         <div className="p-6 text-center">
@@ -43,7 +27,7 @@ const InventoryGauges: React.FC = () => {
         Itens disponíveis no estoque
       </p>
       <CardContent className="grid grid-cols-2 gap-4 md:gap-6 my-0 md:my-3 mt-2 md:mt-0">
-        {inventoryData.map((item) => (
+        {inventoryData?.map((item) => (
           <div key={item.name}>
             <div className="block sm:inline lg:hidden">
               <div className="flex flex-col justify-center items-center md:my-0 p-4 rounded-md">

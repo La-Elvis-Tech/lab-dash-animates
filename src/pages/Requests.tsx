@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,112 +23,21 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ExamsStats from "@/components/exams/ExamsStats";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-// Mock data for exams
-const mockExams = [
-  { 
-    id: '001',
-    patient: 'João Silva',
-    type: 'Hemograma',
-    date: new Date(2024, 4, 15), 
-    doctor: 'Dra. Ana Souza',
-    laboratory: 'LabTech',
-    unit: 'Unidade Centro',
-    cost: 80.00,
-    status: 'Concluído',
-    result: 'Normal'
-  },
-  { 
-    id: '002',
-    patient: 'Maria Santos',
-    type: 'Glicemia',
-    date: new Date(2024, 4, 16), 
-    doctor: 'Dr. Carlos Mendes',
-    laboratory: 'BioLab',
-    unit: 'Unidade Norte',
-    cost: 45.00,
-    status: 'Concluído',
-    result: 'Alterado'
-  },
-  { 
-    id: '003',
-    patient: 'Pedro Oliveira',
-    type: 'Colonoscopia',
-    date: new Date(2024, 4, 17), 
-    doctor: 'Dra. Lucia Freitas',
-    laboratory: 'MedDiag',
-    unit: 'Unidade Sul',
-    cost: 550.00,
-    status: 'Pendente',
-    result: '-'
-  },
-  { 
-    id: '004',
-    patient: 'Ana Pereira',
-    type: 'Ultrassom',
-    date: new Date(2024, 4, 18), 
-    doctor: 'Dr. Roberto Castro',
-    laboratory: 'ImageLab',
-    unit: 'Unidade Leste',
-    cost: 280.00,
-    status: 'Concluído',
-    result: 'Normal'
-  },
-  { 
-    id: '005',
-    patient: 'Carlos Ribeiro',
-    type: 'Raio-X',
-    date: new Date(2024, 4, 19), 
-    doctor: 'Dra. Fernanda Lima',
-    laboratory: 'ImageLab',
-    unit: 'Unidade Centro',
-    cost: 180.00,
-    status: 'Concluído',
-    result: 'Alterado'
-  },
-  { 
-    id: '006',
-    patient: 'Luiza Martins',
-    type: 'Eletrocardiograma',
-    date: new Date(2024, 4, 20), 
-    doctor: 'Dr. Paulo Vieira',
-    laboratory: 'CardioLab',
-    unit: 'Unidade Norte',
-    cost: 220.00,
-    status: 'Pendente',
-    result: '-'
-  },
-];
-
-// Exam types for filtering
-const examTypes = [
-  'Todos Exames',
-  'Hemograma',
-  'Glicemia',
-  'Colonoscopia',
-  'Ultrassom',
-  'Raio-X',
-  'Eletrocardiograma'
-];
-
-// Units for filtering
-const units = [
-  'Todas Unidades',
-  'Unidade Centro',
-  'Unidade Norte',
-  'Unidade Sul',
-  'Unidade Leste'
-];
-
-// Laboratories for filtering
-const laboratories = [
-  'Todos Labs',
-  'LabTech',
-  'BioLab',
-  'MedDiag',
-  'ImageLab',
-  'CardioLab'
-];
+interface Exam {
+  id: string;
+  patient: string;
+  type: string;
+  date: Date;
+  doctor: string;
+  laboratory: string;
+  unit: string;
+  cost: number;
+  status: string;
+  result: string;
+}
 
 const Requests: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -135,7 +45,85 @@ const Requests: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string>('Todos Exames');
   const [selectedUnit, setSelectedUnit] = useState<string>('Todas Unidades');
   const [selectedLaboratory, setSelectedLaboratory] = useState<string>('Todos Labs');
-  const [exams, setExams] = useState(mockExams);
+
+  // Buscar dados de appointments do Supabase
+  const { data: exams = [], isLoading } = useQuery({
+    queryKey: ['appointments-requests'],
+    queryFn: async (): Promise<Exam[]> => {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          id,
+          patient_name,
+          scheduled_date,
+          cost,
+          status,
+          notes,
+          exam_types(name),
+          doctors(name),
+          units(name, code)
+        `)
+        .order('scheduled_date', { ascending: false });
+
+      if (error) throw error;
+
+      return data?.map(appointment => ({
+        id: appointment.id,
+        patient: appointment.patient_name,
+        type: appointment.exam_types?.name || 'Exame',
+        date: new Date(appointment.scheduled_date),
+        doctor: appointment.doctors?.name || 'Médico',
+        laboratory: 'LabTech', // Valor padrão - em produção viria de uma tabela
+        unit: appointment.units?.name || 'Unidade',
+        cost: appointment.cost || 0,
+        status: appointment.status || 'Agendado',
+        result: appointment.status === 'Concluído' ? 'Normal' : '-'
+      })) || [];
+    }
+  });
+
+  // Buscar tipos de exame únicos
+  const { data: examTypes = [] } = useQuery({
+    queryKey: ['exam-types-filter'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('exam_types')
+        .select('name')
+        .eq('active', true);
+      
+      const types = ['Todos Exames'];
+      if (data) {
+        types.push(...data.map(type => type.name));
+      }
+      return types;
+    }
+  });
+
+  // Buscar unidades únicas
+  const { data: units = [] } = useQuery({
+    queryKey: ['units-filter'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('units')
+        .select('name')
+        .eq('active', true);
+      
+      const unitsList = ['Todas Unidades'];
+      if (data) {
+        unitsList.push(...data.map(unit => unit.name));
+      }
+      return unitsList;
+    }
+  });
+
+  const laboratories = [
+    'Todos Labs',
+    'LabTech',
+    'BioLab',
+    'MedDiag',
+    'ImageLab',
+    'CardioLab'
+  ];
 
   // Filter exams based on search, date, type, unit and laboratory
   const filteredExams = exams.filter(exam => {
@@ -170,6 +158,29 @@ const Requests: React.FC = () => {
     setSelectedUnit('Todas Unidades');
     setSelectedLaboratory('Todos Labs');
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">Exames</h1>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
+              <div className="p-6">
+                <div className="animate-pulse">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -307,7 +318,7 @@ const Requests: React.FC = () => {
                                 {exam.type}
                               </CardTitle>
                               <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                ID: {exam.id}
+                                ID: {exam.id.slice(0, 8)}
                               </p>
                             </div>
                           </div>

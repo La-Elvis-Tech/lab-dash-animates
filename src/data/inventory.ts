@@ -1,6 +1,8 @@
 
+import { supabase } from '@/integrations/supabase/client';
+
 export interface InventoryItem {
-  id: number;
+  id: string;
   name: string;
   category: string;
   stock: number;
@@ -30,171 +32,156 @@ export const inventoryCategories: InventoryCategory[] = [
   { id: "disposable", name: "Descartáveis" },
 ];
 
-export const inventoryItems: InventoryItem[] = [
-  {
-    id: 1,
-    name: "Ácido Sulfúrico",
-    category: "reagents",
-    stock: 18,
-    unit: "Litros",
-    location: "Armário A3",
-    size: null,
-    expiryDate: "2025-10-15",
-    lastUsed: "2023-04-10",
-    status: "ok",
-    minStock: 15,
-    maxStock: 50,
-    reservedForAppointments: 3,
-    consumptionHistory: [12, 15, 18, 22, 20, 18],
-  },
-  {
-    id: 2,
-    name: "Placas de Petri",
-    category: "disposable",
-    stock: 35,
-    unit: "Unidades",
-    location: "Armário D2",
-    size: null,
-    expiryDate: "2025-08-22",
-    lastUsed: "2023-04-15",
-    status: "ok",
-    minStock: 20,
-    maxStock: 100,
-    reservedForAppointments: 8,
-    consumptionHistory: [25, 30, 35, 40, 38, 35],
-  },
-  {
-    id: 3,
-    name: "Etanol Absoluto",
-    category: "reagents",
-    stock: 3,
-    unit: "Litros",
-    location: "Armário A1",
-    size: null,
-    expiryDate: "2024-12-15",
-    lastUsed: "2023-04-12",
-    status: "low",
-    minStock: 10,
-    maxStock: 30,
-    reservedForAppointments: 1,
-    consumptionHistory: [8, 10, 6, 4, 3, 3],
-  },
-  {
-    id: 4,
-    name: "Balão Volumétrico",
-    category: "glassware",
-    stock: 12,
-    unit: "Unidades",
-    location: "Armário G4",
-    size: "500ml",
-    expiryDate: null,
-    lastUsed: "2023-03-28",
-    status: "ok",
-    minStock: 5,
-    maxStock: 20,
-    reservedForAppointments: 2,
-    consumptionHistory: [8, 10, 12, 14, 12, 12],
-  },
-  {
-    id: 5,
-    name: "Luvas de Nitrila (M)",
-    category: "disposable",
-    stock: 10,
-    unit: "Pares",
-    location: "Armário D1",
-    size: null,
-    expiryDate: "2024-07-18",
-    lastUsed: "2023-04-18",
-    status: "low",
-    minStock: 50,
-    maxStock: 200,
-    reservedForAppointments: 5,
-    consumptionHistory: [45, 50, 35, 25, 15, 10],
-  },
-  {
-    id: 6,
-    name: "Microscópio Óptico",
-    category: "equipment",
-    stock: 5,
-    unit: "Unidades",
-    location: "Sala E2",
-    expiryDate: null,
-    lastUsed: "2023-04-05",
-    status: "ok",
-    minStock: 3,
-    maxStock: 8,
-    reservedForAppointments: 0,
-    consumptionHistory: [5, 5, 5, 5, 5, 5],
-  },
-  {
-    id: 7,
-    name: "Pipeta Graduada",
-    category: "glassware",
-    stock: 25,
-    unit: "Unidades",
-    location: "Armário G2",
-    size: "10ml",
-    expiryDate: null,
-    lastUsed: "2023-04-14",
-    status: "ok",
-    minStock: 15,
-    maxStock: 40,
-    reservedForAppointments: 4,
-    consumptionHistory: [20, 22, 25, 28, 26, 25],
-  },
-  {
-    id: 8,
-    name: "Tubos de Ensaio",
-    category: "glassware",
-    stock: 8,
-    unit: "Unidades",
-    location: "Armário G3",
-    size: "15ml",
-    expiryDate: null,
-    lastUsed: "2023-04-16",
-    status: "low",
-    minStock: 20,
-    maxStock: 60,
-    reservedForAppointments: 2,
-    consumptionHistory: [35, 30, 25, 20, 15, 8],
-  },
-];
-
-// API Simulation Functions - Ready for backend integration
+// API Functions using Supabase
 export const getInventoryItems = async (): Promise<InventoryItem[]> => {
-  // Simula chamada para API
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(inventoryItems), 100);
-  });
+  const { data, error } = await supabase
+    .from('inventory_items')
+    .select(`
+      id,
+      name,
+      current_stock,
+      unit_measure,
+      storage_location,
+      expiry_date,
+      min_stock,
+      max_stock,
+      updated_at,
+      inventory_categories(name)
+    `)
+    .eq('active', true);
+
+  if (error) throw error;
+
+  return data?.map(item => ({
+    id: item.id,
+    name: item.name,
+    category: item.inventory_categories?.name || 'outros',
+    stock: item.current_stock,
+    unit: item.unit_measure,
+    location: item.storage_location || 'Não especificado',
+    size: null,
+    expiryDate: item.expiry_date,
+    lastUsed: item.updated_at,
+    status: item.current_stock <= item.min_stock ? 'low' : 'ok',
+    minStock: item.min_stock,
+    maxStock: item.max_stock || 100,
+    reservedForAppointments: 0, // Será calculado via query separada
+    consumptionHistory: [0, 0, 0, 0, 0, 0] // Histórico fictício - implementar via movimentações
+  })) || [];
 };
 
 export const getInventoryCategories = async (): Promise<InventoryCategory[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(inventoryCategories), 100);
-  });
+  const { data, error } = await supabase
+    .from('inventory_categories')
+    .select('id, name');
+
+  if (error) throw error;
+
+  const categories = [{ id: "all", name: "Todos" }];
+  if (data) {
+    categories.push(...data.map(cat => ({
+      id: cat.id,
+      name: cat.name
+    })));
+  }
+
+  return categories;
 };
 
-export const updateInventoryItem = async (itemId: number, updatedData: Partial<InventoryItem>): Promise<InventoryItem> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const item = inventoryItems.find(i => i.id === itemId);
-      if (item) {
-        Object.assign(item, updatedData);
-        resolve(item);
-      }
-    }, 100);
-  });
+export const updateInventoryItem = async (itemId: string, updatedData: Partial<InventoryItem>): Promise<InventoryItem> => {
+  const updateData: any = {};
+  
+  if (updatedData.stock !== undefined) updateData.current_stock = updatedData.stock;
+  if (updatedData.minStock !== undefined) updateData.min_stock = updatedData.minStock;
+  if (updatedData.maxStock !== undefined) updateData.max_stock = updatedData.maxStock;
+  if (updatedData.location !== undefined) updateData.storage_location = updatedData.location;
+  if (updatedData.expiryDate !== undefined) updateData.expiry_date = updatedData.expiryDate;
+
+  const { data, error } = await supabase
+    .from('inventory_items')
+    .update(updateData)
+    .eq('id', itemId)
+    .select(`
+      id,
+      name,
+      current_stock,
+      unit_measure,
+      storage_location,
+      expiry_date,
+      min_stock,
+      max_stock,
+      updated_at,
+      inventory_categories(name)
+    `)
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: data.id,
+    name: data.name,
+    category: data.inventory_categories?.name || 'outros',
+    stock: data.current_stock,
+    unit: data.unit_measure,
+    location: data.storage_location || 'Não especificado',
+    size: null,
+    expiryDate: data.expiry_date,
+    lastUsed: data.updated_at,
+    status: data.current_stock <= data.min_stock ? 'low' : 'ok',
+    minStock: data.min_stock,
+    maxStock: data.max_stock || 100,
+    reservedForAppointments: 0,
+    consumptionHistory: [0, 0, 0, 0, 0, 0]
+  };
 };
 
-export const reserveInventoryItem = async (itemId: number, quantity: number): Promise<InventoryItem> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const item = inventoryItems.find(i => i.id === itemId);
-      if (item) {
-        item.reservedForAppointments += quantity;
-        item.stock -= quantity;
-        resolve(item);
-      }
-    }, 100);
-  });
+export const reserveInventoryItem = async (itemId: string, quantity: number): Promise<InventoryItem> => {
+  // Em produção, isso seria implementado via função do banco
+  // Por enquanto, apenas atualizamos o estoque
+  const { data: currentItem } = await supabase
+    .from('inventory_items')
+    .select('current_stock')
+    .eq('id', itemId)
+    .single();
+
+  if (!currentItem) throw new Error('Item não encontrado');
+
+  const newStock = currentItem.current_stock - quantity;
+  
+  const { data, error } = await supabase
+    .from('inventory_items')
+    .update({ current_stock: newStock })
+    .eq('id', itemId)
+    .select(`
+      id,
+      name,
+      current_stock,
+      unit_measure,
+      storage_location,
+      expiry_date,
+      min_stock,
+      max_stock,
+      updated_at,
+      inventory_categories(name)
+    `)
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: data.id,
+    name: data.name,
+    category: data.inventory_categories?.name || 'outros',
+    stock: data.current_stock,
+    unit: data.unit_measure,
+    location: data.storage_location || 'Não especificado',
+    size: null,
+    expiryDate: data.expiry_date,
+    lastUsed: data.updated_at,
+    status: data.current_stock <= data.min_stock ? 'low' : 'ok',
+    minStock: data.min_stock,
+    maxStock: data.max_stock || 100,
+    reservedForAppointments: quantity,
+    consumptionHistory: [0, 0, 0, 0, 0, 0]
+  };
 };

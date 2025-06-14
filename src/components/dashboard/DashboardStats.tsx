@@ -2,33 +2,54 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import { useDashboardStats } from "@/hooks/useDashboardData";
 
 const DashboardStats: React.FC = () => {
-  const stats = [
+  const { data: stats, isLoading } = useDashboardStats();
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
+            <CardContent className="pt-4 sm:pt-5 p-3 md:p-4">
+              <div className="animate-pulse">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  const statsData = [
     {
       title: "Total de Itens",
-      value: "1,284",
+      value: stats?.totalItems || 0,
       trend: "up",
       trendValue: "+2.5%",
       description: "este mês"
     },
     {
       title: "Consumo Mensal",
-      value: "187",
+      value: stats?.monthlyConsumption || 0,
       trend: "down",
       trendValue: "-1.8%",
       description: "este mês"
     },
     {
-      title: "Reagentes",
-      value: "362",
-      trend: "up",
-      trendValue: "+5.2%",
-      description: "este mês"
+      title: "Itens Expirando",
+      value: stats?.expiringItems || 0,
+      trend: "warning",
+      trendValue: "Próximos 30 dias",
+      description: ""
     },
     {
       title: "Em Alerta",
-      value: "12",
+      value: stats?.lowStockItems || 0,
       trend: "warning",
       trendValue: "Requer atenção",
       description: ""
@@ -55,7 +76,7 @@ const DashboardStats: React.FC = () => {
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4">
-      {stats.map((stat, index) => (
+      {statsData.map((stat, index) => (
         <Card key={index} className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
           <CardContent className="pt-4 sm:pt-5 p-3 md:p-4">
             <div className="flex items-center justify-between p-2">
