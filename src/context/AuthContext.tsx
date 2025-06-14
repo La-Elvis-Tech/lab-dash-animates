@@ -1,92 +1,110 @@
-// src/contexts/AuthContext.tsx
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  ReactNode,
-  useRef,
-} from 'react';
-import {
-  login as doLogin,
-  logout as doLogout,
-  getSession,
-} from '../services/authService';
 
-interface User {
-  id: number;
-  username: string;
-  role: 'admin' | 'user';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+
+interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'user' | 'supervisor';
+  department?: string;
+  position?: string;
 }
 
-interface AuthContextData {
-  user: User | null;
+interface AuthContextType {
+  user: AuthUser | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  isAuthenticated: boolean;
   loading: boolean;
-  signin: (username: string, password: string) => boolean;
-  signout: () => void;
 }
 
-export const AuthContext = createContext<AuthContextData>(
-  {} as AuthContextData
-);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const {
+    user: supabaseUser,
+    profile,
+    userRole,
+    loading: supabaseLoading,
+    signIn,
+    signUp,
+    signOut,
+    resetPassword,
+    isAuthenticated: supabaseAuthenticated
+  } = useSupabaseAuth();
+
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const logoutTimer = useRef<number>();
 
-  // Função para agendar o auto-logout
-  const scheduleLogout = (expiresAt: number) => {
-    const ms = expiresAt - Date.now();
-    if (ms <= 0) {
-      signout();
-    } else {
-      // limpa timer anterior
-      if (logoutTimer.current) clearTimeout(logoutTimer.current);
-      // agenda novo logout
-      logoutTimer.current = window.setTimeout(() => {
-        signout();
-        alert('Sua sessão expirou. Faça login novamente.');
-      }, ms);
-    }
-  };
-
-  // Carrega sessão salva no storage quando monta
   useEffect(() => {
-    const session = getSession();
-    if (session) {
+    if (supabaseUser && profile && userRole) {
       setUser({
-        id: session.id,
-        username: session.username,
-        role: session.role,
+        id: supabaseUser.id,
+        email: supabaseUser.email!,
+        name: profile.full_name,
+        role: userRole.role,
+        department: profile.department,
+        position: profile.position,
       });
-      scheduleLogout(session.expires);
+    } else {
+      setUser(null);
     }
-    setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    
+    setLoading(supabaseLoading);
+  }, [supabaseUser, profile, userRole, supabaseLoading]);
 
-  const signin = (username: string, password: string): boolean => {
-    const session = doLogin({ username, password });
-    if (!session) return false;
-
-    setUser({
-      id: session.id,
-      username: session.username,
-      role: session.role,
-    });
-    scheduleLogout(session.expires);
-    return true;
+  const login = async (email: string, password: string) => {
+    const { error } = await signIn(email, password);
+    if (error) {
+      throw new Error(error.message);
+    }
   };
 
-  const signout = () => {
-    doLogout();
-    setUser(null);
-    if (logoutTimer.current) clearTimeout(logoutTimer.current);
+  const register = async (email: string, password: string, name: string) => {
+    const { error } = await signUp(email, password, name);
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const logout = async () => {
+    const { error } = await signOut();
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const handleResetPassword = async (email: string) => {
+    const { error } = await resetPassword(email);
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
+  const value = {
+    user,
+    login,
+    register,
+    logout,
+    resetPassword: handleResetPassword,
+    isAuthenticated: supabaseAuthenticated,
+    loading,
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signin, signout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

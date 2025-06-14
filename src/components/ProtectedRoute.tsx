@@ -1,25 +1,25 @@
-// src/components/ProtectedRoute.tsx
-import { useContext } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
 
-interface Props {
-  requireAdmin?: boolean;
-}
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
-export const ProtectedRoute = ({ requireAdmin = false }: Props) => {
-  const { user, loading } = useContext(AuthContext);
+export const ProtectedRoute = () => {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
-    // enquanto conferimos o storage, exibe um spinner ou tela em branco
-    return <div className="flex items-center justify-center h-screen">Carregando...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lab-blue mx-auto"></div>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Verificando autenticação...</p>
+        </div>
+      </div>
+    );
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
   }
-  if (requireAdmin && user.role !== 'admin') {
-    return <Navigate to="/" replace />;
-  }
+
   return <Outlet />;
 };

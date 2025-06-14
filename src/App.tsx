@@ -8,7 +8,6 @@ import { Suspense, lazy } from "react";
 import Layout from "./components/Layout";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { Login } from "./pages/Login";
 import { ThemeProvider } from "./hooks/use-theme";
 import { PageLoaderLogin } from "./components/PageLoaderLogin";
 
@@ -22,6 +21,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Alerts = lazy(() => import("./pages/Alerts"));
 const Simulations = lazy(() => import("./pages/Simulations"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Auth = lazy(() => import("./pages/Auth"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,7 +52,11 @@ const App = () => (
           <BrowserRouter>
           <PageLoaderLogin paths={['/']} delay={300} />  
             <Routes>
-              <Route path="/login" element={<Login />} />
+              <Route path="/auth" element={
+                <Suspense fallback={<PageFallback />}>
+                  <Auth />
+                </Suspense>
+              } />
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Layout />}>
                   <Route path="/" element={

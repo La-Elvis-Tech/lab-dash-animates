@@ -9,16 +9,657 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      appointment_inventory: {
+        Row: {
+          appointment_id: string
+          cost_per_unit: number | null
+          created_at: string | null
+          id: string
+          inventory_item_id: string
+          quantity_used: number
+          total_cost: number | null
+        }
+        Insert: {
+          appointment_id: string
+          cost_per_unit?: number | null
+          created_at?: string | null
+          id?: string
+          inventory_item_id: string
+          quantity_used: number
+          total_cost?: number | null
+        }
+        Update: {
+          appointment_id?: string
+          cost_per_unit?: number | null
+          created_at?: string | null
+          id?: string
+          inventory_item_id?: string
+          quantity_used?: number
+          total_cost?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_inventory_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_inventory_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      appointments: {
+        Row: {
+          cost: number | null
+          created_at: string | null
+          created_by: string
+          doctor_id: string
+          duration_minutes: number | null
+          exam_type_id: string
+          id: string
+          notes: string | null
+          patient_email: string | null
+          patient_name: string
+          patient_phone: string | null
+          scheduled_date: string
+          status: string | null
+          unit_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string | null
+          created_by: string
+          doctor_id: string
+          duration_minutes?: number | null
+          exam_type_id: string
+          id?: string
+          notes?: string | null
+          patient_email?: string | null
+          patient_name: string
+          patient_phone?: string | null
+          scheduled_date: string
+          status?: string | null
+          unit_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string | null
+          created_by?: string
+          doctor_id?: string
+          duration_minutes?: number | null
+          exam_type_id?: string
+          id?: string
+          notes?: string | null
+          patient_email?: string | null
+          patient_name?: string
+          patient_phone?: string | null
+          scheduled_date?: string
+          status?: string | null
+          unit_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_exam_type_id_fkey"
+            columns: ["exam_type_id"]
+            isOneToOne: false
+            referencedRelation: "exam_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consumption_data: {
+        Row: {
+          average_daily_consumption: number | null
+          created_at: string | null
+          id: string
+          item_id: string
+          period_end: string
+          period_start: string
+          quantity_consumed: number
+          total_cost: number | null
+          unit_id: string
+        }
+        Insert: {
+          average_daily_consumption?: number | null
+          created_at?: string | null
+          id?: string
+          item_id: string
+          period_end: string
+          period_start: string
+          quantity_consumed: number
+          total_cost?: number | null
+          unit_id: string
+        }
+        Update: {
+          average_daily_consumption?: number | null
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          period_end?: string
+          period_start?: string
+          quantity_consumed?: number
+          total_cost?: number | null
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consumption_data_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consumption_data_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          crm: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          specialty: string | null
+          unit_id: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          crm?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          specialty?: string | null
+          unit_id?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          crm?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          specialty?: string | null
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctors_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_types: {
+        Row: {
+          active: boolean | null
+          category: string | null
+          cost: number | null
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          name: string
+          preparation_instructions: string | null
+          requires_preparation: boolean | null
+        }
+        Insert: {
+          active?: boolean | null
+          category?: string | null
+          cost?: number | null
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          name: string
+          preparation_instructions?: string | null
+          requires_preparation?: boolean | null
+        }
+        Update: {
+          active?: boolean | null
+          category?: string | null
+          cost?: number | null
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          name?: string
+          preparation_instructions?: string | null
+          requires_preparation?: boolean | null
+        }
+        Relationships: []
+      }
+      inventory_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      inventory_items: {
+        Row: {
+          active: boolean | null
+          category_id: string
+          cost_per_unit: number | null
+          created_at: string | null
+          current_stock: number | null
+          description: string | null
+          expiry_date: string | null
+          id: string
+          lot_number: string | null
+          max_stock: number | null
+          min_stock: number | null
+          name: string
+          sku: string | null
+          storage_location: string | null
+          supplier: string | null
+          unit_id: string
+          unit_measure: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          category_id: string
+          cost_per_unit?: number | null
+          created_at?: string | null
+          current_stock?: number | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          lot_number?: string | null
+          max_stock?: number | null
+          min_stock?: number | null
+          name: string
+          sku?: string | null
+          storage_location?: string | null
+          supplier?: string | null
+          unit_id: string
+          unit_measure: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          category_id?: string
+          cost_per_unit?: number | null
+          created_at?: string | null
+          current_stock?: number | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          lot_number?: string | null
+          max_stock?: number | null
+          min_stock?: number | null
+          name?: string
+          sku?: string | null
+          storage_location?: string | null
+          supplier?: string | null
+          unit_id?: string
+          unit_measure?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_movements: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_id: string
+          movement_type: string
+          performed_by: string
+          quantity: number
+          reason: string | null
+          reference_id: string | null
+          reference_type: string | null
+          total_cost: number | null
+          unit_cost: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_id: string
+          movement_type: string
+          performed_by: string
+          quantity: number
+          reason?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          total_cost?: number | null
+          unit_cost?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          movement_type?: string
+          performed_by?: string
+          quantity?: number
+          reason?: string | null
+          reference_id?: string | null
+          reference_type?: string | null
+          total_cost?: number | null
+          unit_cost?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          department: string | null
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+          position: string | null
+          status: Database["public"]["Enums"]["user_status"] | null
+          unit_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          department?: string | null
+          email: string
+          full_name: string
+          id: string
+          phone?: string | null
+          position?: string | null
+          status?: Database["public"]["Enums"]["user_status"] | null
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          position?: string | null
+          status?: Database["public"]["Enums"]["user_status"] | null
+          unit_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      stock_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          current_value: number | null
+          description: string | null
+          expiry_date: string | null
+          id: string
+          item_id: string
+          priority: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+          threshold_value: number | null
+          title: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          current_value?: number | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          item_id: string
+          priority?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          threshold_value?: number | null
+          title: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          current_value?: number | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          item_id?: string
+          priority?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          threshold_value?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_alerts_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_settings: {
+        Row: {
+          category: string | null
+          description: string | null
+          id: string
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          category?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          category?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      units: {
+        Row: {
+          active: boolean | null
+          address: string | null
+          code: string
+          created_at: string | null
+          id: string
+          manager_id: string | null
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          address?: string | null
+          code: string
+          created_at?: string | null
+          id?: string
+          manager_id?: string | null
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          address?: string | null
+          code?: string
+          created_at?: string | null
+          id?: string
+          manager_id?: string | null
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user" | "supervisor"
+      user_status: "active" | "inactive" | "pending"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +774,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user", "supervisor"],
+      user_status: ["active", "inactive", "pending"],
+    },
   },
 } as const
