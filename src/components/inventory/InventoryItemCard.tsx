@@ -9,8 +9,8 @@ import {
   Database,
   Clock,
   Edit2,
-  ShoppingCart,
-  Link,
+  PackagePlus,
+  Archive ,
   TrendingUp,
   AlertTriangle,
   CheckCircle,
@@ -18,6 +18,7 @@ import {
   X,
   Info,
   Minus,
+  PackageMinus,
 } from "lucide-react";
 import {
   HoverCard,
@@ -35,9 +36,25 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
+interface InventoryItem {
+  id: number;
+  name: string;
+  category: string;
+  stock: number;
+  minStock: number;
+  maxStock: number;
+  unit: string;
+  location: string;
+  expiryDate?: string;
+  lastUsed: string;
+  consumptionHistory?: number[];
+  reservedForAppointments: number;
+  size?: string;
+}
+
 interface InventoryItemCardProps {
-  item: any;
-  onUpdateItem: (itemId: number, updatedData: any) => void;
+  item: InventoryItem;
+  onUpdateItem: (itemId: number, updatedData: Partial<InventoryItem>) => void;
   onReserveItem: (itemId: number, quantity: number) => void;
   onRequestRestock: (itemId: number) => void;
 }
@@ -304,9 +321,9 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
             <DialogTrigger asChild>
               <Button
                 size="sm"
-                className="text-xs h-8 bg-blue-500 hover:bg-blue-600 text-white"
+                className="text-xs h-8 bg-blue-500 hover:bg-neutral-600 text-white"
               >
-                <Link size={12} className="mr-1" />
+                <Archive  size={12} className="mr-1" />
                 Reservar
               </Button>
             </DialogTrigger>
@@ -345,9 +362,9 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
           <Button
             onClick={() => onRequestRestock(item.id)}
             size="sm"
-            className="text-xs h-8 bg-neutral-500 hover:bg-neutral-600 text-white"
+            className="text-xs h-8 bg-green-500 hover:bg-neutral-600 text-white"
           >
-            <ShoppingCart size={12} className="mr-1" />
+            <PackagePlus size={12} className="mr-1" />
             Repor
           </Button>
         </div>
@@ -357,9 +374,9 @@ const InventoryItemCard: React.FC<InventoryItemCardProps> = ({
             <DialogTrigger asChild>
               <Button
                 size="sm"
-                className="text-xs w-full bg-red-500 hover:bg-red-600 text-white"
+                className="text-xs w-full bg-red-500 hover:bg-neutral-600 text-white"
               >
-                <Minus size={12} className="mr-1" />
+                <PackageMinus size={12} className="mr-1" />
                 Baixa
               </Button>
             </DialogTrigger>

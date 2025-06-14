@@ -134,8 +134,8 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-800 p-4 md:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen">
+      <div className="mx-auto space-y-6">
         <div className="flex justify-between flex-wrap items-center">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
