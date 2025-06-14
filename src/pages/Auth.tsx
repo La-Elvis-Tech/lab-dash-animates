@@ -11,7 +11,7 @@ import { useInviteCodes } from '@/hooks/useInviteCodes';
 import { useOTP } from '@/hooks/useOTP';
 import { InviteCodeStep } from '@/components/auth/InviteCodeStep';
 import { OTPStep } from '@/components/auth/OTPStep';
-import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Loader2, LogIn, UserPlus, Lock, Mail, Sparkles } from 'lucide-react';
 
 const Auth = () => {
@@ -35,7 +35,8 @@ const Auth = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
 
-  const { login, register, resetPassword, isAuthenticated } = useAuth();
+  const { login, register, isAuthenticated } = useAuth();
+  const { signOut, resetPassword } = useSupabaseAuth();
   const { useInviteCode } = useInviteCodes();
   const { generateOTP } = useOTP();
   const { toast } = useToast();
@@ -177,12 +178,7 @@ const Auth = () => {
 
     try {
       setLoading(true);
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: 'https://laelvistech.netlify.app/reset-password',
-      });
-
-      if (error) throw error;
+      await resetPassword(resetEmail);
       
       toast({
         title: 'Email enviado!',
