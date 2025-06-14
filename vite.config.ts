@@ -26,19 +26,28 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'esnext',
     minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
           recharts: ['recharts'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-tabs'],
           utils: ['date-fns', 'clsx', 'tailwind-merge'],
         },
       },
     },
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 1500,
+    cssCodeSplit: true,
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'recharts'],
+    exclude: ['three', '@react-three/fiber', '@react-three/drei'],
   },
 }));
