@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { 
-  Home, 
+  LayoutDashboard, 
   Package, 
   FileText, 
   ShoppingCart, 
@@ -34,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   const menuItemsRef = useRef<(HTMLLIElement | null)[]>([]);
 
   const menuItems = [
-    { icon: Home, label: 'Dashboard', path: '/' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: Package, label: 'Inventário', path: '/inventory' },
     { icon: FileText, label: 'Solicitações', path: '/requests' },
     { icon: ShoppingCart, label: 'Pedidos', path: '/orders' },
@@ -78,8 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
 
   const handleMenuItemHover = (element: HTMLElement, isEntering: boolean) => {
     gsap.to(element, {
-      scale: isEntering ? 1.02 : 1,
-      x: isEntering ? 8 : 0,
+      scale: isEntering ? 1.01 : 1,
       duration: 0.2,
       ease: "power2.out"
     });
@@ -90,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
       ref={sidebarRef}
       className={`${
         theme === 'dark'
-          ? 'bg-gradient-to-b from-gray-900 via-gray-950 to-black border-gray-800/50'
+          ? 'bg-gradient-to-b from-neutral-900 via-neutral-950 to-black border-gray-800/50'
           : 'bg-gradient-to-b from-white via-gray-50 to-gray-100 border-gray-200/50'
       } h-screen fixed left-0 top-0 z-50 flex flex-col border-r backdrop-blur-xl shadow-2xl ${
         theme === 'dark' ? 'text-white' : 'text-gray-800'
@@ -180,6 +179,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
                 <li 
                   key={item.path}
                   ref={el => menuItemsRef.current[index] = el}
+                  className='px-2'
                 >
                   <Link
                     to={item.path}
@@ -217,8 +217,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
                     
                     {/* Indicador de ativo */}
                     {isActive && (
-                      <div className={`absolute right-0 w-1 h-8 rounded-l-full ${
-                        theme === 'dark' ? 'bg-gray-400' : 'bg-gray-600'
+                      <div className={`absolute right-0 w-1 h-9 rounded-l-full ${
+                        theme === 'dark' ? 'bg-gray-600' : 'bg-neutral-300'
                       }`} />
                     )}
                   </Link>
