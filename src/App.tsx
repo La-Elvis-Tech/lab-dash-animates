@@ -20,6 +20,7 @@ const Reports = lazy(() => import("./pages/Reports"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Alerts = lazy(() => import("./pages/Alerts"));
 const Simulations = lazy(() => import("./pages/Simulations"));
+const Users = lazy(() => import("./pages/Users"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
 
@@ -97,6 +98,11 @@ const App = () => (
                   <Route path="/settings" element={
                     <Suspense fallback={<PageFallback />}>
                       <Settings />
+                    </Suspense>
+                  } />
+                  <Route path="/users" element={
+                    <Suspense fallback={<PageFallback />}>
+                      <Users />
                     </Suspense>
                   } />
                   <Route path="*" element={
