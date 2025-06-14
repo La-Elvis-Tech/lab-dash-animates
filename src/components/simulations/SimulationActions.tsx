@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -12,7 +13,7 @@ interface SimulationActionsProps {
   onScheduleSimulation: () => void;
 }
 
-const SimulationActions: React.FC<SimulationActionsProps> = ({
+const SimulationActions: React.FC<SimulationActionsProps> = memo(({
   isRunning,
   onRunSimulation,
   onSaveScenario,
@@ -57,40 +58,42 @@ const SimulationActions: React.FC<SimulationActionsProps> = ({
           </div>
         )}
 
-          <div className="grid grid-cols-3 gap-2">
-            <Button
-              variant="outline"
-              onClick={onScheduleSimulation}
-              className="border-neutral-300 dark:border-neutral-600"
-              size="lg"
-            >
-              <Clock className="mr-2 h-4 w-4" />
-              Agendar Simulação
-            </Button>
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            variant="outline"
+            onClick={onScheduleSimulation}
+            className="border-neutral-300 dark:border-neutral-600"
+            size="lg"
+          >
+            <Clock className="mr-2 h-4 w-4" />
+            Agendar
+          </Button>
 
-            <Button
-              variant="outline"
-              onClick={onSaveScenario}
-              className="border-neutral-300 dark:border-neutral-600"
-              size="lg"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              Salvar
-            </Button>
+          <Button
+            variant="outline"
+            onClick={onSaveScenario}
+            className="border-neutral-300 dark:border-neutral-600"
+            size="lg"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            Salvar
+          </Button>
 
-            <Button
-              variant="outline"
-              onClick={onExportResults}
-              className="border-neutral-300 dark:border-neutral-600"
-              size="lg"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Exportar
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            onClick={onExportResults}
+            className="border-neutral-300 dark:border-neutral-600"
+            size="lg"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Exportar
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
-};
+});
+
+SimulationActions.displayName = 'SimulationActions';
 
 export default SimulationActions;

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -72,7 +72,7 @@ const templates = {
   }
 };
 
-const SimulationParameters: React.FC<SimulationParametersProps> = ({
+const SimulationParameters: React.FC<SimulationParametersProps> = memo(({
   currentScenario,
   setCurrentScenario,
   selectedTemplate,
@@ -310,6 +310,8 @@ const SimulationParameters: React.FC<SimulationParametersProps> = ({
       </div>
     </div>
   );
-};
+});
+
+SimulationParameters.displayName = 'SimulationParameters';
 
 export default SimulationParameters;
