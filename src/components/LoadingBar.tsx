@@ -1,17 +1,24 @@
-import { useEffect } from "react";
+
+import { useEffect, memo } from "react";
 import { useLocation } from "react-router-dom";
 import NProgress from "nprogress";
-import "nprogress/nprogress.css";          // estilos default       // (opcional) customizações
+import "nprogress/nprogress.css";
 
-// Opcional: crie um arquivo `nprogress-custom.css` ao lado para customizar
-// .nprogress .bar { background: #7f00ff; height: 3px; }
+// Configure NProgress
+NProgress.configure({ 
+  showSpinner: false,
+  minimum: 0.1,
+  easing: 'ease',
+  speed: 200
+});
 
-export const LoadingBar = () => {
+export const LoadingBar = memo(() => {
   const location = useLocation();
+  
   useEffect(() => {
     NProgress.start();
-    // pequena espera para mostrar o progresso mínimos de 200ms
-    const timer = setTimeout(() => NProgress.done(), 200);
+    const timer = setTimeout(() => NProgress.done(), 150);
+    
     return () => {
       clearTimeout(timer);
       NProgress.done();
@@ -19,4 +26,6 @@ export const LoadingBar = () => {
   }, [location]);
 
   return null;
-};
+});
+
+LoadingBar.displayName = 'LoadingBar';

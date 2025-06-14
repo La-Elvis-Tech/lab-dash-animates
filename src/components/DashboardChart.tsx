@@ -1,5 +1,6 @@
+
 import { Card, CardContent } from '@/components/ui/card';
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, memo, useMemo } from 'react';
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell, RadialBar,
   PolarAngleAxis,
     RadarChart,
@@ -11,13 +12,21 @@ import { Progress } from '@/components/ui/progress';
 import GaugeChart from '@/components/ui/GaugeChart';
 
 // Define a consistent color palette for all charts
-
 const CHART_COLORS = ['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9', '#10B981', '#6366F1', '#EC4899', '#F59E0B'];
 
-const DashboardChart = ({ type, data, title, description }) => {
+interface DashboardChartProps {
+  type: string;
+  data: any[];
+  title: string;
+  description: string;
+}
+
+const DashboardChart: React.FC<DashboardChartProps> = memo(({ type, data, title, description }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
+    if (!chartRef.current) return;
+    
     const ctx = gsap.context(() => {
       gsap.fromTo(
         chartRef.current,
@@ -29,16 +38,19 @@ const DashboardChart = ({ type, data, title, description }) => {
     return () => ctx.revert();
   }, []);
 
-  // Calculate total for percentage calculations
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  // Memoize expensive calculations
+  const total = useMemo(() => 
+    data.reduce((sum, item) => sum + item.value, 0), 
+    [data]
+  );
 
-  const renderProgressBars = () => {
+  const renderProgressBars = useMemo(() => {
     return (
       <div className="space-y-3 sm:space-y-6 py-2 sm:py-4">
         {data.map((item, index) => {
           const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
           return (
-            <div key={index} className="space-y-1 sm:space-y-2">
+            <div key={`${item.name}-${index}`} className="space-y-1 sm:space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div 
@@ -66,9 +78,18 @@ const DashboardChart = ({ type, data, title, description }) => {
         })}
       </div>
     );
-  };
+  }, [data, total]);
 
-  const renderChart = () => {
+  const renderChart = useMemo(() => {
+    const commonTooltipStyle = {
+      backgroundColor: 'rgb(31 41 55)',
+      borderColor: 'rgb(55 65 81)',
+      borderRadius: '0.5rem',
+      color: 'rgb(243 244 246)',
+      fontSize: '12px',
+      padding: '8px'
+    };
+
     switch (type) {
       case 'bar':
         return (
@@ -87,14 +108,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 strokeOpacity={0.3}
               />
               <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'rgb(31 41 55)',
-                  borderColor: 'rgb(55 65 81)',
-                  borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)',
-                  fontSize: '12px',
-                  padding: '8px'
-                }}
+                contentStyle={commonTooltipStyle}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
               <Legend wrapperStyle={{ fontSize: '14px' }} />
@@ -126,14 +140,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 strokeOpacity={0.3}
               />
               <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'rgb(31 41 55)',
-                  borderColor: 'rgb(55 65 81)',
-                  borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)',
-                  fontSize: '12px',
-                  padding: '8px'
-                }}
+                contentStyle={commonTooltipStyle}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
               <Line 
@@ -179,14 +186,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 strokeOpacity={0.3}
               />
               <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'rgb(31 41 55)',
-                  borderColor: 'rgb(55 65 81)',
-                  borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)',
-                  fontSize: '12px',
-                  padding: '8px'
-                }}
+                contentStyle={commonTooltipStyle}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
               <Legend wrapperStyle={{ fontSize: '12px' }} />
@@ -219,14 +219,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 domain={[0, 'dataMax']}
               />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: 'rgb(31 41 55)',
-                  borderColor: 'rgb(55 65 81)',
-                  borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)',
-                  fontSize: '12px',
-                  padding: '8px',
-                }}
+                contentStyle={commonTooltipStyle}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
               <Radar
@@ -271,14 +264,7 @@ const DashboardChart = ({ type, data, title, description }) => {
                 ))}
               </Pie>
               <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'rgb(31 41 55)',
-                  borderColor: 'rgb(55 65 81)',
-                  borderRadius: '0.5rem',
-                  color: 'rgb(243 244 246)',
-                  fontSize: '12px',
-                  padding: '8px'
-                }}
+                contentStyle={commonTooltipStyle}
                 itemStyle={{ color: 'rgb(243 244 246)' }}
               />
               <Legend 
@@ -291,13 +277,13 @@ const DashboardChart = ({ type, data, title, description }) => {
           </ResponsiveContainer>
         );
       case 'progress':
-        return renderProgressBars();
+        return renderProgressBars;
       case 'gauge':
         return <GaugeChart value={data[0].value} size={200} title={title} />;
       default:
         return null;
     }
-  };
+  }, [type, data, title, renderProgressBars]);
 
   return (
     <Card 
@@ -308,9 +294,11 @@ const DashboardChart = ({ type, data, title, description }) => {
         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2">{title}</h3>
         <p className=" sm:text-base text-gray-600 dark:text-gray-300">{description}</p>
       </CardContent>
-      {renderChart()}
+      {renderChart}
     </Card>
   );
-};
+});
+
+DashboardChart.displayName = 'DashboardChart';
 
 export default DashboardChart;
