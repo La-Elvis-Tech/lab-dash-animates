@@ -8,10 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useInviteCodes, InviteCode } from '@/hooks/useInviteCodes';
-import { Loader2, Plus, Users, Shield, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Plus, Users as UsersIcon, Shield, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const Users = () => {
+const UsersPage = () => {
   const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
   const [selectedRole, setSelectedRole] = useState<'admin' | 'user' | 'supervisor'>('user');
   const [maxUses, setMaxUses] = useState(1);
@@ -179,7 +179,7 @@ const Users = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Códigos</CardTitle>
-            <Users className="h-4 w-4 text-blue-500" />
+            <UsersIcon className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{inviteCodes.length}</div>
@@ -266,4 +266,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default UsersPage;

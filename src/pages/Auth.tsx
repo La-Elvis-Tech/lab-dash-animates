@@ -272,8 +272,8 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
+        {/* Header - altura fixa */}
+        <div className="text-center mb-8 h-32">
           <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
             <Sparkles className="h-8 w-8 text-white" />
           </div>
@@ -304,118 +304,22 @@ const Auth = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="login">
-            <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-0 shadow-2xl">
-              <CardContent className="pt-6">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email" className="text-gray-700 dark:text-gray-300">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="login-email"
-                        type="email"
-                        placeholder="seu@email.com"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password" className="text-gray-700 dark:text-gray-300">Senha</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="login-password"
-                        type="password"
-                        placeholder="••••••••"
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                        className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="p-0 h-auto text-sm text-blue-600 hover:text-blue-800"
-                      onClick={() => setShowResetForm(true)}
-                    >
-                      Esqueceu a senha?
-                    </Button>
-                  </div>
-                  
-                  <Button
-                    type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Entrando...
-                      </>
-                    ) : (
-                      <>
-                        <LogIn className="mr-2 h-4 w-4" />
-                        Entrar
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="register">
-            {step === 'invite' && (
-              <div className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-0 shadow-2xl rounded-lg">
-                <InviteCodeStep 
-                  onValidCode={handleInviteValidation}
-                  loading={loading}
-                />
-              </div>
-            )}
-
-            {step === 'form' && (
+          {/* Container com altura mínima fixa para evitar mudanças de layout */}
+          <div className="min-h-[500px]">
+            <TabsContent value="login">
               <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-0 shadow-2xl">
-                <CardHeader>
-                  <CardTitle className="text-xl text-gray-900 dark:text-white">Criar Conta</CardTitle>
-                  <CardDescription className="text-gray-600 dark:text-gray-400">
-                    Preencha seus dados para criar sua conta
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                <CardContent className="pt-6">
+                  <form onSubmit={handleLogin} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="register-name" className="text-gray-700 dark:text-gray-300">Nome Completo</Label>
-                      <Input
-                        id="register-name"
-                        type="text"
-                        placeholder="Seu nome completo"
-                        value={registerName}
-                        onChange={(e) => setRegisterName(e.target.value)}
-                        className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="register-email" className="text-gray-700 dark:text-gray-300">Email</Label>
+                      <Label htmlFor="login-email" className="text-gray-700 dark:text-gray-300">Email</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input
-                          id="register-email"
+                          id="login-email"
                           type="email"
                           placeholder="seu@email.com"
-                          value={registerEmail}
-                          onChange={(e) => setRegisterEmail(e.target.value)}
+                          value={loginEmail}
+                          onChange={(e) => setLoginEmail(e.target.value)}
                           className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
                           required
                         />
@@ -423,82 +327,181 @@ const Auth = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="register-password" className="text-gray-700 dark:text-gray-300">Senha</Label>
+                      <Label htmlFor="login-password" className="text-gray-700 dark:text-gray-300">Senha</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input
-                          id="register-password"
+                          id="login-password"
                           type="password"
                           placeholder="••••••••"
-                          value={registerPassword}
-                          onChange={(e) => setRegisterPassword(e.target.value)}
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
                           className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
                           required
                         />
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="confirm-password" className="text-gray-700 dark:text-gray-300">Confirmar Senha</Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input
-                          id="confirm-password"
-                          type="password"
-                          placeholder="••••••••"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
-                          required
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <Button
-                        type="submit"
-                        className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Processando...
-                          </>
-                        ) : (
-                          <>
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            Continuar
-                          </>
-                        )}
-                      </Button>
-
+                    <div className="text-right">
                       <Button
                         type="button"
-                        variant="outline"
-                        className="w-full h-12 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                        onClick={() => setStep('invite')}
+                        variant="link"
+                        className="p-0 h-auto text-sm text-blue-600 hover:text-blue-800"
+                        onClick={() => setShowResetForm(true)}
                       >
-                        Voltar
+                        Esqueceu a senha?
                       </Button>
                     </div>
+                    
+                    <Button
+                      type="submit"
+                      className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Entrando...
+                        </>
+                      ) : (
+                        <>
+                          <LogIn className="mr-2 h-4 w-4" />
+                          Entrar
+                        </>
+                      )}
+                    </Button>
                   </form>
                 </CardContent>
               </Card>
-            )}
+            </TabsContent>
 
-            {step === 'otp' && (
-              <div className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-0 shadow-2xl rounded-lg">
-                <OTPStep
-                  email={registerEmail}
-                  type="signup"
-                  onVerified={handleOTPVerified}
-                  onResend={() => generateOTP(registerEmail, 'signup')}
-                  loading={loading}
-                />
-              </div>
-            )}
-          </TabsContent>
+            <TabsContent value="register">
+              {step === 'invite' && (
+                <div className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-0 shadow-2xl rounded-lg">
+                  <InviteCodeStep 
+                    onValidCode={handleInviteValidation}
+                    loading={loading}
+                  />
+                </div>
+              )}
+
+              {step === 'form' && (
+                <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-0 shadow-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-gray-900 dark:text-white">Criar Conta</CardTitle>
+                    <CardDescription className="text-gray-600 dark:text-gray-400">
+                      Preencha seus dados para criar sua conta
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="register-name" className="text-gray-700 dark:text-gray-300">Nome Completo</Label>
+                        <Input
+                          id="register-name"
+                          type="text"
+                          placeholder="Seu nome completo"
+                          value={registerName}
+                          onChange={(e) => setRegisterName(e.target.value)}
+                          className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="register-email" className="text-gray-700 dark:text-gray-300">Email</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="register-email"
+                            type="email"
+                            placeholder="seu@email.com"
+                            value={registerEmail}
+                            onChange={(e) => setRegisterEmail(e.target.value)}
+                            className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="register-password" className="text-gray-700 dark:text-gray-300">Senha</Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="register-password"
+                            type="password"
+                            placeholder="••••••••"
+                            value={registerPassword}
+                            onChange={(e) => setRegisterPassword(e.target.value)}
+                            className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password" className="text-gray-700 dark:text-gray-300">Confirmar Senha</Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                          <Input
+                            id="confirm-password"
+                            type="password"
+                            placeholder="••••••••"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <Button
+                          type="submit"
+                          className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                          disabled={loading}
+                        >
+                          {loading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Processando...
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus className="mr-2 h-4 w-4" />
+                              Continuar
+                            </>
+                          )}
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full h-12 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                          onClick={() => setStep('invite')}
+                        >
+                          Voltar
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
+
+              {step === 'otp' && (
+                <div className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-0 shadow-2xl rounded-lg">
+                  <OTPStep
+                    email={registerEmail}
+                    type="signup"
+                    onVerified={handleOTPVerified}
+                    onResend={() => generateOTP(registerEmail, 'signup')}
+                    loading={loading}
+                  />
+                </div>
+              )}
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>

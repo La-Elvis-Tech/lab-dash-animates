@@ -27,11 +27,26 @@ export const InviteCodeStep: React.FC<InviteCodeStepProps> = ({ onValidCode, loa
   const handleValidate = async () => {
     if (!code.trim()) return;
 
-    const result = await validateInviteCode(code.trim().toUpperCase()) as ValidationResult;
-    setValidationResult(result);
+    try {
+      const result = await validateInviteCode(code.trim().toUpperCase());
+      
+      // Safely convert the result to ValidationResult
+      const validationResult: ValidationResult = {
+        valid: Boolean(result && typeof result === 'object' && 'valid' in result ? result.valid : false),
+        role: result && typeof result === 'object' && 'role' in result ? String(result.role) : undefined,
+        message: result && typeof result === 'object' && 'message' in result ? String(result.message) : undefined
+      };
+      
+      setValidationResult(validationResult);
 
-    if (result.valid && result.role) {
-      onValidCode(code.trim().toUpperCase(), result.role);
+      if (validationResult.valid && validationResult.role) {
+        onValidCode(code.trim().toUpperCase(), validationResult.role);
+      }
+    } catch (error) {
+      setValidationResult({
+        valid: false,
+        message: 'Erro ao validar código'
+      });
     }
   };
 
