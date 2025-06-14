@@ -36,7 +36,6 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          three: ['three', '@react-three/fiber', '@react-three/drei'],
           recharts: ['recharts'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-tabs'],
           utils: ['date-fns', 'clsx', 'tailwind-merge'],
@@ -48,6 +47,5 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'recharts'],
-    exclude: ['three', '@react-three/fiber', '@react-three/drei'],
   },
 }));
