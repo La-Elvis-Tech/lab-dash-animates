@@ -1,4 +1,3 @@
-
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -14,7 +13,7 @@ import { gsap } from "gsap";
 import { useEffect, useRef, useState } from "react";
 import { TrendingUp, Calendar, DollarSign, FileText } from "lucide-react";
 
-import DashboardChart, { CHART_COLORS } from "@/components/DashboardChart.js";
+import DashboardChart from "@/components/DashboardChart";
 
 // Import simplified advanced components
 import AdvancedFilters from "@/components/reports/AdvancedFilters";
