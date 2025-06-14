@@ -1,6 +1,8 @@
+
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useTheme } from '../hooks/use-theme';
 
 export const Login = () => {
   const [u, setU] = useState('');
@@ -9,6 +11,7 @@ export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signin } = useContext(AuthContext);
+  const { theme } = useTheme();
   const nav = useNavigate();
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -27,27 +30,64 @@ export const Login = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Animated Granular Background */}
+      <div 
+        className={`absolute inset-0 ${
+          theme === 'dark' 
+            ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-black' 
+            : 'bg-gradient-to-br from-blue-50 via-blue-100 to-white'
+        }`}
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 25% 25%, ${
+              theme === 'dark' 
+                ? 'rgba(59, 130, 246, 0.3)' 
+                : 'rgba(59, 130, 246, 0.2)'
+            } 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, ${
+              theme === 'dark' 
+                ? 'rgba(37, 99, 235, 0.3)' 
+                : 'rgba(147, 197, 253, 0.3)'
+            } 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, ${
+              theme === 'dark' 
+                ? 'rgba(30, 64, 175, 0.2)' 
+                : 'rgba(191, 219, 254, 0.4)'
+            } 0%, transparent 50%)
+          `,
+          animation: 'gradientShift 8s ease-in-out infinite'
+        }}
+      >
+        {/* Grain overlay */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23${theme === 'dark' ? '3b82f6' : '1e40af'}' fill-opacity='0.4'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3Ccircle cx='27' cy='7' r='1'/%3E%3Ccircle cx='47' cy='7' r='1'/%3E%3Ccircle cx='7' cy='27' r='1'/%3E%3Ccircle cx='27' cy='27' r='1'/%3E%3Ccircle cx='47' cy='27' r='1'/%3E%3Ccircle cx='7' cy='47' r='1'/%3E%3Ccircle cx='27' cy='47' r='1'/%3E%3Ccircle cx='47' cy='47' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            animation: 'grainMove 20s linear infinite'
+          }}
+        />
       </div>
 
-      {/* Floating Particles */}
+      {/* Floating Light Orbs */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-white/10 rounded-full animate-bounce"
+            className={`absolute rounded-full blur-xl ${
+              theme === 'dark'
+                ? 'bg-blue-500/10'
+                : 'bg-blue-400/20'
+            }`}
             style={{
+              width: `${80 + Math.random() * 120}px`,
+              height: `${80 + Math.random() * 120}px`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
+              animation: `float ${4 + Math.random() * 4}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 2}s`
             }}
-          ></div>
+          />
         ))}
       </div>
 
@@ -56,28 +96,50 @@ export const Login = () => {
         <div className="max-w-md w-full">
           {/* Logo/Brand Area */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
+            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg ${
+              theme === 'dark'
+                ? 'bg-gradient-to-r from-blue-500 to-blue-600'
+                : 'bg-gradient-to-r from-blue-600 to-blue-700'
+            }`}>
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
+            <h1 className={`text-4xl font-bold mb-2 ${
+              theme === 'dark'
+                ? 'bg-gradient-to-r from-blue-400 via-blue-300 to-blue-400 bg-clip-text text-transparent'
+                : 'bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 bg-clip-text text-transparent'
+            }`}>
               DASA Labs
             </h1>
-            <p className="text-gray-300 text-sm">Sistema de Gestão Laboratorial</p>
+            <p className={`text-sm ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+            }`}>Sistema de Gestão Laboratorial</p>
           </div>
 
           {/* Login Card */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
+          <div className={`backdrop-blur-lg rounded-3xl shadow-2xl p-8 border ${
+            theme === 'dark'
+              ? 'bg-white/10 border-white/20'
+              : 'bg-white/70 border-blue-200/50'
+          }`}>
             {/* Decorative top border */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
+            <div className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-1 rounded-full ${
+              theme === 'dark'
+                ? 'bg-gradient-to-r from-blue-400 to-blue-500'
+                : 'bg-gradient-to-r from-blue-500 to-blue-600'
+            }`}></div>
 
             <div className="space-y-6">
               <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className={`text-2xl font-bold ${
+                  theme === 'dark' ? 'text-white' : 'text-gray-900'
+                }`}>
                   Bem-vindo de Volta!
                 </h2>
-                <p className="text-gray-300 text-sm">Faça login na sua conta</p>
+                <p className={`text-sm ${
+                  theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                }`}>Faça login na sua conta</p>
               </div>
 
               <form onSubmit={onSubmit} className="space-y-6">
@@ -85,19 +147,27 @@ export const Login = () => {
                 <div className="group">
                   <label
                     htmlFor="username"
-                    className="block text-sm font-medium text-gray-200 mb-2 transition-all duration-300 group-focus-within:text-blue-400"
+                    className={`block text-sm font-medium mb-2 transition-all duration-300 group-focus-within:text-blue-500 ${
+                      theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+                    }`}
                   >
                     Nome de Usuário
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
                     <input
                       id="username"
-                      className="w-full pl-10 pr-4 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
+                      className={`w-full pl-10 pr-4 py-4 backdrop-blur-sm border rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 ${
+                        theme === 'dark'
+                          ? 'bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-500'
+                          : 'bg-white/50 border-blue-200/50 text-gray-900 placeholder-gray-500 focus:border-blue-500'
+                      }`}
                       placeholder="joao@dasa2025"
                       value={u}
                       onChange={e => setU(e.target.value)}
@@ -110,20 +180,28 @@ export const Login = () => {
                 <div className="group">
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-gray-200 mb-2 transition-all duration-300 group-focus-within:text-blue-400"
+                    className={`block text-sm font-medium mb-2 transition-all duration-300 group-focus-within:text-blue-500 ${
+                      theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+                    }`}
                   >
                     Senha
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`w-5 h-5 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'  
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
                     </div>
                     <input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
-                      className="w-full pl-10 pr-12 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300"
+                      className={`w-full pl-10 pr-12 py-4 backdrop-blur-sm border rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 ${
+                        theme === 'dark'
+                          ? 'bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-500'
+                          : 'bg-white/50 border-blue-200/50 text-gray-900 placeholder-gray-500 focus:border-blue-500'
+                      }`}
                       placeholder="••••••••"
                       value={p}
                       onChange={e => setP(e.target.value)}
@@ -132,7 +210,11 @@ export const Login = () => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-white transition-colors"
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 transition-colors ${
+                        theme === 'dark' 
+                          ? 'text-gray-400 hover:text-white' 
+                          : 'text-gray-500 hover:text-gray-700'
+                      }`}
                     >
                       {showPassword ? (
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +243,7 @@ export const Login = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-4 px-4 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-4 px-4 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -182,7 +264,7 @@ export const Login = () => {
               <div className="text-center">
                 <a
                   href="#forgot-password"
-                  className="text-blue-400 hover:text-blue-300 hover:underline transition-colors text-sm flex items-center justify-center gap-1"
+                  className="text-blue-500 hover:text-blue-400 hover:underline transition-colors text-sm flex items-center justify-center gap-1"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -194,7 +276,9 @@ export const Login = () => {
           </div>
 
           {/* Bottom Text */}
-          <div className="text-center mt-8 text-gray-400 text-sm">
+          <div className={`text-center mt-8 text-sm ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}>
             <p>&copy; 2025 DASA Labs. Todos os direitos reservados.</p>
           </div>
         </div>
