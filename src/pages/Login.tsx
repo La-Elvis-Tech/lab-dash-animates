@@ -1,8 +1,10 @@
-
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useTheme } from '../hooks/use-theme';
+import { User,Lock } from 'lucide-react';
+// Importação do gradiente animado
+import { BgradientAnim } from "@/components/soft-gradient-background-animation";
 
 export const Login = () => {
   const [u, setU] = useState('');
@@ -31,65 +33,11 @@ export const Login = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Animated Granular Background */}
-      <div 
-        className={`absolute inset-0 ${
-          theme === 'dark' 
-            ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-black' 
-            : 'bg-gradient-to-br from-blue-50 via-blue-100 to-white'
-        }`}
-        style={{
-          backgroundImage: `
-            radial-gradient(circle at 25% 25%, ${
-              theme === 'dark' 
-                ? 'rgba(59, 130, 246, 0.3)' 
-                : 'rgba(59, 130, 246, 0.2)'
-            } 0%, transparent 50%),
-            radial-gradient(circle at 75% 75%, ${
-              theme === 'dark' 
-                ? 'rgba(37, 99, 235, 0.3)' 
-                : 'rgba(147, 197, 253, 0.3)'
-            } 0%, transparent 50%),
-            radial-gradient(circle at 50% 50%, ${
-              theme === 'dark' 
-                ? 'rgba(30, 64, 175, 0.2)' 
-                : 'rgba(191, 219, 254, 0.4)'
-            } 0%, transparent 50%)
-          `,
-          animation: 'gradientShift 8s ease-in-out infinite'
-        }}
-      >
-        {/* Grain overlay */}
-        <div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23${theme === 'dark' ? '3b82f6' : '1e40af'}' fill-opacity='0.4'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3Ccircle cx='27' cy='7' r='1'/%3E%3Ccircle cx='47' cy='7' r='1'/%3E%3Ccircle cx='7' cy='27' r='1'/%3E%3Ccircle cx='27' cy='27' r='1'/%3E%3Ccircle cx='47' cy='27' r='1'/%3E%3Ccircle cx='7' cy='47' r='1'/%3E%3Ccircle cx='27' cy='47' r='1'/%3E%3Ccircle cx='47' cy='47' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            animation: 'grainMove 20s linear infinite'
-          }}
-        />
-      </div>
-
-      {/* Floating Light Orbs */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className={`absolute rounded-full blur-xl ${
-              theme === 'dark'
-                ? 'bg-blue-500/10'
-                : 'bg-blue-400/20'
-            }`}
-            style={{
-              width: `${80 + Math.random() * 120}px`,
-              height: `${80 + Math.random() * 120}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${4 + Math.random() * 4}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
+      {/* Gradiente animado customizado */}
+      <BgradientAnim
+        className="absolute inset-0 z-0"
+        animationDuration={8}
+      />
 
       {/* Login Form Container */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
@@ -105,16 +53,16 @@ export const Login = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 className={`text-4xl font-bold mb-2 ${
+            <h1 className={`text-4xl font-bold font-michroma mb-2 ${
               theme === 'dark'
                 ? 'bg-gradient-to-r from-blue-400 via-blue-300 to-blue-400 bg-clip-text text-transparent'
                 : 'bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 bg-clip-text text-transparent'
             }`}>
-              DASA Labs
+              La Elvis Tech
             </h1>
-            <p className={`text-sm ${
+            <p className={`text-sm px-2 ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-            }`}>Sistema de Gestão Laboratorial</p>
+            }`}>Sistema de Gestão Laboratorial desenvolvido para Dasa</p>
           </div>
 
           {/* Login Card */}
@@ -154,18 +102,14 @@ export const Login = () => {
                     Nome de Usuário
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className={`w-5 h-5 ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <User />
                     </div>
                     <input
                       id="username"
-                      className={`w-full pl-10 pr-4 py-4 backdrop-blur-sm border rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 ${
+                      className={`w-full pl-12 py-4 backdrop-blur-sm border rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 ${
                         theme === 'dark'
-                          ? 'bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-500'
+                          ? 'bg-white/10 border-white/20 text-white placeholder-gray-500 focus:border-blue-500'
                           : 'bg-white/50 border-blue-200/50 text-gray-900 placeholder-gray-500 focus:border-blue-500'
                       }`}
                       placeholder="joao@dasa2025"
@@ -187,19 +131,15 @@ export const Login = () => {
                     Senha
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className={`w-5 h-5 ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'  
-                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Lock />
                     </div>
                     <input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
-                      className={`w-full pl-10 pr-12 py-4 backdrop-blur-sm border rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 ${
+                      className={`w-full pl-12 py-4 backdrop-blur-sm border rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all duration-300 ${
                         theme === 'dark'
-                          ? 'bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-blue-500'
+                          ? 'bg-white/10 border-white/20 text-white placeholder-gray-500 focus:border-blue-500'
                           : 'bg-white/50 border-blue-200/50 text-gray-900 placeholder-gray-500 focus:border-blue-500'
                       }`}
                       placeholder="••••••••"
@@ -243,7 +183,7 @@ export const Login = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-4 px-4 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-4 px-4 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.01] active:scale-[0.98] shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -277,7 +217,7 @@ export const Login = () => {
 
           {/* Bottom Text */}
           <div className={`text-center mt-8 text-sm ${
-            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            theme === 'dark' ? 'text-gray-200' : 'text-gray-300'
           }`}>
             <p>&copy; 2025 DASA Labs. Todos os direitos reservados.</p>
           </div>
