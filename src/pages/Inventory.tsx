@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { Card, CardContent } from "@/components/ui/card";
@@ -168,7 +169,7 @@ const Inventory = () => {
     setSelectedCategory(categoryId);
   };
 
-  const handleUpdateItem = async (itemId: number, updatedData: any) => {
+  const handleUpdateItem = async (itemId: string, updatedData: any) => {
     try {
       await updateInventoryItem(itemId, updatedData);
       const item = items.find(i => i.id === itemId);
@@ -203,7 +204,7 @@ const Inventory = () => {
     }
   };
 
-  const handleReserveItem = async (itemId: number, quantity: number) => {
+  const handleReserveItem = async (itemId: string, quantity: number) => {
     try {
       await reserveInventoryItem(itemId, quantity);
       const item = items.find(i => i.id === itemId);
@@ -244,7 +245,7 @@ const Inventory = () => {
     }
   };
 
-  const handleRequestRestock = (itemId: number) => {
+  const handleRequestRestock = (itemId: string) => {
     const item = items.find(i => i.id === itemId);
     
     // Log da ação
@@ -285,9 +286,6 @@ const Inventory = () => {
         </p>
       </div>
 
-      {/* Dashboard de Saúde do Estoque 
-      <InventoryStockHealth items={items} expiringItems={expiringItems} />
-      */}
       {/* Filters */}
       <Card className="inventory-filters">
         <CardContent className="p-4 bg-neutral-100/80 dark:bg-neutral-800/80">
@@ -346,7 +344,7 @@ const Inventory = () => {
                   setIsOpen={setIsAddDialogOpen}
                   categories={categories.filter(c => c.id !== "all" && c.id !== "expiring")}
                   onAddItem={(newItem) => {
-                    const addedItem = { ...newItem, id: Date.now() };
+                    const addedItem = { ...newItem, id: `item-${Date.now()}` };
                     setItems(prev => [...prev, addedItem]);
                     
                     // Log da ação

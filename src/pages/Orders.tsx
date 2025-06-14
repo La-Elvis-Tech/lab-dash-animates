@@ -1,12 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar, Plus, Search, Filter, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { AppointmentsTabs } from '@/components/appointments/AppointmentsTabs';
-import { CreateAppointmentForm } from '@/components/appointments/CreateAppointmentForm';
-import { AppointmentStats } from '@/components/appointments/AppointmentStats';
+import AppointmentsTabs from '@/components/appointments/AppointmentsTabs';
+import CreateAppointmentForm from '@/components/appointments/CreateAppointmentForm';
+import AppointmentStats from '@/components/appointments/AppointmentStats';
 import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -14,15 +15,15 @@ const Orders = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const { appointments, loading, error, refetch } = useSupabaseAppointments();
+  const { appointments, loading, createAppointment, refreshAppointments } = useSupabaseAppointments();
 
   const filteredAppointments = appointments
     ? appointments.filter((appointment) => {
         const searchTermLower = searchTerm.toLowerCase();
         return (
           appointment.patient_name.toLowerCase().includes(searchTermLower) ||
-          appointment.patient_email.toLowerCase().includes(searchTermLower) ||
-          appointment.patient_phone.includes(searchTerm) ||
+          (appointment.patient_email && appointment.patient_email.toLowerCase().includes(searchTermLower)) ||
+          (appointment.patient_phone && appointment.patient_phone.includes(searchTerm)) ||
           appointment.status.toLowerCase().includes(searchTermLower)
         );
       }).filter((appointment) => {
@@ -35,11 +36,11 @@ const Orders = () => {
   const confirmedAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Confirmado').length : 0;
   const completedAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Concluído').length : 0;
   const canceledAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Cancelado').length : 0;
-  const inProgressAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Em Andamento').length : 0;
+  const inProgressAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Em andamento').length : 0;
 
   const handleCreateAppointment = () => {
     setShowCreateForm(false);
-    refetch();
+    refreshAppointments();
   };
 
   return (
@@ -63,13 +64,6 @@ const Orders = () => {
             Novo Agendamento
           </Button>
         </div>
-
-        {error && (
-          <Alert className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
 
         <AppointmentStats appointments={appointments} />
 
@@ -95,7 +89,7 @@ const Orders = () => {
               <option value="all">Todos os Status</option>
               <option value="Agendado">Agendado</option>
               <option value="Confirmado">Confirmado</option>
-              <option value="Em Andamento">Em Andamento</option>
+              <option value="Em andamento">Em Andamento</option>
               <option value="Concluído">Concluído</option>
               <option value="Cancelado">Cancelado</option>
             </select>
@@ -105,7 +99,7 @@ const Orders = () => {
         <AppointmentsTabs 
           appointments={filteredAppointments} 
           loading={loading}
-          onAppointmentUpdate={refetch}
+          onAppointmentUpdate={refreshAppointments}
         />
 
         {showCreateForm && (

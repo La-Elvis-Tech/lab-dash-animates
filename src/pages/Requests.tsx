@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -324,73 +323,55 @@ const Requests: React.FC = () => {
                           </div>
                           <Badge className={`text-xs ${
                             exam.status === 'Concluído' 
-                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100' 
-                              : 'bg-amber-100 text-amber-800 dark:bg-amber-800 dark:text-amber-100'
-                          }`} variant="secondary">
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                              : exam.status === 'Em andamento'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                              : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                          }`}>
                             {exam.status}
                           </Badge>
                         </div>
                       </CardHeader>
-                      
-                      <CardContent className="space-y-4 mt-2">
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
-                          <div className="pl-2">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Paciente</p>
-                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{exam.patient}</p>
+                      <CardContent className="pt-0">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+                            <span className="text-sm text-neutral-700 dark:text-neutral-300">{exam.patient}</span>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Stethoscope className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
-                          <div className="pl-2">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Médico</p>
-                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{exam.doctor}</p>
+                          
+                          <div className="flex items-center gap-2">
+                            <Stethoscope className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+                            <span className="text-sm text-neutral-700 dark:text-neutral-300">{exam.doctor}</span>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <CalendarIcon className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
-                          <div className="pl-2">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Data</p>
-                            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">{format(exam.date, "dd/MM/yyyy")}</p>
+                          
+                          <div className="flex items-center gap-2">
+                            <Building className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+                            <span className="text-sm text-neutral-700 dark:text-neutral-300">{exam.unit}</span>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Database className="h-3 w-3 text-neutral-500 dark:text-neutral-400" />
-                          <div className="pl-2">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Lab</p>
-                            <p className="text-xs font-medium text-neutral-900 dark:text-neutral-100">{exam.laboratory}</p>
+                          
+                          <div className="flex items-center gap-2">
+                            <Database className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
+                            <span className="text-sm text-neutral-700 dark:text-neutral-300">{exam.laboratory}</span>
                           </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Building className="h-3 w-3 text-neutral-500 dark:text-neutral-400" />
-                          <div className="pl-2">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400">Unidade</p>
-                            <p className="text-xs font-medium text-neutral-900 dark:text-neutral-100">{exam.unit}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center pt-2 border-t border-neutral-200 dark:border-neutral-700">
-                          <div className="flex items-center space-x-1 mt-3">
-                            <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                            <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-                              R$ {exam.cost.toFixed(2)}
+                          
+                          <div className="flex items-center justify-between pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                            <div className="flex items-center gap-2">
+                              <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
+                              <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                                R$ {exam.cost.toFixed(2)}
+                              </span>
+                            </div>
+                            <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                              {format(exam.date, "dd/MM/yyyy")}
                             </span>
                           </div>
-                          <div className="flex items-center text-left md:text-right mt-2">
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Resultado:</p>
-                            <span className={`text-sm font-medium ml-3 ${
-                              exam.result === 'Alterado' 
-                                ? 'text-red-600 dark:text-red-400' 
-                                : exam.result === 'Normal'
-                                  ? 'text-emerald-600 dark:text-emerald-400'
-                                  : 'text-neutral-500 dark:text-neutral-400'
-                            }`}>
-                              {exam.result}
-                            </span>
-                          </div>
+                          
+                          {exam.result !== '-' && (
+                            <div className="pt-2">
+                              <span className="text-xs text-neutral-500 dark:text-neutral-400">Resultado: </span>
+                              <span className="text-sm font-medium text-green-600 dark:text-green-400">{exam.result}</span>
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -398,13 +379,7 @@ const Requests: React.FC = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <FileText className="h-12 w-12 text-neutral-400 dark:text-neutral-600 mx-auto mb-4" />
-                  <p className="text-lg font-medium text-neutral-500 dark:text-neutral-400 mb-2">
-                    Nenhum exame encontrado
-                  </p>
-                  <p className="text-sm text-neutral-400 dark:text-neutral-500">
-                    Tente ajustar os filtros para encontrar os exames desejados.
-                  </p>
+                  <p className="text-neutral-500 dark:text-neutral-400">Nenhum exame encontrado com os filtros aplicados.</p>
                 </div>
               )}
             </ScrollArea>

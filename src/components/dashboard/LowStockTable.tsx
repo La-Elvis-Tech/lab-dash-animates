@@ -21,18 +21,23 @@ const LowStockTable: React.FC = () => {
         .from('inventory_items')
         .select('id, name, current_stock, min_stock, unit_measure')
         .eq('active', true)
-        .lte('current_stock', supabase.rpc('min_stock'))
+        .order('current_stock', { ascending: true })
         .limit(4);
 
       if (error) throw error;
 
-      return data?.map(item => ({
+      // Filter items where current stock is below minimum stock
+      const lowStockItems = data?.filter(item => 
+        item.current_stock <= item.min_stock
+      ) || [];
+
+      return lowStockItems.map(item => ({
         id: item.id,
         name: item.name,
         currentStock: item.current_stock,
         minStock: item.min_stock,
         unit: item.unit_measure
-      })) || [];
+      }));
     }
   });
 

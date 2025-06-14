@@ -34,8 +34,7 @@ export const useRecentActivity = () => {
           movement_type,
           reason,
           created_at,
-          inventory_items(name),
-          profiles(full_name)
+          inventory_items(name)
         `)
         .order('created_at', { ascending: false })
         .limit(4);
@@ -64,7 +63,7 @@ export const useRecentActivity = () => {
           day: date.toLocaleDateString('pt-BR', { weekday: 'long' }),
           date: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
           time: date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          responsavel: movement.profiles?.full_name || "Sistema"
+          responsavel: "Sistema"
         });
       });
 

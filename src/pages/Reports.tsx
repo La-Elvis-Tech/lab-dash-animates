@@ -1,3 +1,4 @@
+
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -12,6 +13,8 @@ import { addDays, format, startOfDay } from "date-fns";
 import { gsap } from "gsap";
 import { useEffect, useRef, useState } from "react";
 import { TrendingUp, Calendar, DollarSign, FileText } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 import DashboardChart from "@/components/DashboardChart";
 
@@ -21,56 +24,35 @@ import PerformanceMetrics from "@/components/reports/PerformanceMetrics";
 import CostAnalysis from "@/components/reports/CostAnalysis";
 import ExportControls from "@/components/reports/ExportControls";
 
-// Simplified mock data
-const mockAppointments = [
-  {
-    id: "A001",
-    patient: "João Silva",
-    type: "Coleta de Sangue",
-    date: new Date(2024, 4, 15, 9, 30),
-    doctor: "Dra. Ana Souza",
-    unit: "Unidade Centro",
-    cost: 120.0,
-    status: "Concluído",
-  },
-  {
-    id: "A002",
-    patient: "Maria Santos",
-    type: "Entrega de Resultado",
-    date: new Date(2024, 4, 16, 10, 45),
-    doctor: "Dr. Carlos Mendes",
-    unit: "Unidade Norte",
-    cost: 80.0,
-    status: "Concluído",
-  },
-  {
-    id: "A003",
-    patient: "Pedro Oliveira",
-    type: "Colonoscopia",
-    date: new Date(2024, 4, 22, 8, 0),
-    doctor: "Dra. Lucia Freitas",
-    unit: "Unidade Sul",
-    cost: 550.0,
-    status: "Agendado",
-  },
-  {
-    id: "A004",
-    patient: "Ana Pereira",
-    type: "Ultrassom",
-    date: new Date(2024, 4, 23, 14, 15),
-    doctor: "Dr. Roberto Castro",
-    unit: "Unidade Leste",
-    cost: 280.0,
-    status: "Agendado",
-  },
-];
-
 const Reports = () => {
   const pageRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [reportType, setReportType] = useState("weekly");
   const [filters, setFilters] = useState({});
   const today = startOfDay(new Date());
+
+  // Buscar dados reais do Supabase
+  const { data: appointments = [] } = useQuery({
+    queryKey: ['reports-appointments'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`
+          id,
+          patient_name,
+          scheduled_date,
+          cost,
+          status,
+          exam_types(name, category),
+          doctors(name),
+          units(name)
+        `)
+        .order('scheduled_date', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    }
+  });
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -84,18 +66,18 @@ const Reports = () => {
     return () => ctx.revert();
   }, []);
 
-  // Calculate analytics data
+  // Calculate analytics data from real appointments
   const calculateWeeklyExpenses = () => {
     const weeklyData = Array(7)
       .fill(0)
       .map((_, i) => {
         const date = addDays(today, i);
-        const dayAppointments = mockAppointments.filter(
+        const dayAppointments = appointments.filter(
           (app) =>
-            date.getDate() === new Date(app.date).getDate() &&
-            date.getMonth() === new Date(app.date).getMonth()
+            date.getDate() === new Date(app.scheduled_date).getDate() &&
+            date.getMonth() === new Date(app.scheduled_date).getMonth()
         );
-        const total = dayAppointments.reduce((sum, app) => sum + app.cost, 0);
+        const total = dayAppointments.reduce((sum, app) => sum + (app.cost || 0), 0);
         return {
           name: format(date, "dd/MM"),
           value: total,
@@ -106,12 +88,12 @@ const Reports = () => {
   };
 
   const calculateExpensesByUnit = () => {
-    const unitExpenses = mockAppointments.reduce((acc, app) => {
-      const unit = app.unit.replace("Unidade ", "");
+    const unitExpenses = appointments.reduce((acc, app) => {
+      const unit = app.units?.name || "Unidade";
       if (!acc[unit]) {
         acc[unit] = 0;
       }
-      acc[unit] += app.cost;
+      acc[unit] += app.cost || 0;
       return acc;
     }, {} as Record<string, number>);
 
@@ -122,11 +104,12 @@ const Reports = () => {
   };
 
   const calculateExpensesByType = () => {
-    const typeExpenses = mockAppointments.reduce((acc, app) => {
-      if (!acc[app.type]) {
-        acc[app.type] = 0;
+    const typeExpenses = appointments.reduce((acc, app) => {
+      const type = app.exam_types?.name || "Exame";
+      if (!acc[type]) {
+        acc[type] = 0;
       }
-      acc[app.type] += app.cost;
+      acc[type] += app.cost || 0;
       return acc;
     }, {} as Record<string, number>);
 
@@ -140,8 +123,8 @@ const Reports = () => {
   const expensesByUnit = calculateExpensesByUnit();
   const expensesByType = calculateExpensesByType();
 
-  const totalExpenses = mockAppointments.reduce((sum, app) => sum + app.cost, 0);
-  const averageExpense = totalExpenses / mockAppointments.length;
+  const totalExpenses = appointments.reduce((sum, app) => sum + (app.cost || 0), 0);
+  const averageExpense = appointments.length > 0 ? totalExpenses / appointments.length : 0;
 
   const handleExport = (format: string, dataTypes: string[]) => {
     console.log(`Exporting ${dataTypes.join(', ')} in ${format} format`);
@@ -161,8 +144,6 @@ const Reports = () => {
           Análise detalhada com métricas de performance e previsões
         </p>
       </div>
-
-      
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="overflow-x-auto mx-1 xl:-mx-3 px-0 sm:px-2">
@@ -218,7 +199,7 @@ const Reports = () => {
                   <Calendar className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{mockAppointments.length}</div>
+                  <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">{appointments.length}</div>
                   <p className="text-xs pt-2 text-neutral-500 dark:text-neutral-400">
                     Total registrado
                   </p>
@@ -227,13 +208,15 @@ const Reports = () => {
 
               <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Mais Caro</CardTitle>
+                  <CardTitle className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Tipo Popular</CardTitle>
                   <FileText className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100">Colonoscopia</div>
+                  <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
+                    {expensesByType.length > 0 ? expensesByType[0].name : 'N/A'}
+                  </div>
                   <p className="text-xs pt-2 text-neutral-500 dark:text-neutral-400">
-                    R$ 550,00
+                    Mais solicitado
                   </p>
                 </CardContent>
               </Card>
@@ -308,7 +291,7 @@ const Reports = () => {
               <CardContent className="p-3 sm:p-6">
                 <ScrollArea className="h-[300px] w-full">
                   <div className="space-y-3">
-                    {mockAppointments.map((app) => (
+                    {appointments.slice(0, 10).map((app) => (
                       <div
                         key={app.id}
                         className="border-l-4 border-l-blue-500 pl-3 py-2 bg-neutral-50 dark:bg-neutral-800/50 rounded-r-md px-4"
@@ -316,15 +299,15 @@ const Reports = () => {
                         <div className="flex justify-between items-start">
                           <div>
                             <span className="font-medium text-sm text-neutral-900 dark:text-neutral-100">
-                              {app.patient}
+                              {app.patient_name}
                             </span>
                             <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                              {format(app.date, "dd/MM/yyyy")} · {app.type}
+                              {format(new Date(app.scheduled_date), "dd/MM/yyyy")} · {app.exam_types?.name || 'Exame'}
                             </div>
                           </div>
                           <div className="text-right">
                             <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">
-                              R$ {app.cost.toFixed(2)}
+                              R$ {(app.cost || 0).toFixed(2)}
                             </span>
                             <Badge
                               variant="outline"

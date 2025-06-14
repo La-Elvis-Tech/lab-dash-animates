@@ -18,27 +18,11 @@ import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
 import UnitSelectorCard from "@/components/dashboard/UnitSelectorCard";
 
 // Data imports
-import { getDashboardConsumption, type ConsumptionData } from "@/data/dashboard";
+import { useConsumptionData } from "@/hooks/useDashboardData";
 
 const Dashboard: React.FC = () => {
   const dashboardRef = useRef<HTMLDivElement>(null);
-  const [consumptionData, setConsumptionData] = useState<ConsumptionData[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        const consumption = await getDashboardConsumption();
-        setConsumptionData(consumption);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
-        setLoading(false);
-      }
-    };
-
-    loadDashboardData();
-  }, []);
+  const { data: consumptionData, isLoading: loading } = useConsumptionData();
 
   useEffect(() => {
     if (loading) return;
@@ -151,7 +135,7 @@ const Dashboard: React.FC = () => {
         
                 <DashboardChart
                   type="area"
-                  data={consumptionData}
+                  data={consumptionData || []}
                   title="Consumo de Itens"
                   description="Itens consumidos nos últimos 7 meses"
                 />
