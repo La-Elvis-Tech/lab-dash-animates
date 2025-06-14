@@ -111,7 +111,7 @@ export const useSupabaseAuth = () => {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `https://laelvistech.netlify.app/`;
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -148,7 +148,7 @@ export const useSupabaseAuth = () => {
   };
 
   const resetPassword = async (email: string) => {
-    const redirectUrl = `${window.location.origin}/reset-password`;
+    const redirectUrl = `https://laelvistech.netlify.app/reset-password`;
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,

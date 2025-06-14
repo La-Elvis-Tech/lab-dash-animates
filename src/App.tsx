@@ -23,6 +23,7 @@ const Simulations = lazy(() => import("./pages/Simulations"));
 const Users = lazy(() => import("./pages/Users"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,11 @@ const App = () => (
               <Route path="/auth" element={
                 <Suspense fallback={<PageFallback />}>
                   <Auth />
+                </Suspense>
+              } />
+              <Route path="/reset-password" element={
+                <Suspense fallback={<PageFallback />}>
+                  <ResetPassword />
                 </Suspense>
               } />
               <Route element={<ProtectedRoute />}>
