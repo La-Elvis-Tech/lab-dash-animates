@@ -5,35 +5,59 @@ import { Building } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AppointmentsTable from './AppointmentsTable';
 import UnitsTable from './UnitsTable';
-import { Appointment, UnitSummary } from '@/types/appointment';
+import { SupabaseAppointment } from '@/hooks/useSupabaseAppointments';
 
 interface AppointmentsTabsProps {
-  recentAppointments: Appointment[];
-  next7DaysAppointments: Appointment[];
-  restOfMonthAppointments: Appointment[];
-  selectedDate: Date | undefined;
-  selectedDateAppointments: Appointment[];
-  unitsList: UnitSummary[];
-  today: Date;
-  sevenDaysFromNow: Date;
-  endOfCurrentMonth: Date;
-  getStatusColor: (status: string) => string;
-  onUpdateStatus?: (appointmentId: string, newStatus: string) => void;
+  appointments: SupabaseAppointment[];
+  loading: boolean;
+  onAppointmentUpdate?: () => void;
 }
 
 const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
-  recentAppointments,
-  next7DaysAppointments,
-  restOfMonthAppointments,
-  selectedDate,
-  selectedDateAppointments,
-  unitsList,
-  today,
-  sevenDaysFromNow,
-  endOfCurrentMonth,
-  getStatusColor,
-  onUpdateStatus,
+  appointments,
+  loading,
+  onAppointmentUpdate,
 }) => {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Agendado': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'Confirmado': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'Em andamento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'Concluído': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'Cancelado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+    }
+  };
+
+  const today = new Date();
+  const sevenDaysFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const endOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  const recentAppointments = appointments.filter(appointment => 
+    new Date(appointment.scheduled_date) < today
+  );
+
+  const next7DaysAppointments = appointments.filter(appointment => {
+    const appointmentDate = new Date(appointment.scheduled_date);
+    return appointmentDate >= today && appointmentDate <= sevenDaysFromNow;
+  });
+
+  const restOfMonthAppointments = appointments.filter(appointment => {
+    const appointmentDate = new Date(appointment.scheduled_date);
+    return appointmentDate > sevenDaysFromNow && appointmentDate <= endOfCurrentMonth;
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando agendamentos...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Tabs defaultValue="next7days">
       <TabsList className="mb-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm">
@@ -41,35 +65,20 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
           value="recent"
           className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
         >
-          Recentes
+          Recentes ({recentAppointments.length})
         </TabsTrigger>
         <TabsTrigger 
           value="next7days"
           className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
         >
-          Próximos 7 dias
+          Próximos 7 dias ({next7DaysAppointments.length})
         </TabsTrigger>
         <TabsTrigger 
           value="restOfMonth"
           className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
         >
-          Resto do mês
+          Resto do mês ({restOfMonthAppointments.length})
         </TabsTrigger>
-        <TabsTrigger 
-          value="units"
-          className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
-        >
-          <Building className="h-4 w-4 mr-1" />
-          Unidades
-        </TabsTrigger>
-        {selectedDate && (
-          <TabsTrigger 
-            value="selectedDate"
-            className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
-          >
-            {format(selectedDate, "dd/MM/yyyy")}
-          </TabsTrigger>
-        )}
       </TabsList>
       
       <TabsContent value="recent" className="mt-0">
@@ -84,7 +93,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
         <AppointmentsTable 
           appointments={recentAppointments} 
           getStatusColor={getStatusColor}
-          onUpdateStatus={onUpdateStatus}
+          onUpdateStatus={onAppointmentUpdate}
         />
       </TabsContent>
       
@@ -100,7 +109,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
         <AppointmentsTable 
           appointments={next7DaysAppointments} 
           getStatusColor={getStatusColor}
-          onUpdateStatus={onUpdateStatus}
+          onUpdateStatus={onAppointmentUpdate}
         />
       </TabsContent>
       
@@ -116,39 +125,9 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
         <AppointmentsTable 
           appointments={restOfMonthAppointments} 
           getStatusColor={getStatusColor}
-          onUpdateStatus={onUpdateStatus}
+          onUpdateStatus={onAppointmentUpdate}
         />
       </TabsContent>
-
-      <TabsContent value="units" className="mt-0">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-            Unidades e seus agendamentos
-          </h3>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            Resumo dos agendamentos por unidade
-          </p>
-        </div>
-        <UnitsTable units={unitsList} />
-      </TabsContent>
-      
-      {selectedDate && (
-        <TabsContent value="selectedDate" className="mt-0">
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-              Agendamentos em {format(selectedDate, "dd/MM/yyyy")}
-            </h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Todos os agendamentos para a data selecionada
-            </p>
-          </div>
-          <AppointmentsTable 
-            appointments={selectedDateAppointments} 
-            getStatusColor={getStatusColor}
-            onUpdateStatus={onUpdateStatus}
-          />
-        </TabsContent>
-      )}
     </Tabs>
   );
 };

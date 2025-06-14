@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface InventoryItem {
@@ -15,6 +16,7 @@ export interface InventoryItem {
   lastUpdated: string;
   status: 'active' | 'low' | 'critical' | 'expired';
   reservedForAppointments: number;
+  lastUsed?: string; // Added missing property
 }
 
 export interface InventoryCategory {
@@ -57,7 +59,8 @@ export const getInventoryItems = async (): Promise<InventoryItem[]> => {
     expiryDate: item.expiry_date,
     lastUpdated: item.updated_at,
     status: item.current_stock <= item.min_stock ? 'critical' : 'active',
-    reservedForAppointments: 0
+    reservedForAppointments: 0,
+    lastUsed: item.updated_at // Using updated_at as lastUsed for now
   })) || [];
 };
 

@@ -5,17 +5,27 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar, Plus, Search, Filter, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import AppointmentsTabs from '@/components/appointments/AppointmentsTabs';
-import CreateAppointmentForm from '@/components/appointments/CreateAppointmentForm';
 import AppointmentStats from '@/components/appointments/AppointmentStats';
 import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { format, startOfDay, endOfDay, addDays, endOfMonth } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+// Import appointment components that work with Supabase data
+import AppointmentsTable from '@/components/appointments/AppointmentsTable';
+import CreateAppointmentForm from '@/components/appointments/CreateAppointmentForm';
 
 const Orders = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const { appointments, loading, createAppointment, refreshAppointments } = useSupabaseAppointments();
+  const { 
+    appointments, 
+    loading, 
+    createAppointment, 
+    updateAppointment,
+    refreshAppointments 
+  } = useSupabaseAppointments();
 
   const filteredAppointments = appointments
     ? appointments.filter((appointment) => {
@@ -31,17 +41,40 @@ const Orders = () => {
       })
     : [];
 
-  const totalAppointments = appointments ? appointments.length : 0;
-  const scheduledAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Agendado').length : 0;
-  const confirmedAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Confirmado').length : 0;
-  const completedAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Concluído').length : 0;
-  const canceledAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Cancelado').length : 0;
-  const inProgressAppointments = appointments ? appointments.filter(appointment => appointment.status === 'Em andamento').length : 0;
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Agendado': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      case 'Confirmado': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'Em andamento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'Concluído': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'Cancelado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+    }
+  };
 
   const handleCreateAppointment = () => {
     setShowCreateForm(false);
     refreshAppointments();
   };
+
+  const handleUpdateStatus = async (appointmentId: string, newStatus: string) => {
+    try {
+      await updateAppointment(appointmentId, { status: newStatus as any });
+    } catch (error) {
+      console.error('Error updating appointment status:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando agendamentos...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -96,19 +129,26 @@ const Orders = () => {
           </div>
         </div>
 
-        <AppointmentsTabs 
-          appointments={filteredAppointments} 
-          loading={loading}
-          onAppointmentUpdate={refreshAppointments}
-        />
+        <Card className="bg-white dark:bg-gray-800">
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-white">
+              Lista de Agendamentos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AppointmentsTable 
+              appointments={filteredAppointments} 
+              getStatusColor={getStatusColor}
+              onUpdateStatus={handleUpdateStatus}
+            />
+          </CardContent>
+        </Card>
 
-        {showCreateForm && (
-          <CreateAppointmentForm
-            isOpen={showCreateForm}
-            onClose={() => setShowCreateForm(false)}
-            onSuccess={handleCreateAppointment}
-          />
-        )}
+        <CreateAppointmentForm
+          open={showCreateForm}
+          onOpenChange={setShowCreateForm}
+          onSuccess={handleCreateAppointment}
+        />
       </div>
     </div>
   );
