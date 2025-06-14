@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   useEffect(() => {
     if (sidebarRef.current) {
       gsap.to(sidebarRef.current, {
-        width: isCollapsed ? '80px' : '280px',
+        width: isCollapsed ? '100px' : '280px',
         duration: 0.4,
         ease: "power2.out"
       });
@@ -95,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
       } h-screen fixed left-0 top-0 z-50 flex flex-col border-r backdrop-blur-xl shadow-2xl ${
         theme === 'dark' ? 'text-white' : 'text-gray-800'
       }`}
-      style={{ width: isCollapsed ? '80px' : '280px' }}
+      style={{ width: isCollapsed ? '100px' : '280px' }}
     >
       {/* Header com logo */}
       <div className={`p-6 border-b ${
@@ -116,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
                 />
               </div>
               <div>
-                <h1 className="text-xl font-bold font-michroma">La Elvis Tech</h1>
+                <h1 className="text-lg font-bold font-michroma">La Elvis Tech</h1>
                 <p className={`text-xs ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                 }`}>Sistema de Gestão</p>

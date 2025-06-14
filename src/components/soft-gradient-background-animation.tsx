@@ -28,13 +28,13 @@ const BgradientAnim: React.FC<BgradientAnimProps> = ({
       .oklch-gradient-bg {
         background-image: linear-gradient(
             in oklch longer hue to right,
-            oklch(0.92 0.08 var(--hue1) / 70%), /* azul claro */
-            oklch(0.72 0.15 var(--hue2) / 70%)  /* azul escuro */
+            oklch(0.95 0.07 var(--hue1) / 60%),
+            oklch(0.92 0.08 var(--hue2) / 60%)
           ),
           linear-gradient(
             in oklch longer hue to bottom,
-            oklch(0.92 0.08 var(--hue1) / 70%),
-            oklch(0.72 0.15 var(--hue2) / 70%)
+            oklch(0.95 0.07 var(--hue1) / 60%),
+            oklch(0.92 0.08 var(--hue2) / 60%)
           );
         background-size: 100% 100%;
         animation-name: anim_bg;
