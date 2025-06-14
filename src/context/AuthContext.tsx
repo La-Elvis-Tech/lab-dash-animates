@@ -19,9 +19,13 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<void>;
   isAuthenticated: boolean;
   loading: boolean;
+  // Compatibilidade com código existente
+  signin?: (username: string, password: string) => boolean;
+  signout?: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Export the context
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const {
@@ -84,6 +88,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Funções de compatibilidade com código antigo
+  const signin = (username: string, password: string): boolean => {
+    // Esta é uma implementação de fallback para compatibilidade
+    // O código antigo deve usar login() em vez de signin()
+    console.warn('signin() is deprecated, use login() instead');
+    return false;
+  };
+
+  const signout = () => {
+    logout().catch(console.error);
+  };
+
   const value = {
     user,
     login,
@@ -92,6 +108,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     resetPassword: handleResetPassword,
     isAuthenticated: supabaseAuthenticated,
     loading,
+    signin,
+    signout,
   };
 
   return (

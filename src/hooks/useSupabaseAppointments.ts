@@ -86,7 +86,14 @@ export const useSupabaseAppointments = () => {
         .order('scheduled_date', { ascending: false });
 
       if (error) throw error;
-      setAppointments(data || []);
+      
+      // Type-safe conversion
+      const typedAppointments: SupabaseAppointment[] = (data || []).map(item => ({
+        ...item,
+        status: item.status as SupabaseAppointment['status']
+      }));
+      
+      setAppointments(typedAppointments);
     } catch (error: any) {
       console.error('Error fetching appointments:', error);
       toast({
