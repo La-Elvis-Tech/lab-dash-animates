@@ -1,0 +1,192 @@
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Calendar, Users, Clock, Settings } from 'lucide-react';
+import AppointmentCalendar from './AppointmentCalendar';
+import CreateAppointmentForm from './CreateAppointmentForm';
+import DoctorManagement from './DoctorManagement';
+import ExamTypeManagement from './ExamTypeManagement';
+import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
+import { useToast } from '@/hooks/use-toast';
+
+const AppointmentsDashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('calendar');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const { 
+    appointments, 
+    examTypes, 
+    doctors, 
+    units, 
+    loading,
+    refreshAppointments,
+    refreshExamTypes,
+    refreshDoctors,
+  } = useSupabaseAppointments();
+  const { toast } = useToast();
+
+  const handleCreateDoctor = async (doctorData: any) => {
+    // Implementar criação de médico via API
+    console.log('Creating doctor:', doctorData);
+    toast({
+      title: 'Função em desenvolvimento',
+      description: 'A criação de médicos será implementada em breve.',
+    });
+  };
+
+  const handleUpdateDoctor = async (id: string, updates: any) => {
+    // Implementar atualização de médico via API
+    console.log('Updating doctor:', id, updates);
+    toast({
+      title: 'Função em desenvolvimento',
+      description: 'A atualização de médicos será implementada em breve.',
+    });
+  };
+
+  const handleDeleteDoctor = async (id: string) => {
+    // Implementar remoção de médico via API
+    console.log('Deleting doctor:', id);
+    toast({
+      title: 'Função em desenvolvimento',
+      description: 'A remoção de médicos será implementada em breve.',
+    });
+  };
+
+  const handleCreateExamType = async (examTypeData: any) => {
+    // Implementar criação de tipo de exame via API
+    console.log('Creating exam type:', examTypeData);
+    toast({
+      title: 'Função em desenvolvimento',
+      description: 'A criação de tipos de exame será implementada em breve.',
+    });
+  };
+
+  const handleUpdateExamType = async (id: string, updates: any) => {
+    // Implementar atualização de tipo de exame via API
+    console.log('Updating exam type:', id, updates);
+    toast({
+      title: 'Função em desenvolvimento',
+      description: 'A atualização de tipos de exame será implementada em breve.',
+    });
+  };
+
+  const handleDeleteExamType = async (id: string) => {
+    // Implementar remoção de tipo de exame via API
+    console.log('Deleting exam type:', id);
+    toast({
+      title: 'Função em desenvolvimento',
+      description: 'A remoção de tipos de exame será implementada em breve.',
+    });
+  };
+
+  const handleSelectAppointment = (appointment: any) => {
+    console.log('Selected appointment:', appointment);
+    toast({
+      title: 'Agendamento selecionado',
+      description: `Paciente: ${appointment.patient_name}`,
+    });
+  };
+
+  const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
+    console.log('Selected slot:', slotInfo);
+    setShowCreateForm(true);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lab-blue mx-auto"></div>
+          <p className="mt-4 text-neutral-500 dark:text-neutral-400">Carregando agendamentos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+            Sistema de Agendamentos
+          </h1>
+          <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+            Gerencie agendamentos, médicos e tipos de exames
+          </p>
+        </div>
+        <Button 
+          onClick={() => setShowCreateForm(true)}
+          className="bg-lab-blue hover:bg-lab-blue/90"
+        >
+          <Calendar className="mr-2 h-4 w-4" />
+          Novo Agendamento
+        </Button>
+      </div>
+
+      {showCreateForm && (
+        <CreateAppointmentForm 
+          onAppointmentCreated={() => {
+            setShowCreateForm(false);
+            refreshAppointments();
+          }}
+        />
+      )}
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+          <TabsTrigger 
+            value="calendar"
+            className="data-[state=active]:bg-lab-blue data-[state=active]:text-white"
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            Calendário
+          </TabsTrigger>
+          <TabsTrigger 
+            value="doctors"
+            className="data-[state=active]:bg-lab-blue data-[state=active]:text-white"
+          >
+            <Users className="h-4 w-4 mr-2" />
+            Médicos
+          </TabsTrigger>
+          <TabsTrigger 
+            value="exam-types"
+            className="data-[state=active]:bg-lab-blue data-[state=active]:text-white"
+          >
+            <Clock className="h-4 w-4 mr-2" />
+            Tipos de Exames
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="calendar">
+          <AppointmentCalendar
+            appointments={appointments}
+            onSelectAppointment={handleSelectAppointment}
+            onSelectSlot={handleSelectSlot}
+          />
+        </TabsContent>
+
+        <TabsContent value="doctors">
+          <DoctorManagement
+            doctors={doctors}
+            units={units}
+            onCreateDoctor={handleCreateDoctor}
+            onUpdateDoctor={handleUpdateDoctor}
+            onDeleteDoctor={handleDeleteDoctor}
+          />
+        </TabsContent>
+
+        <TabsContent value="exam-types">
+          <ExamTypeManagement
+            examTypes={examTypes}
+            onCreateExamType={handleCreateExamType}
+            onUpdateExamType={handleUpdateExamType}
+            onDeleteExamType={handleDeleteExamType}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AppointmentsDashboard;
