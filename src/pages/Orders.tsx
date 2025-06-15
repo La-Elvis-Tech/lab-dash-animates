@@ -1,19 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar, Plus, Search, Filter, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import AppointmentStats from '@/components/appointments/AppointmentStats';
 import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { format, startOfDay, endOfDay, addDays, endOfMonth } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-
-// Import appointment components that work with Supabase data
 import AppointmentsTable from '@/components/appointments/AppointmentsTable';
 import CreateAppointmentForm from '@/components/appointments/CreateAppointmentForm';
+import { adaptSupabaseAppointmentsToAppointments } from '@/utils/appointmentAdapters';
 
 const Orders = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -22,7 +17,6 @@ const Orders = () => {
   const { 
     appointments, 
     loading, 
-    createAppointment, 
     updateAppointment,
     refreshAppointments 
   } = useSupabaseAppointments();
@@ -137,18 +131,19 @@ const Orders = () => {
           </CardHeader>
           <CardContent>
             <AppointmentsTable 
-              appointments={filteredAppointments} 
+              appointments={adaptSupabaseAppointmentsToAppointments(filteredAppointments)} 
               getStatusColor={getStatusColor}
               onUpdateStatus={handleUpdateStatus}
             />
           </CardContent>
         </Card>
 
-        <CreateAppointmentForm
-          open={showCreateForm}
-          onOpenChange={setShowCreateForm}
-          onSuccess={handleCreateAppointment}
-        />
+        {showCreateForm && (
+          <CreateAppointmentForm
+            onClose={() => setShowCreateForm(false)}
+            onSuccess={handleCreateAppointment}
+          />
+        )}
       </div>
     </div>
   );

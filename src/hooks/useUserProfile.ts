@@ -44,7 +44,15 @@ export const useUserProfile = () => {
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      
+      // Map the database status to our interface status
+      const mappedProfile: UserProfile = {
+        ...data,
+        status: data.status === 'pending' ? 'inactive' : data.status as 'active' | 'inactive' | 'suspended',
+        unit: data.units
+      };
+      
+      setProfile(mappedProfile);
     } catch (error: any) {
       console.error('Error fetching profile:', error);
       toast({
@@ -75,9 +83,15 @@ export const useUserProfile = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('User not authenticated');
 
+      // Map our interface status to database status if needed
+      const dbUpdates = {
+        ...updates,
+        status: updates.status === 'suspended' ? 'inactive' : updates.status
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(dbUpdates)
         .eq('id', userData.user.id);
 
       if (error) throw error;

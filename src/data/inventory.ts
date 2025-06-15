@@ -2,7 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 export interface InventoryItem {
-  id: string;
+  id: string; // Changed from number to string to match Supabase UUID
   name: string;
   category: string;
   stock: number;
@@ -16,7 +16,7 @@ export interface InventoryItem {
   lastUpdated: string;
   status: 'active' | 'low' | 'critical' | 'expired';
   reservedForAppointments: number;
-  lastUsed?: string; // Added missing property
+  lastUsed?: string;
 }
 
 export interface InventoryCategory {
@@ -60,7 +60,7 @@ export const getInventoryItems = async (): Promise<InventoryItem[]> => {
     lastUpdated: item.updated_at,
     status: item.current_stock <= item.min_stock ? 'critical' : 'active',
     reservedForAppointments: 0,
-    lastUsed: item.updated_at // Using updated_at as lastUsed for now
+    lastUsed: item.updated_at
   })) || [];
 };
 
@@ -87,6 +87,5 @@ export const updateInventoryItem = async (itemId: string, updatedData: any) => {
 };
 
 export const reserveInventoryItem = async (itemId: string, quantity: number) => {
-  // Implementar lógica de reserva se necessário
   console.log(`Reserving ${quantity} of item ${itemId}`);
 };

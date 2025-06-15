@@ -1,11 +1,10 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { Building } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AppointmentsTable from './AppointmentsTable';
-import UnitsTable from './UnitsTable';
 import { SupabaseAppointment } from '@/hooks/useSupabaseAppointments';
+import { adaptSupabaseAppointmentsToAppointments } from '@/utils/appointmentAdapters';
 
 interface AppointmentsTabsProps {
   appointments: SupabaseAppointment[];
@@ -91,7 +90,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
           </p>
         </div>
         <AppointmentsTable 
-          appointments={recentAppointments} 
+          appointments={adaptSupabaseAppointmentsToAppointments(recentAppointments)} 
           getStatusColor={getStatusColor}
           onUpdateStatus={onAppointmentUpdate}
         />
@@ -107,7 +106,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
           </p>
         </div>
         <AppointmentsTable 
-          appointments={next7DaysAppointments} 
+          appointments={adaptSupabaseAppointmentsToAppointments(next7DaysAppointments)} 
           getStatusColor={getStatusColor}
           onUpdateStatus={onAppointmentUpdate}
         />
@@ -123,7 +122,7 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
           </p>
         </div>
         <AppointmentsTable 
-          appointments={restOfMonthAppointments} 
+          appointments={adaptSupabaseAppointmentsToAppointments(restOfMonthAppointments)} 
           getStatusColor={getStatusColor}
           onUpdateStatus={onAppointmentUpdate}
         />
