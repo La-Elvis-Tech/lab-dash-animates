@@ -1,4 +1,3 @@
-
 // Utility functions for exporting data without xlsx dependency
 export const exportToCSV = (data: any[], filename: string) => {
   if (!data || data.length === 0) {
@@ -59,5 +58,35 @@ export const exportToJSON = (data: any[], filename: string) => {
   link.click();
   document.body.removeChild(link);
   
+  URL.revokeObjectURL(url);
+};
+
+// NOVO: Exportar para Excel XLSX
+import * as XLSX from "xlsx";
+
+export const exportToXLSX = (data: any[], filename: string) => {
+  if (!data || data.length === 0) {
+    console.warn('No data to export');
+    return;
+  }
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Relatório");
+
+  const xlsxBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([xlsxBuffer], { type: 'application/octet-stream' });
+
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+
+  link.href = url;
+  link.download = `${filename}.xlsx`;
+  link.style.visibility = 'hidden';
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
   URL.revokeObjectURL(url);
 };

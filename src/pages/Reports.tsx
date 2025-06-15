@@ -1,4 +1,3 @@
-
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -261,6 +260,18 @@ const Reports = () => {
   const handleFiltersChange = (newFilters: any) => {
     setFilters(newFilters);
   };
+
+  // LOG extra para debug caso os gráficos não recebam dados
+  console.log("DEBUG gráficos:", {
+    weeklyRevenue,
+    appointmentsByType,
+    monthlyTrends,
+    inventoryByCategory,
+    appointments,
+    inventoryData,
+    movements,
+    alerts
+  });
 
   return (
     <div ref={pageRef} className="space-y-6">

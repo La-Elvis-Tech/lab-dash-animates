@@ -14,40 +14,46 @@ const Requests = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const { examTypes, loading } = useSupabaseAppointments();
+  // Remover dependência de examDetailsService para simplificar exibição de exames (se examTypes já contém tudo)
+  // Se precisar dos detalhes, corrigir aqui depois
 
-  const { data: detailedExams, isLoading: detailsLoading } = useQuery({
-    queryKey: ['detailed-exams'],
-    queryFn: () => examDetailsService.getAllExamsWithMaterials(),
-    enabled: examTypes.length > 0
-  });
-
-  const categories = [
-    { id: 'all', name: 'Todos', count: examTypes.length },
-    { id: 'Hematologia', name: 'Hematologia', count: examTypes.filter(e => e.category === 'Hematologia').length },
-    { id: 'Bioquímica', name: 'Bioquímica', count: examTypes.filter(e => e.category === 'Bioquímica').length },
-    { id: 'Endocrinologia', name: 'Endocrinologia', count: examTypes.filter(e => e.category === 'Endocrinologia').length },
-    { id: 'Cardiologia', name: 'Cardiologia', count: examTypes.filter(e => e.category === 'Cardiologia').length },
-    { id: 'Uroanálise', name: 'Uroanálise', count: examTypes.filter(e => e.category === 'Uroanálise').length },
-    { id: 'Microbiologia', name: 'Microbiologia', count: examTypes.filter(e => e.category === 'Microbiologia').length },
-  ];
-
-  const filteredExams = detailedExams?.filter(exam => {
-    const matchesSearch = exam.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (exam.description && exam.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === 'all' || exam.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  }) || [];
-
-  if (loading || detailsLoading) {
+  // Garante que examTypes sempre é um array
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
-          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando exames...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
+          <p className="mt-4 text-blue-400">Carregando exames...</p>
         </div>
       </div>
     );
   }
+
+  if (!Array.isArray(examTypes) || examTypes.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-40">
+        <span className="text-gray-500">Nenhum exame cadastrado.</span>
+      </div>
+    );
+  }
+
+  const categories = [
+    { id: 'all', name: 'Todos', count: examTypes.length },
+    ...Array.from(new Set(examTypes.map(e => e.category)))
+      .filter(Boolean)
+      .map(category => ({
+        id: category,
+        name: category,
+        count: examTypes.filter(e => e.category === category).length
+      })),
+  ];
+
+  const filteredExams = examTypes.filter(exam => {
+    const matchesSearch = exam.name.toLowerCase().includes(searchTerm.toLowerCase())
+      || (exam.description && exam.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory === 'all' || exam.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="space-y-6">
@@ -60,45 +66,31 @@ const Requests = () => {
         </p>
       </div>
 
-      <ExamsStats examTypes={examTypes} />
+      <div className="flex flex-col md:flex-row gap-2 items-center justify-between">
+        <div className="relative w-full md:max-w-xs">
+          <input
+            placeholder="Buscar exame..."
+            className="pl-8 pr-3 py-2 w-full rounded-md border bg-white dark:bg-neutral-800"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <span className="absolute left-2 top-2.5 text-blue-400">
+            <Search size={18} />
+          </span>
+        </div>
+        <select
+          value={selectedCategory}
+          onChange={e => setSelectedCategory(e.target.value)}
+          className="rounded-md border px-3 py-2 bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-100 min-w-[140px]"
+        >
+          {categories.map(c => (
+            <option key={c.id} value={c.id}>
+              {c.name} ({c.count})
+            </option>
+          ))}
+        </select>
+      </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4 bg-neutral-100/80 dark:bg-neutral-800/80">
-          <div className="flex flex-col gap-4">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-3 transform text-gray-400" size={18} />
-              <Input
-                placeholder="Buscar exame..."
-                className="pl-10 w-full rounded-md bg-white dark:bg-neutral-700/40"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 flex items-center gap-2 ${
-                    selectedCategory === category.id
-                      ? "bg-lab-blue text-white dark:bg-lab-blue/80"
-                      : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-700/80 dark:text-gray-300 dark:hover:bg-gray-700"
-                  } rounded-md transition-colors`}
-                  onClick={() => setSelectedCategory(category.id)}
-                >
-                  {category.name}
-                  <Badge variant="secondary" className="ml-1 text-xs">
-                    {category.count}
-                  </Badge>
-                </button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Exams Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredExams.map((exam) => (
           <ExamDetailsCard
@@ -122,5 +114,4 @@ const Requests = () => {
     </div>
   );
 };
-
 export default Requests;
