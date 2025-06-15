@@ -18,16 +18,18 @@ export const useOTP = () => {
 
       if (error) throw error;
 
-      // Enviar código por email ao administrador
+      // Enviar código por email através da edge function
       try {
-        await supabase.functions.invoke('send-otp-email', {
+        const { error: emailError } = await supabase.functions.invoke('send-otp-email', {
           body: {
             code: data,
             userEmail: email,
-            adminEmail: 'admin@dasalabs.com', // Email do administrador
+            adminEmail: 'admin@dasalabs.com',
             type: type
           }
         });
+
+        if (emailError) throw emailError;
 
         toast({
           title: 'Código OTP enviado!',
@@ -35,7 +37,6 @@ export const useOTP = () => {
         });
       } catch (emailError) {
         console.warn('Falha ao enviar email, exibindo código localmente:', emailError);
-        // Fallback: mostrar código se email falhar
         toast({
           title: 'Código OTP gerado!',
           description: `Código: ${data} (válido por 10 minutos)`,

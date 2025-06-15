@@ -87,9 +87,9 @@ export const useInviteCodes = () => {
 
       if (error) throw error;
 
-      // Enviar código por email ao administrador
+      // Enviar código por email através da edge function
       try {
-        await supabase.functions.invoke('send-invite-email', {
+        const { error: emailError } = await supabase.functions.invoke('send-invite-email', {
           body: {
             code: data,
             role: role,
@@ -99,13 +99,14 @@ export const useInviteCodes = () => {
           }
         });
 
+        if (emailError) throw emailError;
+
         toast({
           title: 'Código gerado e enviado!',
           description: 'O código de convite foi enviado para o administrador.',
         });
       } catch (emailError) {
         console.warn('Falha ao enviar email, exibindo código localmente:', emailError);
-        // Fallback: mostrar código se email falhar
         toast({
           title: 'Código gerado!',
           description: `Código de convite: ${data}`,

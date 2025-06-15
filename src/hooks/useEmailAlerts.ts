@@ -21,7 +21,7 @@ export const useEmailAlerts = () => {
 
   const sendAlertEmail = async (alertData: AlertData, adminEmail = 'admin@dasalabs.com') => {
     try {
-      console.log('Enviando alerta por email:', alertData);
+      console.log('Enviando alerta por email via edge function:', alertData);
       
       const { data, error } = await supabase.functions.invoke('send-alert-email', {
         body: {
