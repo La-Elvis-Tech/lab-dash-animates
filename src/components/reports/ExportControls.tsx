@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, FileText, Database, FileExcel } from 'lucide-react';
+import { Download, FileText, Database } from 'lucide-react'; // <-- Removed FileExcel
 import { useToast } from '@/hooks/use-toast';
 import { exportToCSV, exportToJSON, exportToXLSX } from '@/utils/exportUtils';
 
@@ -69,7 +69,7 @@ const ExportControls: React.FC<ExportControlsProps> = ({ data, reportType, onExp
             </SelectItem>
             <SelectItem value="xlsx">
               <div className="flex items-center gap-2">
-                <FileExcel className="w-4 h-4 text-green-700" />
+                <FileText className="w-4 h-4 text-green-700" />
                 Excel
               </div>
             </SelectItem>

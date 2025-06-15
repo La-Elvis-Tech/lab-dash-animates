@@ -19,6 +19,10 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({ exam, onSchedule }) =
     }).format(value);
   };
 
+  // Defensive fallback for materials and preparation
+  const materials = Array.isArray(exam.materials) ? exam.materials : [];
+  const preparation = exam.preparation || { requires_preparation: false };
+
   return (
     <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700">
       <CardHeader className="pb-4">
@@ -59,12 +63,12 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({ exam, onSchedule }) =
           <div className="flex items-center gap-2">
             <FlaskConical className="h-4 w-4 text-neutral-500" />
             <span className="text-sm text-neutral-600 dark:text-neutral-400">
-              {exam.materials.length} materiais
+              {materials.length} materiais
             </span>
           </div>
         </div>
 
-        {exam.preparation.requires_preparation && (
+        {preparation.requires_preparation && (
           <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
             <div className="flex items-center gap-2 mb-1">
               <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
@@ -73,7 +77,7 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({ exam, onSchedule }) =
               </span>
             </div>
             <p className="text-sm text-yellow-700 dark:text-yellow-300">
-              {exam.preparation.preparation_instructions}
+              {preparation.preparation_instructions}
             </p>
           </div>
         )}
@@ -83,7 +87,7 @@ const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({ exam, onSchedule }) =
             Materiais Necessários:
           </h4>
           <div className="space-y-1">
-            {exam.materials.map((material, index) => (
+            {materials.map((material, index) => (
               <div key={index} className="flex items-center justify-between text-xs">
                 <span className="text-neutral-600 dark:text-neutral-400">
                   {material.item_name} ({material.quantity_required}x)

@@ -1,35 +1,40 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, Plus } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import ExamsStats from '@/components/exams/ExamsStats';
 import ExamDetailsCard from '@/components/exams/ExamDetailsCard';
-import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
-import { useQuery } from '@tanstack/react-query';
 import { examDetailsService } from '@/services/examDetailsService';
+import { ExamDetails } from '@/types/examDetails';
 
 const Requests = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const { examTypes, loading } = useSupabaseAppointments();
-  // Remover dependência de examDetailsService para simplificar exibição de exames (se examTypes já contém tudo)
-  // Se precisar dos detalhes, corrigir aqui depois
+  const [examDetailsList, setExamDetailsList] = useState<ExamDetails[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Garante que examTypes sempre é um array
+  useEffect(() => {
+    setLoading(true);
+    examDetailsService.getAllExamsWithMaterials()
+      .then((exams) => setExamDetailsList(exams))
+      .finally(() => setLoading(false));
+  }, []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
-          <p className="mt-4 text-blue-400">Carregando exames...</p>
+          <div className="animate-spin rounded-full border-b-4 border-blue-400 h-14 w-14 mx-auto mb-3"></div>
+          <p className="text-blue-500">Carregando exames detalhados...</p>
         </div>
       </div>
     );
   }
 
-  if (!Array.isArray(examTypes) || examTypes.length === 0) {
+  if (!Array.isArray(examDetailsList) || examDetailsList.length === 0) {
     return (
       <div className="flex items-center justify-center h-40">
         <span className="text-gray-500">Nenhum exame cadastrado.</span>
@@ -38,19 +43,20 @@ const Requests = () => {
   }
 
   const categories = [
-    { id: 'all', name: 'Todos', count: examTypes.length },
-    ...Array.from(new Set(examTypes.map(e => e.category)))
+    { id: 'all', name: 'Todos', count: examDetailsList.length },
+    ...Array.from(new Set(examDetailsList.map(e => e.category)))
       .filter(Boolean)
-      .map(category => ({
+      .map((category) => ({
         id: category,
         name: category,
-        count: examTypes.filter(e => e.category === category).length
+        count: examDetailsList.filter(e => e.category === category).length
       })),
   ];
 
-  const filteredExams = examTypes.filter(exam => {
-    const matchesSearch = exam.name.toLowerCase().includes(searchTerm.toLowerCase())
-      || (exam.description && exam.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredExams = examDetailsList.filter((exam) => {
+    const matchesSearch =
+      exam.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (exam.description && exam.description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === 'all' || exam.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
