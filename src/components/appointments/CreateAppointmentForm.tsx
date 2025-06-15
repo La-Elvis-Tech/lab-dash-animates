@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, User, Stethoscope, DollarSign, Plus } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Stethoscope, DollarSign, Plus, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,9 +23,20 @@ import { useToast } from "@/hooks/use-toast";
 
 interface CreateAppointmentFormProps {
   onAppointmentCreated?: () => void;
+  onClose?: () => void;
+  prefilledData?: {
+    date: string;
+    time: string;
+    doctorId: string;
+    doctorName: string;
+  } | null;
 }
 
-const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({ onAppointmentCreated }) => {
+const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({ 
+  onAppointmentCreated, 
+  onClose,
+  prefilledData 
+}) => {
   const { 
     examTypes, 
     doctors, 
@@ -46,14 +56,26 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({ onAppoint
     patient_email: '',
     patient_phone: '',
     exam_type_id: '',
-    date: '',
-    time: '',
-    doctor_id: '',
+    date: prefilledData?.date || '',
+    time: prefilledData?.time || '',
+    doctor_id: prefilledData?.doctorId || '',
     unit_id: '',
     duration_minutes: 30,
     cost: 0,
     notes: ''
   });
+
+  // Atualizar formulário quando prefilledData mudar
+  useEffect(() => {
+    if (prefilledData) {
+      setFormData(prev => ({
+        ...prev,
+        date: prefilledData.date,
+        time: prefilledData.time,
+        doctor_id: prefilledData.doctorId
+      }));
+    }
+  }, [prefilledData]);
 
   // Calcular materiais quando o tipo de exame mudar
   useEffect(() => {
@@ -151,17 +173,34 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({ onAppoint
 
   return (
     <div className="space-y-6">
-      <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl text-neutral-900 dark:text-neutral-100">
-            <Plus className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-            Criar Novo Agendamento
-          </CardTitle>
-          <CardDescription className="text-neutral-600 dark:text-neutral-300">
-            Preencha as informações para criar um novo agendamento
-          </CardDescription>
+      <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 shadow-sm">
+        <CardHeader className="border-b border-neutral-100 dark:border-neutral-800">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-xl text-neutral-900 dark:text-neutral-100">
+                <Plus className="h-5 w-5 text-neutral-600 dark:text-neutral-400" />
+                Criar Novo Agendamento
+              </CardTitle>
+              <CardDescription className="text-neutral-600 dark:text-neutral-300 mt-1">
+                {prefilledData ? 
+                  `Horário selecionado: ${prefilledData.time} com ${prefilledData.doctorName}` :
+                  'Preencha as informações para criar um novo agendamento'
+                }
+              </CardDescription>
+            </div>
+            {onClose && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Paciente */}
@@ -336,11 +375,21 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({ onAppoint
               />
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-3">
+              {onClose && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="px-6"
+                >
+                  Cancelar
+                </Button>
+              )}
               <Button
                 type="submit"
                 disabled={isCreating || !canSubmit}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 disabled:opacity-50"
+                className="bg-neutral-900 hover:bg-neutral-800 text-white px-6 disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
               >
                 {isCreating ? (
                   <>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,10 +9,21 @@ import DoctorManagement from './DoctorManagement';
 import ExamTypeManagement from './ExamTypeManagement';
 import AppointmentsStats from './AppointmentsStats';
 import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
+import { useToast } from '@/hooks/use-toast';
+
+interface SelectedSlotData {
+  date: string;
+  time: string;
+  doctorId: string;
+  doctorName: string;
+}
 
 const AppointmentsDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('calendar');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [selectedSlotData, setSelectedSlotData] = useState<SelectedSlotData | null>(null);
+  const { toast } = useToast();
+  
   const { 
     appointments, 
     examTypes, 
@@ -36,14 +46,42 @@ const AppointmentsDashboard: React.FC = () => {
     console.log('Selected appointment:', appointment);
   };
 
-  const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
+  const handleSelectSlot = (slotInfo: { 
+    start: Date; 
+    end: Date; 
+    time?: string; 
+    doctorId?: string; 
+    doctorName?: string 
+  }) => {
     console.log('Selected slot:', slotInfo);
-    setShowCreateForm(true);
+    
+    if (slotInfo.time && slotInfo.doctorId && slotInfo.doctorName) {
+      setSelectedSlotData({
+        date: slotInfo.start.toISOString().split('T')[0],
+        time: slotInfo.time,
+        doctorId: slotInfo.doctorId,
+        doctorName: slotInfo.doctorName
+      });
+      
+      setShowCreateForm(true);
+      setActiveTab('calendar');
+      
+      toast({
+        title: 'Horário selecionado',
+        description: `${slotInfo.time} com ${slotInfo.doctorName}`,
+      });
+    }
   };
 
   const handleCreateAppointment = async () => {
     setShowCreateForm(false);
+    setSelectedSlotData(null);
     await refreshAppointments();
+  };
+
+  const handleCloseForm = () => {
+    setShowCreateForm(false);
+    setSelectedSlotData(null);
   };
 
   // Wrap the functions to match expected interface
@@ -83,7 +121,7 @@ const AppointmentsDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
@@ -94,8 +132,11 @@ const AppointmentsDashboard: React.FC = () => {
           </p>
         </div>
         <Button 
-          onClick={() => setShowCreateForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm"
+          onClick={() => {
+            setSelectedSlotData(null);
+            setShowCreateForm(true);
+          }}
+          className="bg-neutral-900 hover:bg-neutral-800 text-white text-sm dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
           size="sm"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -108,6 +149,8 @@ const AppointmentsDashboard: React.FC = () => {
       {showCreateForm && (
         <CreateAppointmentForm 
           onAppointmentCreated={handleCreateAppointment}
+          onClose={handleCloseForm}
+          prefilledData={selectedSlotData}
         />
       )}
 
@@ -115,21 +158,21 @@ const AppointmentsDashboard: React.FC = () => {
         <TabsList className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
           <TabsTrigger 
             value="calendar"
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-sm"
+            className="data-[state=active]:bg-neutral-100 data-[state=active]:text-neutral-900 dark:data-[state=active]:bg-neutral-700 dark:data-[state=active]:text-neutral-100 text-sm"
           >
             <Calendar className="h-4 w-4 mr-2" />
             Calendário
           </TabsTrigger>
           <TabsTrigger 
             value="doctors"
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-sm"
+            className="data-[state=active]:bg-neutral-100 data-[state=active]:text-neutral-900 dark:data-[state=active]:bg-neutral-700 dark:data-[state=active]:text-neutral-100 text-sm"
           >
             <Users className="h-4 w-4 mr-2" />
             Médicos ({doctors.length})
           </TabsTrigger>
           <TabsTrigger 
             value="exam-types"
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-sm"
+            className="data-[state=active]:bg-neutral-100 data-[state=active]:text-neutral-900 dark:data-[state=active]:bg-neutral-700 dark:data-[state=active]:text-neutral-100 text-sm"
           >
             <Clock className="h-4 w-4 mr-2" />
             Tipos de Exames ({examTypes.length})

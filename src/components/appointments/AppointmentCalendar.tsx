@@ -3,26 +3,23 @@ import React, { useState, useEffect } from 'react';
 import { format, startOfWeek, endOfWeek, addDays, isSameDay, isToday, isAfter, startOfToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
   Calendar as CalendarIcon, 
   ChevronLeft, 
   ChevronRight, 
-  Clock, 
-  User,
-  Sparkles 
+  Clock,
+  Users 
 } from 'lucide-react';
 import { SupabaseAppointment } from '@/hooks/useSupabaseAppointments';
 import AvailableTimesGrid from './AvailableTimesGrid';
 import { useAvailableSlots } from '@/hooks/useAvailableSlots';
 import { useDoctors } from '@/hooks/useDoctors';
-import { useToast } from '@/hooks/use-toast';
 
 interface AppointmentCalendarProps {
   appointments: SupabaseAppointment[];
   onSelectAppointment?: (appointment: SupabaseAppointment) => void;
-  onSelectSlot?: (slotInfo: { start: Date; end: Date; time?: string; doctorId?: string }) => void;
+  onSelectSlot?: (slotInfo: { start: Date; end: Date; time?: string; doctorId?: string; doctorName?: string }) => void;
 }
 
 const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
@@ -34,23 +31,15 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<string>('');
   const [timeSlots, setTimeSlots] = useState<any[]>([]);
-  const [recommendedSlot, setRecommendedSlot] = useState<any>(null);
   
-  const { getAvailableSlots, findNextAvailableSlot, loading } = useAvailableSlots();
+  const { getAvailableSlots } = useAvailableSlots();
   const { doctors } = useDoctors();
-  const { toast } = useToast();
 
   useEffect(() => {
     if (selectedDate && doctors.length > 0) {
       loadAvailableSlots();
     }
   }, [selectedDate, selectedDoctor, doctors]);
-
-  useEffect(() => {
-    if (doctors.length > 0) {
-      findRecommendedSlot();
-    }
-  }, [doctors]);
 
   const loadAvailableSlots = async () => {
     if (!selectedDate || doctors.length === 0) return;
@@ -59,20 +48,11 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     setTimeSlots(slots);
   };
 
-  const findRecommendedSlot = async () => {
-    if (doctors.length === 0) return;
-    
-    const recommended = await findNextAvailableSlot(doctors);
-    if (recommended) {
-      setRecommendedSlot(recommended);
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Agendado': return 'bg-blue-500 text-white';
-      case 'Confirmado': return 'bg-green-500 text-white';
-      case 'Em andamento': return 'bg-yellow-500 text-white';
+      case 'Confirmado': return 'bg-emerald-500 text-white';
+      case 'Em andamento': return 'bg-amber-500 text-white';
       case 'Concluído': return 'bg-gray-500 text-white';
       case 'Cancelado': return 'bg-red-500 text-white';
       default: return 'bg-gray-400 text-white';
@@ -97,17 +77,14 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     startTime.setHours(hour, minute, 0, 0);
     
     const endTime = new Date(startTime.getTime() + (30 * 60000));
+    const doctorName = doctors.find(d => d.id === doctorId)?.name;
     
     onSelectSlot?.({
       start: startTime,
       end: endTime,
       time,
-      doctorId
-    });
-
-    toast({
-      title: 'Horário selecionado',
-      description: `${time} ${doctorId ? `com ${doctors.find(d => d.id === doctorId)?.name}` : ''}`,
+      doctorId,
+      doctorName
     });
   };
 
@@ -115,49 +92,28 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     setCurrentWeek(prev => addDays(prev, direction === 'next' ? 7 : -7));
   };
 
+  const formatDoctorName = (name: string) => {
+    const parts = name.split(' ');
+    if (parts.length === 1) return name;
+    return `Dr. ${parts[0]} ${parts[parts.length - 1]}`;
+  };
+
   return (
-    <div className="space-y-4">
-      {/* Recommended Slot Banner */}
-      {recommendedSlot && (
-        <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 dark:bg-green-800 rounded-lg">
-                  <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                    Próximo horário disponível
-                  </p>
-                  <p className="text-xs text-green-600 dark:text-green-300">
-                    {format(recommendedSlot.date, 'dd/MM/yyyy')} às {recommendedSlot.time} com Dr. {recommendedSlot.doctorName}
-                  </p>
+    <div className="space-y-6">
+      {/* Calendário Semanal */}
+      <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 shadow-sm">
+        <CardHeader className="pb-4 border-b border-neutral-100 dark:border-neutral-800">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <div className="p-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+                <CalendarIcon className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+              </div>
+              <div>
+                <div className="text-base">Calendário Semanal</div>
+                <div className="text-xs font-normal text-neutral-500 dark:text-neutral-400">
+                  Selecione uma data para ver horários disponíveis
                 </div>
               </div>
-              <Button 
-                onClick={() => {
-                  setSelectedDate(recommendedSlot.date);
-                  handleSelectTime(recommendedSlot.time, recommendedSlot.doctorId);
-                }}
-                className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1"
-                size="sm"
-              >
-                <CalendarIcon className="h-3 w-3 mr-1" />
-                Agendar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Week View Calendar */}
-      <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <CalendarIcon className="h-5 w-5" />
-              Calendário Semanal
             </CardTitle>
             
             <div className="flex items-center gap-2">
@@ -165,12 +121,12 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => navigateWeek('prev')}
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 border-neutral-200 dark:border-neutral-700"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               
-              <span className="text-sm font-medium px-3">
+              <span className="text-sm font-medium px-3 text-neutral-700 dark:text-neutral-300 min-w-[140px] text-center">
                 {format(weekStart, 'dd/MM', { locale: ptBR })} - {format(weekEnd, 'dd/MM/yyyy', { locale: ptBR })}
               </span>
               
@@ -178,7 +134,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => navigateWeek('next')}
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 border-neutral-200 dark:border-neutral-700"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -187,7 +143,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         </CardHeader>
         
         <CardContent className="p-4">
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-3">
             {weekDays.map((day) => {
               const dayAppointments = getAppointmentsForDate(day);
               const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -197,21 +153,25 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                 <div
                   key={day.toISOString()}
                   className={`
-                    p-2 rounded-lg cursor-pointer transition-colors min-h-[80px] border
+                    p-3 rounded-xl cursor-pointer transition-all duration-200 min-h-[90px] border-2
                     ${isSelected 
-                      ? 'bg-blue-100 border-blue-300 dark:bg-blue-900/50 dark:border-blue-600' 
-                      : 'bg-gray-50 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700'
+                      ? 'bg-neutral-50 border-neutral-300 dark:bg-neutral-800 dark:border-neutral-600 shadow-sm' 
+                      : 'bg-neutral-25 border-neutral-150 hover:bg-neutral-50 hover:border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800 dark:hover:bg-neutral-800'
                     }
-                    ${isPast ? 'opacity-50' : ''}
-                    ${isToday(day) ? 'ring-2 ring-blue-400' : ''}
+                    ${isPast ? 'opacity-40 cursor-not-allowed' : ''}
+                    ${isToday(day) ? 'ring-2 ring-blue-200 dark:ring-blue-800' : ''}
                   `}
                   onClick={() => !isPast && setSelectedDate(day)}
                 >
-                  <div className="text-center mb-1">
-                    <div className="text-xs text-gray-500 dark:text-gray-400 uppercase">
+                  <div className="text-center mb-2">
+                    <div className="text-xs text-neutral-500 dark:text-neutral-400 uppercase font-medium">
                       {format(day, 'EEE', { locale: ptBR })}
                     </div>
-                    <div className={`text-sm font-medium ${isToday(day) ? 'text-blue-600 font-bold' : 'text-gray-900 dark:text-gray-100'}`}>
+                    <div className={`text-lg font-semibold ${
+                      isToday(day) 
+                        ? 'text-blue-600 dark:text-blue-400' 
+                        : 'text-neutral-900 dark:text-neutral-100'
+                    }`}>
                       {format(day, 'd')}
                     </div>
                   </div>
@@ -220,13 +180,13 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                     {dayAppointments.slice(0, 2).map((appointment) => (
                       <div
                         key={appointment.id}
-                        className={`text-xs p-1 rounded text-center cursor-pointer ${getStatusColor(appointment.status)}`}
+                        className={`text-xs p-1.5 rounded-lg text-center cursor-pointer transition-all ${getStatusColor(appointment.status)} hover:shadow-sm`}
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectAppointment?.(appointment);
                         }}
                       >
-                        <div className="truncate font-medium">
+                        <div className="font-medium">
                           {format(new Date(appointment.scheduled_date), 'HH:mm')}
                         </div>
                         <div className="truncate text-xs opacity-90">
@@ -235,8 +195,13 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                       </div>
                     ))}
                     {dayAppointments.length > 2 && (
-                      <div className="text-xs text-center text-gray-500 font-medium">
+                      <div className="text-xs text-center text-neutral-500 dark:text-neutral-400 font-medium bg-neutral-100 dark:bg-neutral-800 rounded-lg py-1">
                         +{dayAppointments.length - 2} mais
+                      </div>
+                    )}
+                    {dayAppointments.length === 0 && !isPast && (
+                      <div className="text-xs text-center text-neutral-400 dark:text-neutral-500 py-1">
+                        Disponível
                       </div>
                     )}
                   </div>
@@ -247,7 +212,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         </CardContent>
       </Card>
 
-      {/* Available Times Grid */}
+      {/* Grade de Horários Disponíveis */}
       {selectedDate && doctors.length > 0 && (
         <AvailableTimesGrid
           selectedDate={selectedDate}
@@ -256,7 +221,6 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
           selectedDoctor={selectedDoctor}
           doctors={doctors}
           onDoctorChange={setSelectedDoctor}
-          recommendedSlot={recommendedSlot && isSameDay(recommendedSlot.date, selectedDate) ? recommendedSlot : undefined}
         />
       )}
     </div>
