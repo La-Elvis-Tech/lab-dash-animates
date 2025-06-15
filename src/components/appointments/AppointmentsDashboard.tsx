@@ -3,11 +3,12 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Calendar, Users, Clock, Settings } from 'lucide-react';
+import { Calendar, Users, Clock, Plus } from 'lucide-react';
 import AppointmentCalendar from './AppointmentCalendar';
 import CreateAppointmentForm from './CreateAppointmentForm';
 import DoctorManagement from './DoctorManagement';
 import ExamTypeManagement from './ExamTypeManagement';
+import AppointmentsStats from './AppointmentsStats';
 import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,6 +21,9 @@ const AppointmentsDashboard: React.FC = () => {
     doctors, 
     units, 
     loading,
+    createAppointment,
+    updateAppointment,
+    deleteAppointment,
     refreshAppointments,
     refreshExamTypes,
     refreshDoctors,
@@ -93,12 +97,17 @@ const AppointmentsDashboard: React.FC = () => {
     setShowCreateForm(true);
   };
 
+  const handleCreateAppointment = async () => {
+    setShowCreateForm(false);
+    await refreshAppointments();
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900 dark:border-neutral-100 mx-auto"></div>
-          <p className="mt-4 text-neutral-500 dark:text-neutral-400">Carregando agendamentos...</p>
+          <p className="mt-4 text-neutral-500 dark:text-neutral-400">Carregando sistema de agendamentos...</p>
         </div>
       </div>
     );
@@ -119,17 +128,17 @@ const AppointmentsDashboard: React.FC = () => {
           onClick={() => setShowCreateForm(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
         >
-          <Calendar className="mr-2 h-4 w-4" />
+          <Plus className="mr-2 h-4 w-4" />
           Novo Agendamento
         </Button>
       </div>
 
+      {/* Estatísticas dos Agendamentos */}
+      <AppointmentsStats appointments={appointments} />
+
       {showCreateForm && (
         <CreateAppointmentForm 
-          onAppointmentCreated={() => {
-            setShowCreateForm(false);
-            refreshAppointments();
-          }}
+          onAppointmentCreated={handleCreateAppointment}
         />
       )}
 
@@ -147,14 +156,14 @@ const AppointmentsDashboard: React.FC = () => {
             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
             <Users className="h-4 w-4 mr-2" />
-            Médicos
+            Médicos ({doctors.length})
           </TabsTrigger>
           <TabsTrigger 
             value="exam-types"
             className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
             <Clock className="h-4 w-4 mr-2" />
-            Tipos de Exames
+            Tipos de Exames ({examTypes.length})
           </TabsTrigger>
         </TabsList>
 

@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit2, Trash2, Clock, DollarSign, AlertCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Edit2, Trash2, Clock, FileText, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { ExamType } from '@/hooks/useSupabaseAppointments';
@@ -62,7 +62,7 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
         description: examType.description || '',
         duration_minutes: examType.duration_minutes || 30,
         cost: examType.cost || 0,
-        requires_preparation: examType.requires_preparation,
+        requires_preparation: examType.requires_preparation || false,
         preparation_instructions: examType.preparation_instructions || '',
       });
     } else {
@@ -95,7 +95,7 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
     } catch (error) {
       toast({
         title: 'Erro',
-        description: 'Não foi possível salvar o tipo de exame.',
+        description: 'Não foi possível salvar as informações do tipo de exame.',
         variant: 'destructive',
       });
     } finally {
@@ -121,22 +121,20 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
     }
   };
 
-  const categories = [...new Set(examTypes.map(et => et.category).filter(Boolean))];
-
   return (
     <div className="space-y-6">
       <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-xl text-neutral-900 dark:text-neutral-100">
-              <Clock className="h-5 w-5 text-lab-blue" />
-              Tipos de Exames
+              <FileText className="h-5 w-5 text-blue-600" />
+              Gestão de Tipos de Exames
             </CardTitle>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
                   onClick={() => handleOpenDialog()}
-                  className="bg-lab-blue hover:bg-lab-blue/90"
+                  className="bg-blue-600 hover:bg-blue-700"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Tipo de Exame
@@ -150,12 +148,12 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nome do Exame *</Label>
+                    <Label htmlFor="name">Nome *</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Ex: Hemograma Completo"
+                      placeholder="Nome do tipo de exame"
                       required
                     />
                   </div>
@@ -166,14 +164,8 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
                       id="category"
                       value={formData.category}
                       onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                      placeholder="Ex: Sangue, Imagem, Cardiologia"
-                      list="categories"
+                      placeholder="Ex: Cardiologia, Laboratorial"
                     />
-                    <datalist id="categories">
-                      {categories.map(cat => (
-                        <option key={cat} value={cat} />
-                      ))}
-                    </datalist>
                   </div>
 
                   <div className="space-y-2">
@@ -182,14 +174,14 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
                       id="description"
                       value={formData.description}
                       onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                      placeholder="Descrição detalhada do exame..."
+                      placeholder="Descrição detalhada do exame"
                       rows={3}
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="duration_minutes">Duração (min)</Label>
+                      <Label htmlFor="duration_minutes">Duração (minutos)</Label>
                       <Input
                         id="duration_minutes"
                         type="number"
@@ -212,26 +204,24 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="requires_preparation"
-                        checked={formData.requires_preparation}
-                        onCheckedChange={(checked) => setFormData(prev => ({ ...prev, requires_preparation: checked }))}
-                      />
-                      <Label htmlFor="requires_preparation">Requer preparação</Label>
-                    </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="requires_preparation"
+                      checked={formData.requires_preparation}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, requires_preparation: checked }))}
+                    />
+                    <Label htmlFor="requires_preparation">Requer preparação especial</Label>
                   </div>
 
                   {formData.requires_preparation && (
                     <div className="space-y-2">
-                      <Label htmlFor="preparation_instructions">Instruções de Preparação</Label>
+                      <Label htmlFor="preparation_instructions">Instruções de preparação</Label>
                       <Textarea
                         id="preparation_instructions"
                         value={formData.preparation_instructions}
                         onChange={(e) => setFormData(prev => ({ ...prev, preparation_instructions: e.target.value }))}
-                        placeholder="Instruções detalhadas para preparação do exame..."
-                        rows={4}
+                        placeholder="Instruções detalhadas para preparação do exame"
+                        rows={3}
                       />
                     </div>
                   )}
@@ -247,7 +237,7 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="bg-lab-blue hover:bg-lab-blue/90"
+                      className="bg-blue-600 hover:bg-blue-700"
                     >
                       {isSubmitting ? 'Salvando...' : editingExamType ? 'Atualizar' : 'Criar'}
                     </Button>
@@ -261,7 +251,7 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
           <div className="grid gap-4">
             {examTypes.length === 0 ? (
               <div className="text-center py-8 text-neutral-500 dark:text-neutral-400">
-                <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Nenhum tipo de exame cadastrado</p>
                 <p className="text-sm">Clique em "Novo Tipo de Exame" para começar</p>
               </div>
@@ -272,47 +262,46 @@ const ExamTypeManagement: React.FC<ExamTypeManagementProps> = ({
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <div className="p-2 bg-lab-lightBlue rounded-lg">
-                            <Clock className="h-4 w-4 text-lab-blue" />
+                          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                            <FileText className="h-4 w-4 text-blue-600" />
                           </div>
                           <div>
                             <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">
                               {examType.name}
                             </h3>
                             {examType.category && (
-                              <Badge variant="secondary" className="mt-1">
+                              <p className="text-sm text-neutral-600 dark:text-neutral-400">
                                 {examType.category}
-                              </Badge>
+                              </p>
                             )}
                           </div>
                         </div>
                         
-                        {examType.description && (
-                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
-                            {examType.description}
-                          </p>
-                        )}
-                        
-                        <div className="flex flex-wrap gap-2 text-sm">
-                          <Badge variant="outline" className="flex items-center gap-1">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm mb-2">
+                          <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
                             <Clock className="h-3 w-3" />
-                            {examType.duration_minutes} min
-                          </Badge>
+                            {examType.duration_minutes || 30} minutos
+                          </div>
                           
                           {examType.cost && (
-                            <Badge variant="outline" className="flex items-center gap-1">
-                              <DollarSign className="h-3 w-3" />
-                              R$ {examType.cost.toFixed(2)}
-                            </Badge>
+                            <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+                              <span>R$ {examType.cost.toFixed(2)}</span>
+                            </div>
                           )}
                           
                           {examType.requires_preparation && (
-                            <Badge variant="outline" className="flex items-center gap-1 text-amber-600">
+                            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
                               <AlertCircle className="h-3 w-3" />
                               Requer preparação
-                            </Badge>
+                            </div>
                           )}
                         </div>
+
+                        {examType.description && (
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
+                            {examType.description}
+                          </p>
+                        )}
                       </div>
                       
                       <div className="flex gap-2">
