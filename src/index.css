@@ -262,19 +262,23 @@ code {
   }
 }
 
-/* SCROLLBAR CUSTOM STYLE MINIMALISTA - SEM SETINHAS */
+/* SCROLLBAR CUSTOM STYLE MINIMALISTA - SEM SETINHAS, ARREDONDADO */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
   background: transparent;
+  border-radius: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #c7d2fe;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
   min-height: 36px;
   min-width: 36px;
+  transition: background 0.2s;
+  margin: 2px;
+  box-shadow: 0 1px 2px 0 #c7d2fe22;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -283,6 +287,7 @@ code {
 
 ::-webkit-scrollbar-corner {
   background: transparent;
+  border-radius: 8px;
 }
 
 ::-webkit-scrollbar-button { display:none; height:0; width:0; } /* remove as setinhas */
@@ -290,7 +295,10 @@ code {
 * {
   scrollbar-width: thin;
   scrollbar-color: #c7d2fe #f1f5f9;
+  border-radius: 7px;
 }
 .dark * {
   scrollbar-color: #6366f1 #1e293b;
 }
+
+/* FIM SCROLLBAR CUSTOMIZADA */
