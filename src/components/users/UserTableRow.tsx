@@ -96,6 +96,7 @@ const UserTableRow: React.FC<UserTableRowProps> = ({
         <UserRoleManager
           userId={user.id}
           userEmail={user.email}
+          userName={user.full_name}
           currentRole={user.role || 'user'}
           onRoleChange={onRoleChange}
           onDeactivateUser={onDeactivateUser}

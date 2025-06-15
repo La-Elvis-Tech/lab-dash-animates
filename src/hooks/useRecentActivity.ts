@@ -43,7 +43,7 @@ export const useRecentActivity = () => {
           created_at,
           reason,
           inventory_items(name),
-          profiles(full_name)
+          performed_by
         `)
         .order('created_at', { ascending: false })
         .limit(5);
@@ -74,7 +74,7 @@ export const useRecentActivity = () => {
           time: format(date, 'HH:mm'),
           day: format(date, 'EEEE', { locale: ptBR }),
           date: format(date, 'dd/MM'),
-          responsavel: movement.profiles?.full_name
+          responsavel: movement.performed_by
         });
       });
 

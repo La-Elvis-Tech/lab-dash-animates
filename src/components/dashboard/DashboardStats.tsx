@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, AlertCircle, Users, Calendar, DollarSign, Package } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertCircle, Users, Calendar, DollarSign, Package, AlertTriangle } from "lucide-react";
 import { useDashboardStats } from "@/hooks/useDashboardData";
 
 const DashboardStats: React.FC = () => {

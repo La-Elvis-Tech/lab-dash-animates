@@ -44,8 +44,10 @@ export const useAuth = () => {
       };
       
       setProfile(mappedProfile);
+      return { data: mappedProfile, error: null };
     } catch (error: any) {
       console.error('Error fetching profile:', error);
+      return { data: null, error };
     }
   };
 
@@ -61,8 +63,10 @@ export const useAuth = () => {
 
       if (error && error.code !== 'PGRST116') throw error;
       setRole(data?.role || null);
+      return { data: data?.role || null, error: null };
     } catch (error: any) {
       console.error('Error fetching user role:', error);
+      return { data: null, error };
     }
   };
 

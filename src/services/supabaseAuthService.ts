@@ -12,6 +12,8 @@ export interface AuthUser {
 
 export const supabaseAuthService = {
   async signIn(email: string, password: string) {
+    console.log(`[AUTH] Tentativa de login para: ${email}`);
+    
     // Verificar status do usuário ANTES do login
     const { data: profileData } = await supabase
       .from('profiles')
@@ -20,14 +22,17 @@ export const supabaseAuthService = {
       .single();
 
     if (!profileData) {
+      console.log(`[AUTH] Usuário não encontrado: ${email}`);
       throw new Error('Usuário não encontrado no sistema.');
     }
 
     if (profileData.status === 'pending') {
+      console.log(`[AUTH] Login negado - conta pendente: ${email}`);
       throw new Error('Sua conta ainda está pendente de aprovação. Aguarde a aprovação de um administrador.');
     }
 
     if (profileData.status === 'inactive') {
+      console.log(`[AUTH] Login negado - conta desativada: ${email}`);
       throw new Error('Sua conta foi desativada. Entre em contato com um administrador.');
     }
 
@@ -38,13 +43,17 @@ export const supabaseAuthService = {
     });
 
     if (error) {
+      console.log(`[AUTH] Erro no login para ${email}: ${error.message}`);
       throw new Error(error.message);
     }
 
+    console.log(`[AUTH] Login bem-sucedido para: ${email}`);
     return data;
   },
 
   async signUp(email: string, password: string, fullName: string) {
+    console.log(`[AUTH] Tentativa de registro para: ${email}`);
+    
     const redirectUrl = `https://laelvistech.netlify.app/`;
     
     const { data, error } = await supabase.auth.signUp({
@@ -59,17 +68,22 @@ export const supabaseAuthService = {
     });
 
     if (error) {
+      console.log(`[AUTH] Erro no registro para ${email}: ${error.message}`);
       throw new Error(error.message);
     }
 
+    console.log(`[AUTH] Registro bem-sucedido para: ${email}`);
     return data;
   },
 
   async signOut() {
+    console.log('[AUTH] Usuário fazendo logout');
     const { error } = await supabase.auth.signOut();
     if (error) {
+      console.log(`[AUTH] Erro no logout: ${error.message}`);
       throw new Error(error.message);
     }
+    console.log('[AUTH] Logout bem-sucedido');
   },
 
   async getCurrentUser(): Promise<AuthUser | null> {
@@ -90,6 +104,7 @@ export const supabaseAuthService = {
 
     // Verificar se o usuário está ativo
     if (profile.status !== 'active') {
+      console.log(`[AUTH] Usuário com status inativo detectado: ${user.email}`);
       await supabase.auth.signOut();
       return null;
     }
@@ -105,6 +120,8 @@ export const supabaseAuthService = {
   },
 
   async resetPassword(email: string) {
+    console.log(`[AUTH] Solicitação de reset de senha para: ${email}`);
+    
     // Verificar se o email existe no sistema
     const { data: profileData } = await supabase
       .from('profiles')
@@ -113,6 +130,7 @@ export const supabaseAuthService = {
       .single();
 
     if (!profileData) {
+      console.log(`[AUTH] Reset negado - email não encontrado: ${email}`);
       throw new Error('Email não encontrado no sistema.');
     }
 
@@ -123,7 +141,10 @@ export const supabaseAuthService = {
     });
 
     if (error) {
+      console.log(`[AUTH] Erro no reset de senha para ${email}: ${error.message}`);
       throw new Error(error.message);
     }
+
+    console.log(`[AUTH] Email de reset enviado para: ${email}`);
   },
 };
