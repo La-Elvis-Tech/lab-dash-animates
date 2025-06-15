@@ -67,10 +67,19 @@ export const useBloodExams = () => {
 
       if (data && data[0]) {
         const result = data[0];
+        const examDetails = Array.isArray(result.exam_details) 
+          ? result.exam_details.map((detail: any) => ({
+              exam_id: String(detail.exam_id || ''),
+              name: String(detail.name || ''),
+              volume_ml: Number(detail.volume_ml || 0),
+              tube_type: String(detail.tube_type || '')
+            }))
+          : [];
+
         return {
           total_volume_ml: result.total_volume_ml,
           tubes_needed: result.tubes_needed,
-          exam_details: Array.isArray(result.exam_details) ? result.exam_details : []
+          exam_details: examDetails
         };
       }
 

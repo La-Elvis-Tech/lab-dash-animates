@@ -76,26 +76,27 @@ const AppointmentsDashboard: React.FC = () => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900 dark:border-neutral-100 mx-auto"></div>
-          <p className="mt-4 text-neutral-500 dark:text-neutral-400">Carregando sistema de agendamentos...</p>
+          <p className="mt-4 text-neutral-500 dark:text-neutral-400 text-sm">Carregando sistema de agendamentos...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
             Sistema de Agendamentos
           </h1>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+          <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
             Gerencie agendamentos, médicos e tipos de exames
           </p>
         </div>
         <Button 
           onClick={() => setShowCreateForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white text-sm"
+          size="sm"
         >
           <Plus className="mr-2 h-4 w-4" />
           Novo Agendamento
@@ -114,21 +115,21 @@ const AppointmentsDashboard: React.FC = () => {
         <TabsList className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
           <TabsTrigger 
             value="calendar"
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-sm"
           >
             <Calendar className="h-4 w-4 mr-2" />
             Calendário
           </TabsTrigger>
           <TabsTrigger 
             value="doctors"
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-sm"
           >
             <Users className="h-4 w-4 mr-2" />
             Médicos ({doctors.length})
           </TabsTrigger>
           <TabsTrigger 
             value="exam-types"
-            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-sm"
           >
             <Clock className="h-4 w-4 mr-2" />
             Tipos de Exames ({examTypes.length})
