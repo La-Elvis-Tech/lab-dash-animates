@@ -14,6 +14,8 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useSupabaseInventory } from '@/hooks/useSupabaseInventory';
+import { useToast } from '@/hooks/use-toast';
 
 const inventoryFormSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -45,6 +47,9 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
   initialData,
   mode = 'create'
 }) => {
+  const { addItem } = useSupabaseInventory();
+  const { toast } = useToast();
+
   const form = useForm<InventoryFormValues>({
     resolver: zodResolver(inventoryFormSchema),
     defaultValues: {
@@ -65,11 +70,25 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
 
   const onSubmit = async (values: InventoryFormValues) => {
     try {
-      // A lógica de submit será implementada no componente pai
-      console.log('Form values:', values);
+      const itemData = {
+        ...values,
+        expiry_date: values.expiry_date?.toISOString().split('T')[0],
+        active: true,
+        unit_id: '', // Will be set by the hook
+        category_id: values.category_id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      await addItem(itemData);
       onSuccess();
     } catch (error) {
       console.error('Error submitting form:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível salvar o item.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -87,7 +106,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nome do Item *</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Nome do Item *</FormLabel>
                 <FormControl>
                   <Input placeholder="Ex: Luvas Descartáveis" {...field} />
                 </FormControl>
@@ -101,7 +120,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="category_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Categoria *</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Categoria *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -127,7 +146,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descrição</FormLabel>
+              <FormLabel className="text-neutral-700 dark:text-neutral-300">Descrição</FormLabel>
               <FormControl>
                 <Textarea 
                   placeholder="Descrição detalhada do item..."
@@ -146,7 +165,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="current_stock"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Estoque Atual *</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Estoque Atual *</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
@@ -165,7 +184,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="min_stock"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Estoque Mínimo *</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Estoque Mínimo *</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
@@ -184,7 +203,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="max_stock"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Estoque Máximo *</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Estoque Máximo *</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
@@ -205,7 +224,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="unit"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Unidade de Medida *</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Unidade de Medida *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -230,7 +249,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="cost_per_unit"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Custo por Unidade (R$)</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Custo por Unidade (R$)</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
@@ -253,7 +272,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="supplier"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Fornecedor</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Fornecedor</FormLabel>
                 <FormControl>
                   <Input placeholder="Ex: MedSupply Ltda" {...field} />
                 </FormControl>
@@ -267,7 +286,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="lot_number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Número do Lote</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Número do Lote</FormLabel>
                 <FormControl>
                   <Input placeholder="Ex: LOT123456" {...field} />
                 </FormControl>
@@ -283,14 +302,14 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="expiry_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Data de Validade</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Data de Validade</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full pl-3 text-left font-normal",
+                          "w-full pl-3 text-left font-normal bg-gray-200/80 dark:bg-neutral-700/80 border-0",
                           !field.value && "text-muted-foreground"
                         )}
                       >
@@ -310,6 +329,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
                       onSelect={field.onChange}
                       disabled={(date) => date < new Date()}
                       initialFocus
+                      className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
@@ -323,7 +343,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Localização</FormLabel>
+                <FormLabel className="text-neutral-700 dark:text-neutral-300">Localização</FormLabel>
                 <FormControl>
                   <Input placeholder="Ex: Armário A1, Prateleira 2" {...field} />
                 </FormControl>
@@ -334,7 +354,7 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
         </div>
 
         <div className="flex justify-end space-x-2 pt-4">
-          <Button type="submit" className="min-w-[120px]">
+          <Button type="submit" className="min-w-[120px] bg-lab-blue hover:bg-lab-blue/90">
             <Plus className="w-4 h-4 mr-2" />
             {mode === 'create' ? 'Adicionar Item' : 'Atualizar Item'}
           </Button>
