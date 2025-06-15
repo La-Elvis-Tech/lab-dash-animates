@@ -1,4 +1,3 @@
-
 import LaboratoryProfile from "@/components/settings/LaboratoryProfile";
 import NotificationSettings from "@/components/settings/NotificationSettings";
 import SecuritySettings from "@/components/settings/SecuritySettings";
@@ -7,7 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import { gsap } from "gsap";
 import { Calendar, Settings as SettingsIcon, User, LogOut, Building2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +15,7 @@ const Settings = () => {
   const pageRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("profile");
   const { toast } = useToast();
-  const { signOut, user, isAdmin } = useAuth();
+  const { signOut, user, isAdmin } = useAuthContext();
 
   useEffect(() => {
     const ctx = gsap.context(() => {

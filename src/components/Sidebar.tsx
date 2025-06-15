@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthContext } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -27,8 +27,9 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   const location = useLocation();
-  const { signOut, user } = useAuth();
+  const { signOut, user } = useAuthContext();
   const { theme } = useTheme();
+  
   const sidebarRef = useRef<HTMLDivElement>(null);
   const logoContainerRef = useRef<HTMLDivElement>(null);
   const logoTextRef = useRef<HTMLDivElement>(null);
