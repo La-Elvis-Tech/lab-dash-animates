@@ -2,67 +2,88 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Clock, Package, MapPin } from "lucide-react";
+import { AlertTriangle, Clock, Calendar, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const RiskAlertsCard: React.FC = () => {
-  const criticalItems = [
-    { name: "Etanol Absoluto", current: 3, min: 5, unit: "L", urgency: "critical" },
-    { name: "Luvas Nitrila", current: 12, min: 50, unit: "pares", urgency: "high" },
-    { name: "Pipetas 10mL", current: 8, min: 15, unit: "unid", urgency: "medium" }
-  ];
+  const { data: expiringItems } = useQuery({
+    queryKey: ['expiring-items'],
+    queryFn: async () => {
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
-  const expiringItems = [
-    { name: "Reagente X", days: 5, lot: "LT-2024-001" },
-    { name: "Solução Y", days: 12, lot: "LT-2024-045" },
-    { name: "Buffer Z", days: 18, lot: "LT-2024-023" }
-  ];
+      const { data, error } = await supabase
+        .from('inventory_items')
+        .select('name, expiry_date, lot_number')
+        .not('expiry_date', 'is', null)
+        .lte('expiry_date', thirtyDaysFromNow.toISOString().split('T')[0])
+        .eq('active', true)
+        .order('expiry_date')
+        .limit(5);
 
-  const getUrgencyColor = (urgency: string) => {
-    switch (urgency) {
-      case "critical": return "text-red-600 bg-red-100 dark:bg-red-900 dark:text-red-200";
-      case "high": return "text-orange-600 bg-orange-100 dark:bg-orange-900 dark:text-orange-200";
-      case "medium": return "text-yellow-600 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-200";
-      default: return "text-gray-600 bg-gray-100 dark:bg-gray-900 dark:text-gray-200";
+      if (error) throw error;
+      return data || [];
     }
-  };
+  });
 
-  const getExpiryUrgencyColor = (days: number) => {
+  const { data: pendingAppointments } = useQuery({
+    queryKey: ['pending-appointments'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('patient_name, scheduled_date, status')
+        .in('status', ['Agendado', 'Confirmado'])
+        .order('scheduled_date')
+        .limit(3);
+
+      if (error) throw error;
+      return data || [];
+    }
+  });
+
+  const getExpiryUrgencyColor = (expiryDate: string) => {
+    const days = Math.ceil((new Date(expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
     if (days <= 7) return "text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-300";
     if (days <= 15) return "text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-300";
     return "text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-300";
   };
 
+  const getDaysUntilExpiry = (expiryDate: string) => {
+    return Math.ceil((new Date(expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+  };
+
   return (
     <div className="grid grid-cols-1 gap-4 h-full">
-      {/* Rupturas Imediatas */}
+      {/* Agendamentos Pendentes */}
       <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
-            <Package size={18} className="text-red-600 dark:text-red-400" />
-            Rupturas Imediatas
+            <Calendar size={18} className="text-blue-600 dark:text-blue-400" />
+            Agendamentos Pendentes
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-red-50/80 to-orange-50/80 dark:from-red-950/40 dark:to-orange-950/40 rounded-xl border border-red-200 dark:border-red-900/50">
-              <span className="text-2xl font-bold text-red-600 dark:text-red-400">
-                {criticalItems.length}
+            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-950/40 dark:to-indigo-950/40 rounded-xl border border-blue-200 dark:border-blue-900/50">
+              <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {pendingAppointments?.length || 0}
               </span>
               <Link 
-                to="/inventory?filter=critical" 
-                className="text-sm text-red-600 hover:underline font-medium"
+                to="/appointments" 
+                className="text-sm text-blue-600 hover:underline font-medium"
               >
-                Ver Críticos
+                Ver Agenda
               </Link>
             </div>
             
             <div className="space-y-2 max-h-40 overflow-y-auto">
-              {criticalItems.map((item, index) => (
+              {pendingAppointments?.map((appointment, index) => (
                 <div key={index} className="flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-neutral-950/80 rounded-lg text-sm">
-                  <span className="truncate text-gray-800 dark:text-gray-200">{item.name}</span>
-                  <Badge className={getUrgencyColor(item.urgency)}>
-                    {item.current}/{item.min} {item.unit}
+                  <span className="truncate text-gray-800 dark:text-gray-200">{appointment.patient_name}</span>
+                  <Badge className="text-blue-600 bg-blue-100 dark:bg-blue-900 dark:text-blue-200">
+                    {new Date(appointment.scheduled_date).toLocaleDateString('pt-BR')}
                   </Badge>
                 </div>
               ))}
@@ -75,30 +96,30 @@ const RiskAlertsCard: React.FC = () => {
       <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
-            <Clock size={18} className="text-purple-600 dark:text-purple-400" />
+            <Clock size={18} className="text-orange-600 dark:text-orange-400" />
             Vencimentos (30 dias)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50/80 to-pink-50/80 dark:from-purple-950/40 dark:to-pink-950/40 rounded-xl border border-purple-200 dark:border-purple-900/50">
-              <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                {expiringItems.length}
+            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-orange-50/80 to-yellow-50/80 dark:from-orange-950/40 dark:to-yellow-950/40 rounded-xl border border-orange-200 dark:border-orange-900/50">
+              <span className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                {expiringItems?.length || 0}
               </span>
               <Link 
                 to="/inventory?filter=expiring" 
-                className="text-sm text-purple-600 hover:underline font-medium"
+                className="text-sm text-orange-600 hover:underline font-medium"
               >
                 Ver Todos
               </Link>
             </div>
             
             <div className="space-y-2 max-h-40 overflow-y-auto">
-              {expiringItems.map((item, index) => (
+              {expiringItems?.map((item, index) => (
                 <div key={index} className="flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-neutral-950/80 rounded-lg text-sm">
                   <span className="truncate text-gray-800 dark:text-gray-200">{item.name}</span>
-                  <Badge className={getExpiryUrgencyColor(item.days)}>
-                    {item.days}d
+                  <Badge className={getExpiryUrgencyColor(item.expiry_date)}>
+                    {getDaysUntilExpiry(item.expiry_date)}d
                   </Badge>
                 </div>
               ))}

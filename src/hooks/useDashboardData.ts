@@ -4,18 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface DashboardStats {
   totalItems: number;
-  lowStockItems: number;
-  expiringItems: number;
   totalAppointments: number;
   pendingAppointments: number;
   completedAppointments: number;
   totalRevenue: number;
   monthlyRevenue: number;
-}
-
-export interface ConsumptionData {
-  name: string;
-  value: number;
+  totalExamTypes: number;
+  activeExamTypes: number;
 }
 
 export interface AppointmentTrend {
@@ -36,7 +31,7 @@ export const useDashboardStats = () => {
       // Buscar dados do inventário
       const { data: items } = await supabase
         .from('inventory_items')
-        .select('current_stock, min_stock, expiry_date')
+        .select('id')
         .eq('active', true);
 
       // Buscar dados dos agendamentos
@@ -44,19 +39,12 @@ export const useDashboardStats = () => {
         .from('appointments')
         .select('status, cost, scheduled_date, created_at');
 
-      const totalItems = items?.length || 0;
-      const lowStockItems = items?.filter(item => 
-        item.current_stock <= item.min_stock
-      ).length || 0;
-      
-      const expiringItems = items?.filter(item => {
-        if (!item.expiry_date) return false;
-        const expiryDate = new Date(item.expiry_date);
-        const thirtyDaysFromNow = new Date();
-        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-        return expiryDate <= thirtyDaysFromNow;
-      }).length || 0;
+      // Buscar dados dos tipos de exames
+      const { data: examTypes } = await supabase
+        .from('exam_types')
+        .select('id, active');
 
+      const totalItems = items?.length || 0;
       const totalAppointments = appointments?.length || 0;
       const pendingAppointments = appointments?.filter(app => 
         app.status === 'Agendado' || app.status === 'Confirmado'
@@ -79,45 +67,19 @@ export const useDashboardStats = () => {
                appointmentDate.getFullYear() === currentYear;
       }).reduce((sum, app) => sum + (app.cost || 0), 0) || 0;
 
+      const totalExamTypes = examTypes?.length || 0;
+      const activeExamTypes = examTypes?.filter(exam => exam.active).length || 0;
+
       return {
         totalItems,
-        lowStockItems,
-        expiringItems,
         totalAppointments,
         pendingAppointments,
         completedAppointments,
         totalRevenue,
-        monthlyRevenue
+        monthlyRevenue,
+        totalExamTypes,
+        activeExamTypes
       };
-    }
-  });
-};
-
-export const useConsumptionData = () => {
-  return useQuery({
-    queryKey: ['consumption-data'],
-    queryFn: async (): Promise<ConsumptionData[]> => {
-      const { data: movements } = await supabase
-        .from('inventory_movements')
-        .select('created_at, quantity, movement_type')
-        .eq('movement_type', 'saida')
-        .gte('created_at', new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000).toISOString());
-
-      if (!movements) return [];
-
-      const monthlyData: { [key: string]: number } = {};
-      const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-
-      movements.forEach(movement => {
-        const date = new Date(movement.created_at);
-        const monthKey = months[date.getMonth()];
-        monthlyData[monthKey] = (monthlyData[monthKey] || 0) + movement.quantity;
-      });
-
-      return months.map(month => ({
-        name: month,
-        value: monthlyData[month] || 0
-      })).slice(-7);
     }
   });
 };

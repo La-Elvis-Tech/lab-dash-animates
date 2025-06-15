@@ -1,37 +1,44 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, Plus, Calendar, Users, Clock, TrendingUp } from 'lucide-react';
+import { Search, Filter, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import ExamsStats from '@/components/exams/ExamsStats';
+import ExamDetailsCard from '@/components/exams/ExamDetailsCard';
 import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { useQuery } from '@tanstack/react-query';
+import { examDetailsService } from '@/services/examDetailsService';
 
 const Requests = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const { examTypes, loading } = useSupabaseAppointments();
 
+  const { data: detailedExams, isLoading: detailsLoading } = useQuery({
+    queryKey: ['detailed-exams'],
+    queryFn: () => examDetailsService.getAllExamsWithMaterials(),
+    enabled: examTypes.length > 0
+  });
+
   const categories = [
     { id: 'all', name: 'Todos', count: examTypes.length },
     { id: 'Hematologia', name: 'Hematologia', count: examTypes.filter(e => e.category === 'Hematologia').length },
     { id: 'Bioquímica', name: 'Bioquímica', count: examTypes.filter(e => e.category === 'Bioquímica').length },
     { id: 'Endocrinologia', name: 'Endocrinologia', count: examTypes.filter(e => e.category === 'Endocrinologia').length },
-    { id: 'Urologia', name: 'Urologia', count: examTypes.filter(e => e.category === 'Urologia').length },
-    { id: 'Imunologia', name: 'Imunologia', count: examTypes.filter(e => e.category === 'Imunologia').length },
+    { id: 'Cardiologia', name: 'Cardiologia', count: examTypes.filter(e => e.category === 'Cardiologia').length },
+    { id: 'Uroanálise', name: 'Uroanálise', count: examTypes.filter(e => e.category === 'Uroanálise').length },
+    { id: 'Microbiologia', name: 'Microbiologia', count: examTypes.filter(e => e.category === 'Microbiologia').length },
   ];
 
-  const filteredExams = examTypes.filter(exam => {
+  const filteredExams = detailedExams?.filter(exam => {
     const matchesSearch = exam.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (exam.description && exam.description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === 'all' || exam.category === selectedCategory;
     return matchesSearch && matchesCategory;
-  });
+  }) || [];
 
-  if (loading) {
+  if (loading || detailsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -94,62 +101,14 @@ const Requests = () => {
       {/* Exams Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredExams.map((exam) => (
-          <Card key={exam.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {exam.name}
-                </CardTitle>
-                <Badge 
-                  variant="secondary" 
-                  className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                >
-                  {exam.category}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {exam.description && (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {exam.description}
-                </p>
-              )}
-              
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600 dark:text-gray-400">
-                    {exam.duration_minutes} min
-                  </span>
-                </div>
-                
-                {exam.cost && (
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-600 dark:text-gray-400">
-                      R$ {exam.cost.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {exam.requires_preparation && (
-                <div className="mt-3">
-                  <Badge variant="outline" className="text-xs">
-                    Requer preparação
-                  </Badge>
-                </div>
-              )}
-
-              {exam.preparation_instructions && (
-                <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                  <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                    <strong>Preparação:</strong> {exam.preparation_instructions}
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <ExamDetailsCard
+            key={exam.id}
+            exam={exam}
+            onSchedule={() => {
+              // TODO: Implementar navegação para agendamento
+              console.log('Agendar exame:', exam.name);
+            }}
+          />
         ))}
       </div>
 
