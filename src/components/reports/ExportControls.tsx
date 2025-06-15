@@ -9,14 +9,22 @@ import { exportToCSV, exportToJSON } from '@/utils/exportUtils';
 interface ExportControlsProps {
   data: any[];
   reportType: string;
+  onExport?: (format: string, dataTypes: string[]) => void;
 }
 
-const ExportControls: React.FC<ExportControlsProps> = ({ data, reportType }) => {
+const ExportControls: React.FC<ExportControlsProps> = ({ data, reportType, onExport }) => {
   const [format, setFormat] = useState<'csv' | 'json'>('csv');
   const { toast } = useToast();
 
   const handleExport = () => {
     try {
+      // If onExport prop is provided, use it (for custom export logic)
+      if (onExport) {
+        onExport(format, []);
+        return;
+      }
+
+      // Default export logic
       const filename = `relatorio_${reportType}_${new Date().toISOString().split('T')[0]}`;
       
       if (format === 'csv') {
