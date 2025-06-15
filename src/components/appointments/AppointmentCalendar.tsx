@@ -198,38 +198,10 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
 
       <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 shadow-lg">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-xl text-neutral-900 dark:text-neutral-100">
-              <CalendarIcon className="h-5 w-5 text-blue-600" />
-              Calendário de Agendamentos
-            </CardTitle>
-            <div className="flex gap-2">
-              <Button
-                variant={view === 'month' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setView('month')}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Mês
-              </Button>
-              <Button
-                variant={view === 'week' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setView('week')}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Semana
-              </Button>
-              <Button
-                variant={view === 'day' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setView('day')}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Dia
-              </Button>
-            </div>
-          </div>
+          <CardTitle className="flex items-center gap-2 text-xl text-neutral-900 dark:text-neutral-100">
+            <CalendarIcon className="h-5 w-5 text-blue-600" />
+            Calendário de Agendamentos
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div style={{ height: '600px' }} className="rounded-lg overflow-hidden">

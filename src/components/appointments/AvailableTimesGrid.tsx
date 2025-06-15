@@ -62,7 +62,7 @@ const AvailableTimesGrid: React.FC<AvailableTimesGridProps> = ({
               size="sm"
               disabled={!slot.available}
               onClick={() => onSelectTime(slot.time, slot.doctorId)}
-              className={`relative h-12 ${
+              className={`relative h-16 flex flex-col ${
                 slot.available 
                   ? isRecommended 
                     ? 'bg-green-600 hover:bg-green-700 text-white shadow-md ring-2 ring-green-300' 
@@ -73,8 +73,8 @@ const AvailableTimesGrid: React.FC<AvailableTimesGridProps> = ({
               <div className="text-center">
                 <div className="font-medium">{slot.time}</div>
                 {slot.doctorName && (
-                  <div className="text-xs text-neutral-600 dark:text-neutral-400 truncate">
-                    {slot.doctorName.split(' ')[0]}
+                  <div className="text-xs text-neutral-600 dark:text-neutral-400 truncate max-w-full">
+                    {slot.doctorName}
                   </div>
                 )}
               </div>
@@ -117,7 +117,7 @@ const AvailableTimesGrid: React.FC<AvailableTimesGridProps> = ({
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <User className="h-3 w-3 mr-1" />
-              {doctor.name.split(' ')[0]}
+              {doctor.name}
             </Button>
           ))}
         </div>
