@@ -10,6 +10,7 @@ import { Clock, User, MapPin, Calendar as CalendarIcon, Sparkles } from 'lucide-
 import { SupabaseAppointment } from '@/hooks/useSupabaseAppointments';
 import AvailableTimesGrid from './AvailableTimesGrid';
 import { useAvailableSlots } from '@/hooks/useAvailableSlots';
+import { useDoctors } from '@/hooks/useDoctors';
 import { useToast } from '@/hooks/use-toast';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -40,34 +41,32 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   const [recommendedSlot, setRecommendedSlot] = useState<any>(null);
   
   const { getAvailableSlots, findNextAvailableSlot, loading } = useAvailableSlots();
+  const { doctors } = useDoctors();
   const { toast } = useToast();
 
-  // Mock doctors data - na implementação real, isso viria de um hook
-  const doctors = [
-    { id: '1', name: 'Dr. João Silva', specialty: 'Cardiologia' },
-    { id: '2', name: 'Dra. Maria Santos', specialty: 'Dermatologia' },
-    { id: '3', name: 'Dr. Pedro Costa', specialty: 'Neurologia' },
-  ];
-
   useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate && doctors.length > 0) {
       loadAvailableSlots();
     }
-  }, [selectedDate, selectedDoctor]);
+  }, [selectedDate, selectedDoctor, doctors]);
 
   useEffect(() => {
-    // Buscar horário recomendado quando o componente carregar
-    findRecommendedSlot();
-  }, []);
+    // Buscar horário recomendado quando os médicos carregarem
+    if (doctors.length > 0) {
+      findRecommendedSlot();
+    }
+  }, [doctors]);
 
   const loadAvailableSlots = async () => {
-    if (!selectedDate) return;
+    if (!selectedDate || doctors.length === 0) return;
     
     const slots = await getAvailableSlots(selectedDate, doctors, selectedDoctor);
     setTimeSlots(slots);
   };
 
   const findRecommendedSlot = async () => {
+    if (doctors.length === 0) return;
+    
     const recommended = await findNextAvailableSlot(doctors);
     if (recommended) {
       setRecommendedSlot(recommended);
@@ -276,7 +275,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
       </Card>
 
       {/* Available Times Grid */}
-      {selectedDate && (
+      {selectedDate && doctors.length > 0 && (
         <AvailableTimesGrid
           selectedDate={selectedDate}
           timeSlots={timeSlots}
