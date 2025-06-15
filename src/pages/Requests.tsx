@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,15 +8,27 @@ import { Badge } from '@/components/ui/badge';
 import ExamsStats from '@/components/exams/ExamsStats';
 import ExamDetailsCard from '@/components/exams/ExamDetailsCard';
 import { examDetailsService } from '@/services/examDetailsService';
-import { ExamDetails } from '@/types/examDetails';
+import { ExamDetails, ExamMaterial } from '@/types/examDetails';
+
+// Add a local Unit interface for illustrative purposes
+interface Unit {
+  id: string;
+  name: string;
+}
+
+// Extend ExamDetails to support 'unit' just for display purposes in this UI
+interface ExamDetailsWithUnit extends ExamDetails {
+  unit?: Unit;
+}
 
 // Mock para simulação: associar exames a unidades distintas (exemplo local)
-const mockUnits = [
+const mockUnits: Unit[] = [
   { id: 'un-a', name: 'Unidade Central' },
   { id: 'un-b', name: 'Unidade Norte' },
   { id: 'un-c', name: 'Unidade Zona Sul' },
 ];
-const mockExams = [
+
+const mockExams: ExamDetailsWithUnit[] = [
   {
     id: 'e1',
     name: 'Hemograma Completo',
@@ -25,7 +38,19 @@ const mockExams = [
     total_material_cost: 21.3,
     duration_minutes: 25,
     materials_available: true,
-    materials: [ { item_name: 'Tubo EDTA', quantity_required: 1, sufficient_stock: true, estimated_cost: 4.1 } ],
+    materials: [
+      {
+        inventory_item_id: 'mat-1',
+        item_name: 'Tubo EDTA',
+        quantity_required: 1,
+        current_stock: 20,
+        reserved_stock: 0,
+        available_stock: 20,
+        sufficient_stock: true,
+        estimated_cost: 4.1,
+        material_type: 'consumable',
+      },
+    ],
     preparation: { requires_preparation: false },
     unit: mockUnits[0],
   },
@@ -38,7 +63,19 @@ const mockExams = [
     total_material_cost: 30,
     duration_minutes: 35,
     materials_available: true,
-    materials: [ { item_name: 'Gel condutor', quantity_required: 1, sufficient_stock: true, estimated_cost: 2.5 } ],
+    materials: [
+      {
+        inventory_item_id: 'mat-2',
+        item_name: 'Gel condutor',
+        quantity_required: 1,
+        current_stock: 12,
+        reserved_stock: 1,
+        available_stock: 11,
+        sufficient_stock: true,
+        estimated_cost: 2.5,
+        material_type: 'consumable',
+      },
+    ],
     preparation: { requires_preparation: true, preparation_instructions: 'Beber 1L de água.' },
     unit: mockUnits[1],
   },
@@ -51,31 +88,117 @@ const mockExams = [
     total_material_cost: 18,
     duration_minutes: 18,
     materials_available: false,
-    materials: [ { item_name: 'Eletrodo adesivo', quantity_required: 5, sufficient_stock: false, estimated_cost: 7 } ],
+    materials: [
+      {
+        inventory_item_id: 'mat-3',
+        item_name: 'Eletrodo adesivo',
+        quantity_required: 5,
+        current_stock: 4,
+        reserved_stock: 0,
+        available_stock: 4,
+        sufficient_stock: false,
+        estimated_cost: 7,
+        material_type: 'consumable',
+      },
+    ],
     preparation: { requires_preparation: false },
     unit: mockUnits[2],
   },
+  // More mock exams (with unique units) for illustration:
+  {
+    id: 'e4',
+    name: 'Tomografia',
+    description: 'Exame detalhado de imagens por cortes.',
+    category: 'Imagem',
+    cost: 320,
+    total_material_cost: 54,
+    duration_minutes: 40,
+    materials_available: true,
+    materials: [
+      {
+        inventory_item_id: 'mat-4',
+        item_name: 'Contraste',
+        quantity_required: 1,
+        current_stock: 10,
+        reserved_stock: 0,
+        available_stock: 10,
+        sufficient_stock: true,
+        estimated_cost: 20,
+        material_type: 'consumable',
+      },
+      {
+        inventory_item_id: 'mat-5',
+        item_name: 'Seringa',
+        quantity_required: 1,
+        current_stock: 30,
+        reserved_stock: 0,
+        available_stock: 30,
+        sufficient_stock: true,
+        estimated_cost: 4,
+        material_type: 'consumable',
+      },
+    ],
+    preparation: { requires_preparation: true, preparation_instructions: 'Jejum de 8h.' },
+    unit: { id: 'un-d', name: 'Unidade Leste' },
+  },
+  {
+    id: 'e5',
+    name: 'Raio-X de Tórax',
+    description: 'Radiografia do tórax.',
+    category: 'Imagem',
+    cost: 90,
+    total_material_cost: 14,
+    duration_minutes: 20,
+    materials_available: true,
+    materials: [
+      {
+        inventory_item_id: 'mat-6',
+        item_name: 'Chassi de Raio-X',
+        quantity_required: 1,
+        current_stock: 2,
+        reserved_stock: 1,
+        available_stock: 1,
+        sufficient_stock: true,
+        estimated_cost: 10,
+        material_type: 'permanent',
+      },
+      {
+        inventory_item_id: 'mat-7',
+        item_name: 'Filme Radiográfico',
+        quantity_required: 1,
+        current_stock: 50,
+        reserved_stock: 0,
+        available_stock: 50,
+        sufficient_stock: true,
+        estimated_cost: 4,
+        material_type: 'consumable',
+      },
+    ],
+    preparation: { requires_preparation: false },
+    unit: { id: 'un-b', name: 'Unidade Norte' },
+  },
 ];
 
-// ExamDetails do banco (de preferência); se não, mock acima:
 const Requests = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [examDetailsList, setExamDetailsList] = useState<ExamDetails[]>([]);
+  // Use ExamDetailsWithUnit as our internal working type
+  const [examDetailsList, setExamDetailsList] = useState<ExamDetailsWithUnit[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Carregar do serviço, se não houver simula
   useEffect(() => {
     let subscribed = true;
     setLoading(true);
-    
-    import('@/services/examDetailsService').then(svc => {
+
+    import('@/services/examDetailsService').then((svc) => {
       svc.examDetailsService.getAllExamsWithMaterials().then((exams) => {
-        // Simula adição de unidade se não tiver (caso não venha do banco)
-        const withUnit = exams.map((e, idx) => ({
-          ...e,
-          unit: e.unit || mockUnits[idx % mockUnits.length]
-        }));
+        // Just attempt to assign a mock unit to each
+        const withUnit: ExamDetailsWithUnit[] = 
+          exams.map((e, idx) => ({
+            ...e,
+            unit: mockUnits[idx % mockUnits.length],
+          })) as ExamDetailsWithUnit[];
+
         if (subscribed) {
           setExamDetailsList(withUnit.length ? withUnit : mockExams);
           setLoading(false);
@@ -91,7 +214,7 @@ const Requests = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        {/* Utiliza o novo loader */}
+        {/* Loader aqui pode ser customizado conforme desejado */}
         <div className="flex flex-col items-center">
           <div className="w-14 h-14 relative mb-2">
             <span className="absolute inset-0 rounded-full border-4 border-blue-400 border-r-transparent animate-spin" />
@@ -169,7 +292,7 @@ const Requests = () => {
               onSchedule={() => { console.log('Agendar exame:', exam.name); }}
             />
             <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 italic text-right">
-              Unidade: {exam.unit?.name || 'N/A'}
+              Unidade: {(exam as ExamDetailsWithUnit).unit?.name || 'N/A'}
             </div>
           </div>
         ))}
@@ -183,3 +306,4 @@ const Requests = () => {
   );
 };
 export default Requests;
+
