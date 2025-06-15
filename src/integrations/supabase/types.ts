@@ -500,93 +500,6 @@ export type Database = {
           },
         ]
       }
-      invite_codes: {
-        Row: {
-          code: string
-          created_at: string | null
-          created_by: string
-          current_uses: number | null
-          expires_at: string | null
-          id: string
-          is_active: boolean | null
-          max_uses: number | null
-          metadata: Json | null
-          role: Database["public"]["Enums"]["app_role"] | null
-          used_at: string | null
-          used_by: string | null
-        }
-        Insert: {
-          code: string
-          created_at?: string | null
-          created_by: string
-          current_uses?: number | null
-          expires_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          max_uses?: number | null
-          metadata?: Json | null
-          role?: Database["public"]["Enums"]["app_role"] | null
-          used_at?: string | null
-          used_by?: string | null
-        }
-        Update: {
-          code?: string
-          created_at?: string | null
-          created_by?: string
-          current_uses?: number | null
-          expires_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          max_uses?: number | null
-          metadata?: Json | null
-          role?: Database["public"]["Enums"]["app_role"] | null
-          used_at?: string | null
-          used_by?: string | null
-        }
-        Relationships: []
-      }
-      otp_codes: {
-        Row: {
-          attempts: number | null
-          code: string
-          created_at: string | null
-          email: string
-          expires_at: string
-          id: string
-          max_attempts: number | null
-          type: string
-          user_id: string
-          verified: boolean | null
-          verified_at: string | null
-        }
-        Insert: {
-          attempts?: number | null
-          code: string
-          created_at?: string | null
-          email: string
-          expires_at: string
-          id?: string
-          max_attempts?: number | null
-          type: string
-          user_id: string
-          verified?: boolean | null
-          verified_at?: string | null
-        }
-        Update: {
-          attempts?: number | null
-          code?: string
-          created_at?: string | null
-          email?: string
-          expires_at?: string
-          id?: string
-          max_attempts?: number | null
-          type?: string
-          user_id?: string
-          verified?: boolean | null
-          verified_at?: string | null
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -789,18 +702,9 @@ export type Database = {
           estimated_cost: number
         }[]
       }
-      generate_invite_code: {
-        Args: {
-          p_created_by: string
-          p_role?: Database["public"]["Enums"]["app_role"]
-          p_max_uses?: number
-          p_expires_hours?: number
-        }
-        Returns: string
-      }
-      generate_otp_code: {
-        Args: { p_email: string; p_type?: string }
-        Returns: string
+      create_first_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
@@ -811,18 +715,6 @@ export type Database = {
           _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
         }
-        Returns: boolean
-      }
-      use_invite_code: {
-        Args: { p_code: string; p_user_id: string }
-        Returns: boolean
-      }
-      validate_invite_code: {
-        Args: { p_code: string }
-        Returns: Json
-      }
-      verify_otp_code: {
-        Args: { p_email: string; p_code: string; p_type?: string }
         Returns: boolean
       }
     }
