@@ -47,29 +47,28 @@ const NotificationSettings = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) return;
 
-      // Using raw SQL query since the table is not in the generated types yet
       const { data, error } = await supabase
-        .rpc('exec_sql', { 
-          sql: `SELECT * FROM notification_preferences WHERE user_id = '${userData.user.id}'`
-        });
+        .from('notification_preferences')
+        .select('*')
+        .eq('user_id', userData.user.id)
+        .maybeSingle();
 
-      if (error && error.message !== 'No rows returned') {
+      if (error && error.code !== 'PGRST116') {
         console.error('Error loading notification settings:', error);
         return;
       }
 
-      if (data && data.length > 0) {
-        const preferences = data[0];
+      if (data) {
         setSettings({
-          email_appointments: preferences.email_appointments,
-          email_results: preferences.email_results,
-          email_marketing: preferences.email_marketing,
-          push_appointments: preferences.push_appointments,
-          push_reminders: preferences.push_reminders,
-          push_results: preferences.push_results,
-          sms_reminders: preferences.sms_reminders,
-          in_app_notifications: preferences.in_app_notifications,
-          digest_frequency: preferences.digest_frequency
+          email_appointments: data.email_appointments,
+          email_results: data.email_results,
+          email_marketing: data.email_marketing,
+          push_appointments: data.push_appointments,
+          push_reminders: data.push_reminders,
+          push_results: data.push_results,
+          sms_reminders: data.sms_reminders,
+          in_app_notifications: data.in_app_notifications,
+          digest_frequency: data.digest_frequency
         });
       }
     } catch (error) {
@@ -94,7 +93,6 @@ const NotificationSettings = () => {
   const testNotification = async () => {
     setTestingNotification(true);
     try {
-      // Simular envio de notificação de teste
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
@@ -118,43 +116,11 @@ const NotificationSettings = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('User not authenticated');
 
-      // Using raw SQL query to insert/update since the table is not in generated types yet
-      const settingsData = {
-        user_id: userData.user.id,
-        ...settings
-      };
-
       const { error } = await supabase
-        .rpc('exec_sql', { 
-          sql: `
-            INSERT INTO notification_preferences (
-              user_id, email_appointments, email_results, email_marketing, 
-              push_appointments, push_reminders, push_results, sms_reminders, 
-              in_app_notifications, digest_frequency
-            ) VALUES (
-              '${settingsData.user_id}', 
-              ${settingsData.email_appointments}, 
-              ${settingsData.email_results}, 
-              ${settingsData.email_marketing},
-              ${settingsData.push_appointments}, 
-              ${settingsData.push_reminders}, 
-              ${settingsData.push_results}, 
-              ${settingsData.sms_reminders},
-              ${settingsData.in_app_notifications}, 
-              '${settingsData.digest_frequency}'
-            )
-            ON CONFLICT (user_id) DO UPDATE SET
-              email_appointments = EXCLUDED.email_appointments,
-              email_results = EXCLUDED.email_results,
-              email_marketing = EXCLUDED.email_marketing,
-              push_appointments = EXCLUDED.push_appointments,
-              push_reminders = EXCLUDED.push_reminders,
-              push_results = EXCLUDED.push_results,
-              sms_reminders = EXCLUDED.sms_reminders,
-              in_app_notifications = EXCLUDED.in_app_notifications,
-              digest_frequency = EXCLUDED.digest_frequency,
-              updated_at = now()
-          `
+        .from('notification_preferences')
+        .upsert({
+          user_id: userData.user.id,
+          ...settings
         });
 
       if (error) throw error;

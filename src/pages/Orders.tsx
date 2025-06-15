@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -56,8 +57,7 @@ const Orders = () => {
 
       {showCreateForm && (
         <CreateAppointmentForm 
-          onSuccess={handleCreateSuccess}
-          onCancel={() => setShowCreateForm(false)}
+          onClose={() => setShowCreateForm(false)}
         />
       )}
     </div>

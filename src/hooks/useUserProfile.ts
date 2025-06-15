@@ -49,7 +49,7 @@ export const useUserProfile = () => {
       const mappedProfile: UserProfile = {
         ...data,
         status: data.status === 'pending' ? 'inactive' : data.status as 'active' | 'inactive' | 'suspended',
-        unit: data.units
+        unit: data.units || undefined
       };
       
       setProfile(mappedProfile);

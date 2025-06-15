@@ -42,26 +42,25 @@ const SecuritySettings = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) return;
 
-      // Using raw SQL query since the table is not in the generated types yet
       const { data, error } = await supabase
-        .rpc('exec_sql', { 
-          sql: `SELECT * FROM security_settings WHERE user_id = '${userData.user.id}'`
-        });
+        .from('security_settings')
+        .select('*')
+        .eq('user_id', userData.user.id)
+        .maybeSingle();
 
-      if (error && error.message !== 'No rows returned') {
+      if (error && error.code !== 'PGRST116') {
         console.error('Error loading security settings:', error);
         return;
       }
 
-      if (data && data.length > 0) {
-        const securityData = data[0];
+      if (data) {
         setSettings({
-          two_factor_enabled: securityData.two_factor_enabled,
-          session_timeout_minutes: securityData.session_timeout_minutes,
-          login_alerts: securityData.login_alerts,
-          password_changed_at: securityData.password_changed_at,
-          last_password_check: securityData.last_password_check,
-          failed_login_attempts: securityData.failed_login_attempts
+          two_factor_enabled: data.two_factor_enabled,
+          session_timeout_minutes: data.session_timeout_minutes,
+          login_alerts: data.login_alerts,
+          password_changed_at: data.password_changed_at,
+          last_password_check: data.last_password_check,
+          failed_login_attempts: data.failed_login_attempts
         });
       }
     } catch (error) {
@@ -117,14 +116,11 @@ const SecuritySettings = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (userData.user) {
         await supabase
-          .rpc('exec_sql', { 
-            sql: `
-              INSERT INTO security_settings (user_id, password_changed_at) 
-              VALUES ('${userData.user.id}', now())
-              ON CONFLICT (user_id) DO UPDATE SET 
-                password_changed_at = now(),
-                updated_at = now()
-            `
+          .from('security_settings')
+          .upsert({
+            user_id: userData.user.id,
+            password_changed_at: new Date().toISOString(),
+            ...settings
           });
       }
 
@@ -152,28 +148,11 @@ const SecuritySettings = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('User not authenticated');
 
-      const settingsData = {
-        user_id: userData.user.id,
-        ...settings
-      };
-
       const { error } = await supabase
-        .rpc('exec_sql', { 
-          sql: `
-            INSERT INTO security_settings (
-              user_id, two_factor_enabled, session_timeout_minutes, login_alerts
-            ) VALUES (
-              '${settingsData.user_id}', 
-              ${settingsData.two_factor_enabled}, 
-              ${settingsData.session_timeout_minutes}, 
-              ${settingsData.login_alerts}
-            )
-            ON CONFLICT (user_id) DO UPDATE SET
-              two_factor_enabled = EXCLUDED.two_factor_enabled,
-              session_timeout_minutes = EXCLUDED.session_timeout_minutes,
-              login_alerts = EXCLUDED.login_alerts,
-              updated_at = now()
-          `
+        .from('security_settings')
+        .upsert({
+          user_id: userData.user.id,
+          ...settings
         });
 
       if (error) throw error;
