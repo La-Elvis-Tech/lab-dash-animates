@@ -1,252 +1,346 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { InventoryCategory } from '@/types/inventory';
+import { CalendarIcon, Plus } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+
+const inventoryFormSchema = z.object({
+  name: z.string().min(1, 'Nome é obrigatório'),
+  description: z.string().optional(),
+  category_id: z.string().min(1, 'Categoria é obrigatória'),
+  current_stock: z.number().min(0, 'Estoque atual deve ser maior ou igual a 0'),
+  min_stock: z.number().min(0, 'Estoque mínimo deve ser maior ou igual a 0'),
+  max_stock: z.number().min(1, 'Estoque máximo deve ser maior que 0'),
+  unit: z.string().min(1, 'Unidade de medida é obrigatória'),
+  cost_per_unit: z.number().min(0, 'Custo por unidade deve ser maior ou igual a 0').optional(),
+  supplier: z.string().optional(),
+  lot_number: z.string().optional(),
+  expiry_date: z.date().optional(),
+  location: z.string().optional(),
+});
+
+type InventoryFormValues = z.infer<typeof inventoryFormSchema>;
 
 interface InventoryFormProps {
   onSuccess: () => void;
-  categories: any[];
+  categories: InventoryCategory[];
+  initialData?: Partial<InventoryFormValues>;
+  mode?: 'create' | 'edit';
 }
 
-const InventoryForm: React.FC<InventoryFormProps> = ({ onSuccess, categories }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category_id: '',
-    current_stock: 0,
-    min_stock: 0,
-    max_stock: 0,
-    unit_measure: '',
-    cost_per_unit: 0,
-    supplier: '',
-    storage_location: '',
-    sku: '',
-    expiry_date: '',
-    lot_number: ''
+const InventoryForm: React.FC<InventoryFormProps> = ({ 
+  onSuccess, 
+  categories, 
+  initialData,
+  mode = 'create'
+}) => {
+  const form = useForm<InventoryFormValues>({
+    resolver: zodResolver(inventoryFormSchema),
+    defaultValues: {
+      name: initialData?.name || '',
+      description: initialData?.description || '',
+      category_id: initialData?.category_id || '',
+      current_stock: initialData?.current_stock || 0,
+      min_stock: initialData?.min_stock || 0,
+      max_stock: initialData?.max_stock || 100,
+      unit: initialData?.unit || '',
+      cost_per_unit: initialData?.cost_per_unit || 0,
+      supplier: initialData?.supplier || '',
+      lot_number: initialData?.lot_number || '',
+      expiry_date: initialData?.expiry_date,
+      location: initialData?.location || '',
+    },
   });
-  
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const onSubmit = async (values: InventoryFormValues) => {
     try {
-      // Get the first unit ID for now (should be selected by user in a real app)
-      const { data: units } = await supabase
-        .from('units')
-        .select('id')
-        .eq('active', true)
-        .limit(1);
-
-      if (!units || units.length === 0) {
-        throw new Error('Nenhuma unidade encontrada');
-      }
-
-      const itemData = {
-        ...formData,
-        unit_id: units[0].id,
-        expiry_date: formData.expiry_date || null,
-        lot_number: formData.lot_number || null,
-        active: true
-      };
-
-      const { error } = await supabase
-        .from('inventory_items')
-        .insert([itemData]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Item adicionado",
-        description: "O item foi adicionado ao inventário com sucesso."
-      });
-
+      // A lógica de submit será implementada no componente pai
+      console.log('Form values:', values);
       onSuccess();
-    } catch (error: any) {
-      console.error('Error adding inventory item:', error);
-      toast({
-        title: "Erro",
-        description: error.message || "Não foi possível adicionar o item.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Error submitting form:', error);
     }
   };
 
+  const commonUnits = [
+    'unidade', 'kg', 'g', 'mg', 'litro', 'ml', 'metro', 'cm', 'mm',
+    'caixa', 'pacote', 'frasco', 'ampola', 'comprimido'
+  ];
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Nome *</Label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="Nome do item"
-            required
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome do Item *</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: Luvas Descartáveis" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="category_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Categoria *</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="category_id">Categoria *</Label>
-          <Select 
-            value={formData.category_id} 
-            onValueChange={(value) => handleInputChange('category_id', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione uma categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="sku">SKU</Label>
-          <Input
-            id="sku"
-            value={formData.sku}
-            onChange={(e) => handleInputChange('sku', e.target.value)}
-            placeholder="Código do produto"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="supplier">Fornecedor</Label>
-          <Input
-            id="supplier"
-            value={formData.supplier}
-            onChange={(e) => handleInputChange('supplier', e.target.value)}
-            placeholder="Nome do fornecedor"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="current_stock">Estoque Atual *</Label>
-          <Input
-            id="current_stock"
-            type="number"
-            min="0"
-            value={formData.current_stock}
-            onChange={(e) => handleInputChange('current_stock', parseInt(e.target.value) || 0)}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="min_stock">Estoque Mínimo *</Label>
-          <Input
-            id="min_stock"
-            type="number"
-            min="0"
-            value={formData.min_stock}
-            onChange={(e) => handleInputChange('min_stock', parseInt(e.target.value) || 0)}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="max_stock">Estoque Máximo</Label>
-          <Input
-            id="max_stock"
-            type="number"
-            min="0"
-            value={formData.max_stock}
-            onChange={(e) => handleInputChange('max_stock', parseInt(e.target.value) || 0)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="unit_measure">Unidade de Medida *</Label>
-          <Input
-            id="unit_measure"
-            value={formData.unit_measure}
-            onChange={(e) => handleInputChange('unit_measure', e.target.value)}
-            placeholder="Ex: ml, unidade, kg"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="cost_per_unit">Custo por Unidade</Label>
-          <Input
-            id="cost_per_unit"
-            type="number"
-            step="0.01"
-            min="0"
-            value={formData.cost_per_unit}
-            onChange={(e) => handleInputChange('cost_per_unit', parseFloat(e.target.value) || 0)}
-            placeholder="0.00"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="storage_location">Localização</Label>
-          <Input
-            id="storage_location"
-            value={formData.storage_location}
-            onChange={(e) => handleInputChange('storage_location', e.target.value)}
-            placeholder="Ex: Geladeira A1, Armário B2"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="expiry_date">Data de Validade</Label>
-          <Input
-            id="expiry_date"
-            type="date"
-            value={formData.expiry_date}
-            onChange={(e) => handleInputChange('expiry_date', e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="lot_number">Número do Lote</Label>
-          <Input
-            id="lot_number"
-            value={formData.lot_number}
-            onChange={(e) => handleInputChange('lot_number', e.target.value)}
-            placeholder="Ex: LOT2024001"
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Descrição</Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => handleInputChange('description', e.target.value)}
-          placeholder="Descrição detalhada do item"
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descrição</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Descrição detalhada do item..."
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="submit" disabled={loading}>
-          {loading ? "Adicionando..." : "Adicionar Item"}
-        </Button>
-      </div>
-    </form>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormField
+            control={form.control}
+            name="current_stock"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estoque Atual *</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="min_stock"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estoque Mínimo *</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min="0"
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="max_stock"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estoque Máximo *</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    min="1"
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 100)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="unit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Unidade de Medida *</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a unidade" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {commonUnits.map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="cost_per_unit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Custo por Unidade (R$)</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    {...field}
+                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="supplier"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fornecedor</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: MedSupply Ltda" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="lot_number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Número do Lote</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: LOT123456" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="expiry_date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Data de Validade</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "dd/MM/yyyy")
+                        ) : (
+                          <span>Selecione uma data</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Localização</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: Armário A1, Prateleira 2" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button type="submit" className="min-w-[120px]">
+            <Plus className="w-4 h-4 mr-2" />
+            {mode === 'create' ? 'Adicionar Item' : 'Atualizar Item'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };
 

@@ -1,174 +1,192 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { InventoryItem, InventoryCategory } from '@/types/inventory';
+import { getUserUnit, fetchInventoryItems, fetchInventoryCategories, createInventoryItem, updateInventoryItem, deleteInventoryItem, addInventoryMovement } from '@/services/inventoryService';
 import { useToast } from '@/hooks/use-toast';
-import { InventoryItem, InventoryCategory, InventoryMovement, UserUnit } from '@/types/inventory';
-import {
-  getUserUnit,
-  fetchInventoryItems,
-  fetchInventoryCategories,
-  fetchInventoryMovements,
-  createInventoryItem,
-  updateInventoryItem,
-  deleteInventoryItem,
-  addInventoryMovement
-} from '@/services/inventoryService';
 
 export const useSupabaseInventory = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [categories, setCategories] = useState<InventoryCategory[]>([]);
-  const [movements, setMovements] = useState<InventoryMovement[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userUnit, setUserUnit] = useState<UserUnit | null>(null);
+  const [userUnit, setUserUnit] = useState<{ id: string; name: string } | null>(null);
   const { toast } = useToast();
 
-  const fetchItems = async () => {
+  const loadUserUnit = useCallback(async () => {
     try {
       const unit = await getUserUnit();
-      if (!unit) return;
-
       setUserUnit(unit);
-      const data = await fetchInventoryItems(unit.id);
-      setItems(data);
-    } catch (error: any) {
-      console.error('Error fetching items:', error);
+      return unit;
+    } catch (error) {
+      console.error('Error loading user unit:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível carregar informações da unidade do usuário.',
+        variant: 'destructive',
+      });
+      return null;
+    }
+  }, [toast]);
+
+  const loadItems = useCallback(async (unitId: string) => {
+    try {
+      setLoading(true);
+      const inventoryItems = await fetchInventoryItems(unitId);
+      setItems(inventoryItems);
+    } catch (error) {
+      console.error('Error loading inventory items:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível carregar os itens do inventário.',
         variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [toast]);
 
-  const fetchCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
-      const data = await fetchInventoryCategories();
-      setCategories(data);
-    } catch (error: any) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const fetchMovements = async () => {
-    try {
-      const unit = await getUserUnit();
-      if (!unit) return;
-
-      const data = await fetchInventoryMovements(unit.id);
-      setMovements(data);
-    } catch (error: any) {
-      console.error('Error fetching movements:', error);
-    }
-  };
-
-  const createItem = async (item: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>) => {
-    try {
-      const unit = await getUserUnit();
-      if (!unit) throw new Error('Unidade do usuário não encontrada');
-
-      await createInventoryItem(item, unit.id);
-      await fetchItems();
-      
-      toast({
-        title: 'Item criado',
-        description: `${item.name} foi adicionado ao inventário.`,
-      });
-    } catch (error: any) {
-      console.error('Error creating item:', error);
+      const inventoryCategories = await fetchInventoryCategories();
+      setCategories(inventoryCategories);
+    } catch (error) {
+      console.error('Error loading categories:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível criar o item.',
+        description: 'Não foi possível carregar as categorias.',
         variant: 'destructive',
       });
-      throw error;
     }
-  };
+  }, [toast]);
 
-  const updateItem = async (id: string, updates: Partial<InventoryItem>) => {
+  const refreshItems = useCallback(async () => {
+    if (userUnit?.id) {
+      await loadItems(userUnit.id);
+    }
+  }, [userUnit?.id, loadItems]);
+
+  const addItem = useCallback(async (item: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>) => {
+    if (!userUnit?.id) {
+      toast({
+        title: 'Erro',
+        description: 'Unidade do usuário não encontrada.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
-      await updateInventoryItem(id, updates);
-      await fetchItems();
+      await createInventoryItem(item, userUnit.id);
+      
+      // Registrar movimento de entrada
+      await addInventoryMovement({
+        item_id: '', // Será preenchido pelo backend
+        movement_type: 'in',
+        quantity: item.current_stock,
+        unit_cost: item.cost_per_unit || 0,
+        total_cost: (item.current_stock * (item.cost_per_unit || 0)),
+        reason: 'Adição inicial de item ao inventário',
+        reference_type: 'manual',
+        performed_by: '' // Será preenchido pelo backend
+      });
+
+      await refreshItems();
       
       toast({
-        title: 'Item atualizado',
-        description: 'As informações foram salvas com sucesso.',
+        title: 'Sucesso',
+        description: 'Item adicionado ao inventário com sucesso.',
       });
-    } catch (error: any) {
+    } catch (error) {
+      console.error('Error adding item:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível adicionar o item ao inventário.',
+        variant: 'destructive',
+      });
+    }
+  }, [userUnit?.id, refreshItems, toast]);
+
+  const updateItem = useCallback(async (id: string, updates: Partial<InventoryItem>) => {
+    try {
+      await updateInventoryItem(id, updates);
+      
+      // Se o estoque foi atualizado, registrar movimento
+      if (updates.current_stock !== undefined) {
+        const currentItem = items.find(item => item.id === id);
+        if (currentItem) {
+          const stockDifference = updates.current_stock - currentItem.current_stock;
+          if (stockDifference !== 0) {
+            await addInventoryMovement({
+              item_id: id,
+              movement_type: stockDifference > 0 ? 'in' : 'out',
+              quantity: Math.abs(stockDifference),
+              unit_cost: currentItem.cost_per_unit || 0,
+              total_cost: Math.abs(stockDifference) * (currentItem.cost_per_unit || 0),
+              reason: 'Ajuste manual de estoque',
+              reference_type: 'manual',
+              performed_by: '' // Será preenchido pelo backend
+            });
+          }
+        }
+      }
+
+      await refreshItems();
+      
+      toast({
+        title: 'Sucesso',
+        description: 'Item atualizado com sucesso.',
+      });
+    } catch (error) {
       console.error('Error updating item:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível atualizar o item.',
         variant: 'destructive',
       });
-      throw error;
     }
-  };
+  }, [items, refreshItems, toast]);
 
-  const deleteItem = async (id: string) => {
+  const deleteItem = useCallback(async (id: string) => {
     try {
       await deleteInventoryItem(id);
-      await fetchItems();
+      await refreshItems();
       
       toast({
-        title: 'Item removido',
-        description: 'O item foi removido do inventário.',
+        title: 'Sucesso',
+        description: 'Item removido do inventário.',
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting item:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível remover o item.',
         variant: 'destructive',
       });
-      throw error;
     }
-  };
-
-  const addMovement = async (movement: Omit<InventoryMovement, 'id' | 'created_at'>) => {
-    try {
-      await addInventoryMovement(movement);
-      await Promise.all([fetchItems(), fetchMovements()]);
-      
-      toast({
-        title: 'Movimentação registrada',
-        description: 'A movimentação foi registrada com sucesso.',
-      });
-    } catch (error: any) {
-      console.error('Error adding movement:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível registrar a movimentação.',
-        variant: 'destructive',
-      });
-      throw error;
-    }
-  };
+  }, [refreshItems, toast]);
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await Promise.all([
-        fetchItems(),
-        fetchCategories(),
-        fetchMovements()
-      ]);
-      setLoading(false);
+    const initializeData = async () => {
+      const unit = await loadUserUnit();
+      if (unit?.id) {
+        await Promise.all([
+          loadItems(unit.id),
+          loadCategories()
+        ]);
+      }
     };
 
-    loadData();
-  }, []);
+    initializeData();
+  }, [loadUserUnit, loadItems, loadCategories]);
 
   return {
     items,
     categories,
-    movements,
     loading,
-    userUnit: userUnit || { id: '', name: 'Unidade não encontrada' },
-    createItem,
+    userUnit,
+    addItem,
     updateItem,
     deleteItem,
-    addMovement,
-    refreshItems: fetchItems,
-    refreshCategories: fetchCategories,
-    refreshMovements: fetchMovements,
+    refreshItems
   };
 };

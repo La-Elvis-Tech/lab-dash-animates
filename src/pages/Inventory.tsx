@@ -5,13 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertCircle, Download, Loader2, Plus, Search, Trash } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Plus, Search, Trash, Package, AlertTriangle } from 'lucide-react';
 import { useSupabaseInventory } from '@/hooks/useSupabaseInventory';
 import InventoryTable from '@/components/inventory/InventoryTable';
 import InventoryForm from '@/components/inventory/InventoryForm';
 import InventoryStats from '@/components/inventory/InventoryStats';
 import { useToast } from '@/hooks/use-toast';
 import { useAlerts } from '@/hooks/useAlerts';
+import { Badge } from '@/components/ui/badge';
 
 const Inventory = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -24,6 +25,8 @@ const Inventory = () => {
     items: inventoryItems, 
     categories, 
     loading, 
+    userUnit,
+    addItem,
     updateItem, 
     deleteItem, 
     refreshItems 
@@ -43,6 +46,9 @@ const Inventory = () => {
     
     return matchesSearch && matchesCategory;
   });
+
+  // Get low stock items
+  const lowStockItems = inventoryItems.filter(item => item.current_stock <= item.min_stock);
 
   const handleSelectItem = (itemId: string) => {
     const newSelected = new Set(selectedItems);
@@ -118,13 +124,30 @@ const Inventory = () => {
     ...categories.map(cat => ({ id: cat.id, name: cat.name }))
   ];
 
+  if (!userUnit) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <Package className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-neutral-700 dark:text-neutral-300">
+            Unidade não encontrada
+          </h3>
+          <p className="text-neutral-500 dark:text-neutral-400">
+            Você precisa estar associado a uma unidade para acessar o inventário.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
-            Inventário
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+            <Package className="h-8 w-8 text-blue-500" />
+            Inventário - {userUnit.name}
           </h1>
           <p className="text-neutral-500 dark:text-neutral-400 mt-1">
             Gerencie o estoque de materiais e reagentes
@@ -138,7 +161,7 @@ const Inventory = () => {
                 Novo Item
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Adicionar Item ao Inventário</DialogTitle>
                 <DialogDescription>
@@ -178,6 +201,26 @@ const Inventory = () => {
           </Dialog>
         </div>
       </div>
+
+      {/* Low Stock Alert */}
+      {lowStockItems.length > 0 && (
+        <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800">
+          <CardContent className="flex items-center gap-3 p-4">
+            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-amber-800 dark:text-amber-200">
+                Atenção: Estoque Baixo
+              </h3>
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                {lowStockItems.length} {lowStockItems.length === 1 ? 'item está' : 'itens estão'} com estoque abaixo do mínimo
+              </p>
+            </div>
+            <Badge variant="outline" className="border-amber-400 text-amber-700 dark:text-amber-300">
+              {lowStockItems.length} itens
+            </Badge>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats Cards */}
       <InventoryStats items={inventoryItems} />
