@@ -12,6 +12,26 @@ export interface AuthUser {
 
 export const supabaseAuthService = {
   async signIn(email: string, password: string) {
+    // Verificar status do usuário ANTES do login
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('status, full_name')
+      .eq('email', email)
+      .single();
+
+    if (!profileData) {
+      throw new Error('Usuário não encontrado no sistema.');
+    }
+
+    if (profileData.status === 'pending') {
+      throw new Error('Sua conta ainda está pendente de aprovação. Aguarde a aprovação de um administrador.');
+    }
+
+    if (profileData.status === 'inactive') {
+      throw new Error('Sua conta foi desativada. Entre em contato com um administrador.');
+    }
+
+    // Só permite login se status for 'active'
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -68,6 +88,12 @@ export const supabaseAuthService = {
 
     if (!profile) return null;
 
+    // Verificar se o usuário está ativo
+    if (profile.status !== 'active') {
+      await supabase.auth.signOut();
+      return null;
+    }
+
     return {
       id: user.id,
       email: user.email!,
@@ -79,6 +105,17 @@ export const supabaseAuthService = {
   },
 
   async resetPassword(email: string) {
+    // Verificar se o email existe no sistema
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('email', email)
+      .single();
+
+    if (!profileData) {
+      throw new Error('Email não encontrado no sistema.');
+    }
+
     const redirectUrl = `https://laelvistech.netlify.app/reset-password`;
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {

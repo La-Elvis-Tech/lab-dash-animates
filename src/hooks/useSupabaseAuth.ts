@@ -32,16 +32,64 @@ export const useSupabaseAuth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Defer profile and role fetching
+          // Verificar status do usuário ANTES de aceitar o login
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('status, full_name')
+            .eq('id', session.user.id)
+            .single();
+
+          if (!profileData) {
+            console.log('Profile not found, signing out');
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            setProfile(null);
+            setUserRole(null);
+            setLoading(false);
+            setInitializing(false);
+            return;
+          }
+
+          // Se o usuário está pendente ou inativo, fazer logout
+          if (profileData.status === 'pending') {
+            console.log('User status is pending, signing out');
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            setProfile(null);
+            setUserRole(null);
+            setLoading(false);
+            setInitializing(false);
+            throw new Error('Sua conta ainda está pendente de aprovação. Aguarde a aprovação de um administrador.');
+          }
+
+          if (profileData.status === 'inactive') {
+            console.log('User status is inactive, signing out');
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+            setProfile(null);
+            setUserRole(null);
+            setLoading(false);
+            setInitializing(false);
+            throw new Error('Sua conta foi desativada. Entre em contato com um administrador.');
+          }
+
+          // Se chegou aqui, usuário é válido
+          setSession(session);
+          setUser(session.user);
+          
+          // Buscar perfil e role em background
           setTimeout(async () => {
             await fetchUserProfile(session.user.id);
             await fetchUserRole(session.user.id);
           }, 0);
         } else {
+          setSession(null);
+          setUser(null);
           setProfile(null);
           setUserRole(null);
         }
@@ -52,12 +100,31 @@ export const useSupabaseAuth = () => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       console.log('Initial session check:', session?.user?.email);
-      setSession(session);
-      setUser(session?.user ?? null);
       
       if (session?.user) {
+        // Verificar status do usuário na sessão inicial
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('status, full_name')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!profileData || profileData.status !== 'active') {
+          console.log('User not active in initial session, signing out');
+          await supabase.auth.signOut();
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setUserRole(null);
+          setLoading(false);
+          setInitializing(false);
+          return;
+        }
+
+        setSession(session);
+        setUser(session.user);
         fetchUserProfile(session.user.id);
         fetchUserRole(session.user.id);
       }
@@ -227,6 +294,6 @@ export const useSupabaseAuth = () => {
     hasRole,
     isAdmin,
     isSupervisor,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !!session,
   };
 };

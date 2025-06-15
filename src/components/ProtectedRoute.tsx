@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, profile } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -17,7 +17,13 @@ export const ProtectedRoute = () => {
     );
   }
 
+  // Verificar se está autenticado
   if (!isAuthenticated) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // Verificar se o perfil existe e se o status é ativo
+  if (!profile || profile.status !== 'active') {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,11 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { AuthErrorAlert } from '@/components/auth/AuthErrorAlert';
 import { Loader2, LogIn, UserPlus, Lock, Mail } from 'lucide-react';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
+  const [authError, setAuthError] = useState('');
   
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
@@ -49,6 +50,7 @@ const Auth = () => {
 
     try {
       setLoading(true);
+      setAuthError('');
       await login(loginEmail, loginPassword);
       
       toast({
@@ -59,22 +61,7 @@ const Auth = () => {
       navigate(from, { replace: true });
     } catch (error: any) {
       console.error('Login error:', error);
-      
-      let errorMessage = 'Erro no login. Verifique suas credenciais.';
-      
-      if (error.message?.includes('Invalid login credentials')) {
-        errorMessage = 'Email ou senha incorretos.';
-      } else if (error.message?.includes('Email not confirmed')) {
-        errorMessage = 'Por favor, confirme seu email antes de fazer login.';
-      } else if (error.message?.includes('Too many requests')) {
-        errorMessage = 'Muitas tentativas. Tente novamente em alguns minutos.';
-      }
-      
-      toast({
-        title: 'Erro no login',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      setAuthError(error.message || 'Erro no login. Verifique suas credenciais.');
     } finally {
       setLoading(false);
     }
@@ -85,25 +72,18 @@ const Auth = () => {
     if (loading) return;
 
     if (registerPassword !== confirmPassword) {
-      toast({
-        title: 'Erro',
-        description: 'As senhas não coincidem.',
-        variant: 'destructive',
-      });
+      setAuthError('As senhas não coincidem.');
       return;
     }
 
     if (registerPassword.length < 6) {
-      toast({
-        title: 'Erro',
-        description: 'A senha deve ter pelo menos 6 caracteres.',
-        variant: 'destructive',
-      });
+      setAuthError('A senha deve ter pelo menos 6 caracteres.');
       return;
     }
 
     try {
       setLoading(true);
+      setAuthError('');
       
       await register(registerEmail, registerPassword, registerName);
       
@@ -120,18 +100,7 @@ const Auth = () => {
       setActiveTab('login');
     } catch (error: any) {
       console.error('Register error:', error);
-      
-      let errorMessage = 'Erro no cadastro. Tente novamente.';
-      
-      if (error.message?.includes('User already registered')) {
-        errorMessage = 'Este email já está cadastrado.';
-      }
-      
-      toast({
-        title: 'Erro no cadastro',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      setAuthError(error.message || 'Erro no cadastro. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -143,6 +112,7 @@ const Auth = () => {
 
     try {
       setLoading(true);
+      setAuthError('');
       await resetPassword(resetEmail);
       
       toast({
@@ -154,20 +124,7 @@ const Auth = () => {
       setResetEmail('');
     } catch (error: any) {
       console.error('Reset password error:', error);
-      
-      let errorMessage = 'Não foi possível enviar o email de recuperação.';
-      
-      if (error.message?.includes('Email não encontrado')) {
-        errorMessage = 'Email não encontrado no sistema.';
-      } else if (error.message?.includes('For security purposes')) {
-        errorMessage = 'Por segurança, aguarde alguns minutos antes de solicitar um novo email.';
-      }
-      
-      toast({
-        title: 'Erro',
-        description: errorMessage,
-        variant: 'destructive',
-      });
+      setAuthError(error.message || 'Não foi possível enviar o email de recuperação.');
     } finally {
       setLoading(false);
     }
@@ -192,6 +149,10 @@ const Auth = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {authError && (
+                <AuthErrorAlert error={authError} />
+              )}
+              
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="reset-email" className="text-gray-700 dark:text-gray-300">Email</Label>
@@ -229,7 +190,10 @@ const Auth = () => {
                     type="button"
                     variant="outline"
                     className="w-full h-12 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    onClick={() => setShowResetForm(false)}
+                    onClick={() => {
+                      setShowResetForm(false);
+                      setAuthError('');
+                    }}
                   >
                     Voltar ao Login
                   </Button>
@@ -259,7 +223,10 @@ const Auth = () => {
           <p className="text-gray-600 dark:text-gray-400">Gestão laboratorial inteligente</p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={(value) => {
+          setActiveTab(value);
+          setAuthError('');
+        }}>
           <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-lg backdrop-blur-sm">
             <TabsTrigger 
               value="login" 
@@ -281,6 +248,12 @@ const Auth = () => {
             <TabsContent value="login">
               <Card className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl">
                 <CardContent className="pt-6">
+                  {authError && (
+                    <div className="mb-4">
+                      <AuthErrorAlert error={authError} />
+                    </div>
+                  )}
+                  
                   <form onSubmit={handleLogin} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="login-email" className="text-gray-700 dark:text-gray-300 font-medium">Email</Label>
@@ -319,7 +292,10 @@ const Auth = () => {
                         type="button"
                         variant="link"
                         className="p-0 h-auto text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                        onClick={() => setShowResetForm(true)}
+                        onClick={() => {
+                          setShowResetForm(true);
+                          setAuthError('');
+                        }}
                       >
                         Esqueceu a senha?
                       </Button>
@@ -356,6 +332,12 @@ const Auth = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {authError && (
+                    <div className="mb-4">
+                      <AuthErrorAlert error={authError} />
+                    </div>
+                  )}
+                  
                   <form onSubmit={handleRegisterSubmit} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="register-name" className="text-gray-700 dark:text-gray-300 font-medium">Nome Completo</Label>
