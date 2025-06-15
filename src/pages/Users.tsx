@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useInviteCodes, InviteCode } from '@/hooks/useInviteCodes';
-import { Loader2, Plus, Users as UsersIcon, Shield, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Plus, Users as UsersIcon, Shield, Clock, CheckCircle, XCircle, UserCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import PendingUsersTable from '@/components/users/PendingUsersTable';
 
 const UsersPage = () => {
   const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
@@ -83,7 +85,7 @@ const UsersPage = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gerenciamento de Usuários</h1>
-          <p className="text-gray-600 dark:text-gray-400">Gerencie códigos de convite e permissões</p>
+          <p className="text-gray-600 dark:text-gray-400">Gerencie aprovações de usuários e códigos de convite</p>
         </div>
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -162,106 +164,126 @@ const UsersPage = () => {
         </Dialog>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Códigos Ativos</CardTitle>
-            <Shield className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {inviteCodes.filter(code => code.is_active && !isExpired(code.expires_at) && code.current_uses < code.max_uses).length}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Códigos</CardTitle>
-            <UsersIcon className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{inviteCodes.length}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Códigos Utilizados</CardTitle>
-            <CheckCircle className="h-4 w-4 text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {inviteCodes.filter(code => code.current_uses > 0).length}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Tabs para separar usuários pendentes e códigos de convite */}
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="pending" className="flex items-center gap-2">
+            <UserCheck className="h-4 w-4" />
+            Usuários Pendentes
+          </TabsTrigger>
+          <TabsTrigger value="invite-codes" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Códigos de Convite
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Invite Codes Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Códigos de Convite</CardTitle>
-          <CardDescription>
-            Lista de todos os códigos de convite criados
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-          ) : inviteCodes.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400">Nenhum código de convite encontrado</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-2">Código</th>
-                    <th className="text-left p-2">Função</th>
-                    <th className="text-left p-2">Status</th>
-                    <th className="text-left p-2">Usos</th>
-                    <th className="text-left p-2">Criado em</th>
-                    <th className="text-left p-2">Expira em</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inviteCodes.map((code) => (
-                    <tr key={code.id} className="border-b">
-                      <td className="p-2">
-                        <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
-                          {code.code}
-                        </code>
-                      </td>
-                      <td className="p-2">
-                        {getRoleBadge(code.role)}
-                      </td>
-                      <td className="p-2">
-                        {getStatusBadge(code)}
-                      </td>
-                      <td className="p-2">
-                        <span className="text-sm">
-                          {code.current_uses} / {code.max_uses}
-                        </span>
-                      </td>
-                      <td className="p-2 text-sm text-gray-600 dark:text-gray-400">
-                        {formatDate(code.created_at)}
-                      </td>
-                      <td className="p-2 text-sm text-gray-600 dark:text-gray-400">
-                        {code.expires_at ? formatDate(code.expires_at) : 'Nunca'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        <TabsContent value="pending" className="space-y-6">
+          <PendingUsersTable />
+        </TabsContent>
+
+        <TabsContent value="invite-codes" className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Códigos Ativos</CardTitle>
+                <Shield className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {inviteCodes.filter(code => code.is_active && !isExpired(code.expires_at) && code.current_uses < code.max_uses).length}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Códigos</CardTitle>
+                <UsersIcon className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{inviteCodes.length}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Códigos Utilizados</CardTitle>
+                <CheckCircle className="h-4 w-4 text-yellow-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {inviteCodes.filter(code => code.current_uses > 0).length}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Invite Codes Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Códigos de Convite</CardTitle>
+              <CardDescription>
+                Lista de todos os códigos de convite criados (opcional - os usuários também podem se cadastrar livremente)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : inviteCodes.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400">Nenhum código de convite encontrado</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2">Código</th>
+                        <th className="text-left p-2">Função</th>
+                        <th className="text-left p-2">Status</th>
+                        <th className="text-left p-2">Usos</th>
+                        <th className="text-left p-2">Criado em</th>
+                        <th className="text-left p-2">Expira em</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inviteCodes.map((code) => (
+                        <tr key={code.id} className="border-b">
+                          <td className="p-2">
+                            <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm">
+                              {code.code}
+                            </code>
+                          </td>
+                          <td className="p-2">
+                            {getRoleBadge(code.role)}
+                          </td>
+                          <td className="p-2">
+                            {getStatusBadge(code)}
+                          </td>
+                          <td className="p-2">
+                            <span className="text-sm">
+                              {code.current_uses} / {code.max_uses}
+                            </span>
+                          </td>
+                          <td className="p-2 text-sm text-gray-600 dark:text-gray-400">
+                            {formatDate(code.created_at)}
+                          </td>
+                          <td className="p-2 text-sm text-gray-600 dark:text-gray-400">
+                            {code.expires_at ? formatDate(code.expires_at) : 'Nunca'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

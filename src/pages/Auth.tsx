@@ -8,18 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useInviteCodes } from '@/hooks/useInviteCodes';
-import { useOTP } from '@/hooks/useOTP';
-import { InviteCodeStep } from '@/components/auth/InviteCodeStep';
-import { AdminEmailStep } from '@/components/auth/AdminEmailStep';
-import { OTPStep } from '@/components/auth/OTPStep';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Loader2, LogIn, UserPlus, Lock, Mail } from 'lucide-react';
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
-  const [step, setStep] = useState<'invite' | 'admin-email' | 'form' | 'otp'>('invite');
   
   // Login form
   const [loginEmail, setLoginEmail] = useState('');
@@ -30,9 +24,6 @@ const Auth = () => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
-  const [userRole, setUserRole] = useState('');
-  const [adminEmail, setAdminEmail] = useState('');
   
   // Reset password form
   const [resetEmail, setResetEmail] = useState('');
@@ -40,8 +31,6 @@ const Auth = () => {
 
   const { login, register, isAuthenticated } = useAuth();
   const { resetPassword } = useSupabaseAuth();
-  const { useInviteCode } = useInviteCodes();
-  const { generateOTP } = useOTP();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,17 +80,6 @@ const Auth = () => {
     }
   };
 
-  const handleInviteValidation = (code: string, role: string) => {
-    setInviteCode(code);
-    setUserRole(role);
-    setStep('admin-email');
-  };
-
-  const handleAdminEmailConfirmed = (email: string) => {
-    setAdminEmail(email);
-    setStep('form');
-  };
-
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
@@ -127,40 +105,19 @@ const Auth = () => {
     try {
       setLoading(true);
       
-      // Gerar OTP para o email do admin (que já foi validado)
-      await generateOTP(adminEmail, 'signup');
-      setStep('otp');
-    } catch (error: any) {
-      console.error('Error generating OTP:', error);
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível gerar o código de verificação.',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOTPVerified = async () => {
-    try {
-      setLoading(true);
-      
-      // Criar conta
       await register(registerEmail, registerPassword, registerName);
-      
-      // Usar código de convite
-      const { user } = useSupabaseAuth();
-      if (user) {
-        await useInviteCode(inviteCode, user.id);
-      }
       
       toast({
         title: 'Cadastro realizado com sucesso!',
-        description: 'Sua conta foi criada e verificada.',
+        description: 'Verifique seu email para confirmar a conta. Após a confirmação, aguarde a aprovação de um administrador.',
       });
       
-      navigate(from, { replace: true });
+      // Resetar formulário
+      setRegisterName('');
+      setRegisterEmail('');
+      setRegisterPassword('');
+      setConfirmPassword('');
+      setActiveTab('login');
     } catch (error: any) {
       console.error('Register error:', error);
       
@@ -302,10 +259,7 @@ const Auth = () => {
           <p className="text-gray-600 dark:text-gray-400">Gestão laboratorial inteligente</p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => {
-          setActiveTab(value);
-          setStep(value === 'register' ? 'invite' : 'form');
-        }}>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100/80 dark:bg-gray-800/80 p-1 rounded-lg backdrop-blur-sm">
             <TabsTrigger 
               value="login" 
@@ -394,139 +348,96 @@ const Auth = () => {
             </TabsContent>
 
             <TabsContent value="register">
-              {step === 'invite' && (
-                <div className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl rounded-lg">
-                  <InviteCodeStep 
-                    onValidCode={handleInviteValidation}
-                    loading={loading}
-                  />
-                </div>
-              )}
-
-              {step === 'admin-email' && (
-                <div className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl rounded-lg">
-                  <AdminEmailStep 
-                    onAdminEmailConfirmed={handleAdminEmailConfirmed}
-                    loading={loading}
-                  />
-                </div>
-              )}
-
-              {step === 'form' && (
-                <Card className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-xl text-gray-900 dark:text-white">Criar Conta</CardTitle>
-                    <CardDescription className="text-gray-600 dark:text-gray-400">
-                      Preencha seus dados para criar sua conta
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handleRegisterSubmit} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="register-name" className="text-gray-700 dark:text-gray-300 font-medium">Nome Completo</Label>
+              <Card className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl">
+                <CardHeader>
+                  <CardTitle className="text-xl text-gray-900 dark:text-white">Criar Conta</CardTitle>
+                  <CardDescription className="text-gray-600 dark:text-gray-400">
+                    Preencha seus dados para criar sua conta. Após o cadastro, você receberá um email de confirmação e aguardará a aprovação de um administrador.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="register-name" className="text-gray-700 dark:text-gray-300 font-medium">Nome Completo</Label>
+                      <Input
+                        id="register-name"
+                        type="text"
+                        placeholder="Seu nome completo"
+                        value={registerName}
+                        onChange={(e) => setRegisterName(e.target.value)}
+                        className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/70 dark:bg-gray-800/70"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="register-email" className="text-gray-700 dark:text-gray-300 font-medium">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
-                          id="register-name"
-                          type="text"
-                          placeholder="Seu nome completo"
-                          value={registerName}
-                          onChange={(e) => setRegisterName(e.target.value)}
-                          className="h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/70 dark:bg-gray-800/70"
+                          id="register-email"
+                          type="email"
+                          placeholder="seu@email.com"
+                          value={registerEmail}
+                          onChange={(e) => setRegisterEmail(e.target.value)}
+                          className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/70 dark:bg-gray-800/70"
                           required
                         />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="register-email" className="text-gray-700 dark:text-gray-300 font-medium">Email</Label>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                          <Input
-                            id="register-email"
-                            type="email"
-                            placeholder="seu@email.com"
-                            value={registerEmail}
-                            onChange={(e) => setRegisterEmail(e.target.value)}
-                            className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/70 dark:bg-gray-800/70"
-                            required
-                          />
-                        </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="register-password" className="text-gray-700 dark:text-gray-300 font-medium">Senha</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="register-password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={registerPassword}
+                          onChange={(e) => setRegisterPassword(e.target.value)}
+                          className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/70 dark:bg-gray-800/70"
+                          required
+                        />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="register-password" className="text-gray-700 dark:text-gray-300 font-medium">Senha</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                          <Input
-                            id="register-password"
-                            type="password"
-                            placeholder="••••••••"
-                            value={registerPassword}
-                            onChange={(e) => setRegisterPassword(e.target.value)}
-                            className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/70 dark:bg-gray-800/70"
-                            required
-                          />
-                        </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password" className="text-gray-700 dark:text-gray-300 font-medium">Confirmar Senha</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="confirm-password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/70 dark:bg-gray-800/70"
+                          required
+                        />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="confirm-password" className="text-gray-700 dark:text-gray-300 font-medium">Confirmar Senha</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                          <Input
-                            id="confirm-password"
-                            type="password"
-                            placeholder="••••••••"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="pl-10 h-12 border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white/70 dark:bg-gray-800/70"
-                            required
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <Button
-                          type="submit"
-                          className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
-                          disabled={loading}
-                        >
-                          {loading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Processando...
-                            </>
-                          ) : (
-                            <>
-                              <UserPlus className="mr-2 h-4 w-4" />
-                              Continuar
-                            </>
-                          )}
-                        </Button>
-
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full h-12 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-                          onClick={() => setStep('admin-email')}
-                        >
-                          Voltar
-                        </Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              )}
-
-              {step === 'otp' && (
-                <div className="backdrop-blur-sm bg-white/90 dark:bg-gray-900/90 border-0 shadow-2xl rounded-lg">
-                  <OTPStep
-                    email={adminEmail}
-                    type="signup"
-                    onVerified={handleOTPVerified}
-                    onResend={() => generateOTP(adminEmail, 'signup')}
-                    loading={loading}
-                  />
-                </div>
-              )}
+                    </div>
+                    
+                    <Button
+                      type="submit"
+                      className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Criando conta...
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          Criar Conta
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
             </TabsContent>
           </div>
         </Tabs>
