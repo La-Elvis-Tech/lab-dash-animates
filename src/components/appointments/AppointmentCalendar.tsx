@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
@@ -59,7 +58,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         <div className="text-gray-600 dark:text-gray-400 truncate">
           {appointment.exam_types?.name}
         </div>
-        <Badge size="sm" className={`${getStatusColor(appointment.status)} text-xs`}>
+        <Badge className={`${getStatusColor(appointment.status)} text-xs`}>
           {appointment.status}
         </Badge>
       </div>
