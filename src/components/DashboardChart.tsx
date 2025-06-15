@@ -38,29 +38,41 @@ const DashboardChart: React.FC<DashboardChartProps> = memo(({ type, data, title,
     return () => ctx.revert();
   }, []);
 
-  // Memoize expensive calculations
+  // Memoize expensive calculations with null safety
   const total = useMemo(() => 
-    data.reduce((sum, item) => sum + item.value, 0), 
+    data.reduce((sum, item) => sum + (item?.value || 0), 0), 
     [data]
   );
 
   const renderProgressBars = useMemo(() => {
+    if (!data || data.length === 0) {
+      return (
+        <div className="space-y-3 sm:space-y-6 py-2 sm:py-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum dado disponível</p>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-3 sm:space-y-6 py-2 sm:py-4">
         {data.map((item, index) => {
-          const percentage = total > 0 ? Math.round((item.value / total) * 100) : 0;
+          // Add null safety checks
+          const itemValue = item?.value || 0;
+          const itemName = item?.name || `Item ${index + 1}`;
+          const percentage = total > 0 ? Math.round((itemValue / total) * 100) : 0;
+          
           return (
-            <div key={`${item.name}-${index}`} className="space-y-1 sm:space-y-2">
+            <div key={`${itemName}-${index}`} className="space-y-1 sm:space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div 
                     className="w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2" 
                     style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
                   />
-                  <span className="text-xs sm:text-sm font-medium">{item.name}</span>
+                  <span className="text-xs sm:text-sm font-medium">{itemName}</span>
                 </div>
                 <div className="flex items-center space-x-2 sm:space-x-3">
-                  <span className="text-xs sm:text-sm font-bold">R$ {item.value.toFixed(2)}</span>
+                  <span className="text-xs sm:text-sm font-bold">R$ {itemValue.toFixed(2)}</span>
                   <span className="text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 rounded-full font-medium">
                     {percentage}%
                   </span>
@@ -81,6 +93,15 @@ const DashboardChart: React.FC<DashboardChartProps> = memo(({ type, data, title,
   }, [data, total]);
 
   const renderChart = useMemo(() => {
+    // Add data validation
+    if (!data || data.length === 0) {
+      return (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500 dark:text-gray-400">Nenhum dado disponível para exibir</p>
+        </div>
+      );
+    }
+
     const commonTooltipStyle = {
       backgroundColor: 'rgb(31 41 55)',
       borderColor: 'rgb(55 65 81)',
@@ -279,9 +300,13 @@ const DashboardChart: React.FC<DashboardChartProps> = memo(({ type, data, title,
       case 'progress':
         return renderProgressBars;
       case 'gauge':
-        return <GaugeChart value={data[0].value} size={200} title={title} />;
+        return <GaugeChart value={data[0]?.value || 0} size={200} title={title} />;
       default:
-        return null;
+        return (
+          <div className="flex items-center justify-center h-64">
+            <p className="text-gray-500 dark:text-gray-400">Tipo de gráfico não suportado: {type}</p>
+          </div>
+        );
     }
   }, [type, data, title, renderProgressBars]);
 
