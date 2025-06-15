@@ -4,16 +4,17 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Mail, Phone, MapPin, Upload, User } from 'lucide-react';
+import { Building2, Mail, Phone, MapPin, Upload, User, Trash2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useAvatarUpload } from '@/hooks/useAvatarUpload';
 
 const LaboratoryProfile = () => {
-  const { profile, units, loading, updateProfile } = useUserProfile();
+  const { profile, units, loading, updateProfile, updateAvatar } = useUserProfile();
+  const { uploadAvatar, deleteAvatar, uploading } = useAvatarUpload();
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -26,6 +27,19 @@ const LaboratoryProfile = () => {
   });
   
   const [saving, setSaving] = useState(false);
+
+  React.useEffect(() => {
+    if (profile) {
+      setFormData({
+        full_name: profile.full_name || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+        position: profile.position || '',
+        department: profile.department || '',
+        unit_id: profile.unit_id || '',
+      });
+    }
+  }, [profile]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -47,13 +61,24 @@ const LaboratoryProfile = () => {
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file || !profile) return;
 
-    // Here you would implement file upload logic
-    toast({
-      title: "Upload de avatar",
-      description: "Funcionalidade de upload será implementada em breve."
-    });
+    const avatarUrl = await uploadAvatar(file, profile.id);
+    if (avatarUrl) {
+      await updateAvatar(avatarUrl);
+    }
+
+    // Clear the input so the same file can be selected again
+    event.target.value = '';
+  };
+
+  const handleAvatarDelete = async () => {
+    if (!profile) return;
+
+    const success = await deleteAvatar(profile.id);
+    if (success) {
+      await updateAvatar(null);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -119,10 +144,16 @@ const LaboratoryProfile = () => {
               </div>
               <div className="flex items-center gap-2">
                 <label htmlFor="avatar-upload">
-                  <Button variant="outline" size="sm" className="cursor-pointer" asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="cursor-pointer" 
+                    asChild
+                    disabled={uploading}
+                  >
                     <span>
                       <Upload className="h-4 w-4 mr-2" />
-                      Alterar Foto
+                      {uploading ? 'Enviando...' : 'Alterar Foto'}
                     </span>
                   </Button>
                 </label>
@@ -132,7 +163,19 @@ const LaboratoryProfile = () => {
                   accept="image/*"
                   className="hidden"
                   onChange={handleAvatarUpload}
+                  disabled={uploading}
                 />
+                {profile?.avatar_url && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAvatarDelete}
+                    disabled={uploading}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </div>
           </div>

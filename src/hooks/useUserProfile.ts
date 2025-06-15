@@ -124,6 +124,26 @@ export const useUserProfile = () => {
     }
   };
 
+  const updateAvatar = async (avatarUrl: string | null) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) throw new Error('User not authenticated');
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: avatarUrl })
+        .eq('id', userData.user.id);
+
+      if (error) throw error;
+      
+      // Update local state immediately
+      setProfile(prev => prev ? { ...prev, avatar_url: avatarUrl || undefined } : null);
+    } catch (error: any) {
+      console.error('Error updating avatar:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -139,6 +159,7 @@ export const useUserProfile = () => {
     units,
     loading,
     updateProfile,
+    updateAvatar,
     refreshProfile: fetchProfile,
   };
 };
