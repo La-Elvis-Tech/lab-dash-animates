@@ -36,25 +36,31 @@ export const useUserProfile = () => {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          units(name, code, address, phone)
-        `)
+        .select('*')
         .eq('id', userData.user.id)
         .single();
 
       if (error) throw error;
       
+      // Fetch unit separately
+      let unitData = null;
+      if (data.unit_id) {
+        const { data: unit, error: unitError } = await supabase
+          .from('units')
+          .select('name, code, address, phone')
+          .eq('id', data.unit_id)
+          .single();
+        
+        if (!unitError && unit) {
+          unitData = unit;
+        }
+      }
+      
       // Map the database status to our interface status
       const mappedProfile: UserProfile = {
         ...data,
         status: data.status === 'pending' ? 'inactive' : data.status as 'active' | 'inactive' | 'suspended',
-        unit: data.units ? {
-          name: data.units.name,
-          code: data.units.code,
-          address: data.units.address,
-          phone: data.units.phone
-        } : undefined
+        unit: unitData || undefined
       };
       
       setProfile(mappedProfile);

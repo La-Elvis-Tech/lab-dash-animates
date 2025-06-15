@@ -5,8 +5,8 @@ import { gsap } from 'gsap';
 import { 
   LayoutDashboard, 
   Package, 
-  FileText, 
-  ShoppingCart, 
+  Calendar, 
+  CalendarCheck, 
   BarChart3, 
   Settings, 
   AlertTriangle, 
@@ -36,8 +36,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
     { icon: Package, label: 'Inventário', path: '/inventory' },
-    { icon: FileText, label: 'Solicitações', path: '/requests' },
-    { icon: ShoppingCart, label: 'Pedidos', path: '/orders' },
+    { icon: Calendar, label: 'Exames', path: '/requests' },
+    { icon: CalendarCheck, label: 'Agendamentos', path: '/orders' },
     { icon: AlertTriangle, label: 'Alertas', path: '/alerts' },
     { icon: Play, label: 'Simulações', path: '/simulations' },
     { icon: BarChart3, label: 'Relatórios', path: '/reports' },
