@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthContext } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { AuthErrorAlert } from '@/components/auth/AuthErrorAlert';
@@ -31,7 +30,7 @@ const Auth = () => {
   // Reset password form state
   const [resetEmail, setResetEmail] = useState('');
 
-  const { signIn, signUp, isAuthenticated, profile } = useAuth();
+  const { signIn, signUp, isAuthenticated, profile } = useAuthContext();
   const { resetPassword } = useSupabaseAuth();
   const { toast } = useToast();
   const navigate = useNavigate();

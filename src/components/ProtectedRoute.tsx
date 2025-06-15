@@ -1,9 +1,9 @@
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, loading, profile } = useAuth();
+  const { isAuthenticated, loading, profile } = useAuthContext();
   const location = useLocation();
 
   console.log('ProtectedRoute check:', { isAuthenticated, loading, profile: profile?.status });
