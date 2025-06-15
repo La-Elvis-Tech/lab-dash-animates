@@ -5,6 +5,7 @@ import { useDoctors } from './useDoctors';
 import { useUnits } from './useUnits';
 import { appointmentService } from '@/services/appointmentService';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useSupabaseAppointments = () => {
   const { appointments, loading: appointmentsLoading, refreshAppointments } = useAppointments();
@@ -93,6 +94,213 @@ export const useSupabaseAppointments = () => {
     }
   };
 
+  // Implementar as funções que estavam em desenvolvimento
+  const createDoctor = async (doctorData: {
+    name: string;
+    specialty: string;
+    crm: string;
+    email?: string;
+    phone?: string;
+    unit_id?: string;
+  }) => {
+    try {
+      const { data, error } = await supabase
+        .from('doctors')
+        .insert({
+          ...doctorData,
+          active: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await refreshDoctors();
+      
+      toast({
+        title: 'Médico criado',
+        description: `Dr(a). ${doctorData.name} foi adicionado com sucesso.`,
+      });
+
+      return data;
+    } catch (error: any) {
+      console.error('Error creating doctor:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível criar o médico.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const updateDoctor = async (id: string, updates: Partial<{
+    name: string;
+    specialty: string;
+    crm: string;
+    email: string;
+    phone: string;
+    unit_id: string;
+  }>) => {
+    try {
+      const { data, error } = await supabase
+        .from('doctors')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await refreshDoctors();
+      
+      toast({
+        title: 'Médico atualizado',
+        description: 'As informações do médico foram atualizadas com sucesso.',
+      });
+
+      return data;
+    } catch (error: any) {
+      console.error('Error updating doctor:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível atualizar o médico.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const deleteDoctor = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('doctors')
+        .update({ active: false })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await refreshDoctors();
+      
+      toast({
+        title: 'Médico removido',
+        description: 'O médico foi removido com sucesso.',
+      });
+    } catch (error: any) {
+      console.error('Error deleting doctor:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível remover o médico.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const createExamType = async (examTypeData: {
+    name: string;
+    category: string;
+    description?: string;
+    duration_minutes: number;
+    cost?: number;
+    requires_preparation: boolean;
+    preparation_instructions?: string;
+  }) => {
+    try {
+      const { data, error } = await supabase
+        .from('exam_types')
+        .insert({
+          ...examTypeData,
+          active: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await refreshExamTypes();
+      
+      toast({
+        title: 'Tipo de exame criado',
+        description: `${examTypeData.name} foi adicionado com sucesso.`,
+      });
+
+      return data;
+    } catch (error: any) {
+      console.error('Error creating exam type:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível criar o tipo de exame.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const updateExamType = async (id: string, updates: Partial<{
+    name: string;
+    category: string;
+    description: string;
+    duration_minutes: number;
+    cost: number;
+    requires_preparation: boolean;
+    preparation_instructions: string;
+  }>) => {
+    try {
+      const { data, error } = await supabase
+        .from('exam_types')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await refreshExamTypes();
+      
+      toast({
+        title: 'Tipo de exame atualizado',
+        description: 'As informações foram atualizadas com sucesso.',
+      });
+
+      return data;
+    } catch (error: any) {
+      console.error('Error updating exam type:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível atualizar o tipo de exame.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
+  const deleteExamType = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('exam_types')
+        .update({ active: false })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      await refreshExamTypes();
+      
+      toast({
+        title: 'Tipo de exame removido',
+        description: 'O tipo de exame foi removido com sucesso.',
+      });
+    } catch (error: any) {
+      console.error('Error deleting exam type:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível remover o tipo de exame.',
+        variant: 'destructive',
+      });
+      throw error;
+    }
+  };
+
   return {
     appointments,
     examTypes,
@@ -102,6 +310,12 @@ export const useSupabaseAppointments = () => {
     createAppointment,
     updateAppointment,
     deleteAppointment,
+    createDoctor,
+    updateDoctor,
+    deleteDoctor,
+    createExamType,
+    updateExamType,
+    deleteExamType,
     calculateExamMaterials: appointmentService.calculateExamMaterials,
     refreshAppointments,
     refreshExamTypes,

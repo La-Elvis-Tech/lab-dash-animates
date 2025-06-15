@@ -1,5 +1,5 @@
 
-import { SupabaseAppointment } from '@/hooks/useSupabaseAppointments';
+import { SupabaseAppointment } from '@/types/appointment';
 
 export interface Appointment {
   id: string;
@@ -21,9 +21,9 @@ export const adaptSupabaseAppointmentToAppointment = (supabaseAppointment: Supab
     type: supabaseAppointment.exam_types?.name || 'Exame não especificado',
     date: new Date(supabaseAppointment.scheduled_date),
     doctor: supabaseAppointment.doctors?.name || 'Médico não especificado',
-    laboratory: 'Laboratório Central', // Default value since not in Supabase data
+    laboratory: 'Laboratório Central',
     unit: supabaseAppointment.units?.name || 'Unidade não especificada',
-    cost: supabaseAppointment.cost || supabaseAppointment.exam_types?.cost || 0,
+    cost: Number(supabaseAppointment.cost || supabaseAppointment.exam_types?.cost || 0),
     status: supabaseAppointment.status,
     result: supabaseAppointment.status === 'Concluído' ? 'Normal' : 'Pendente'
   };

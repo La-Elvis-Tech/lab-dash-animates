@@ -10,7 +10,6 @@ import DoctorManagement from './DoctorManagement';
 import ExamTypeManagement from './ExamTypeManagement';
 import AppointmentsStats from './AppointmentsStats';
 import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
-import { useToast } from '@/hooks/use-toast';
 
 const AppointmentsDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('calendar');
@@ -24,72 +23,17 @@ const AppointmentsDashboard: React.FC = () => {
     createAppointment,
     updateAppointment,
     deleteAppointment,
+    createDoctor,
+    updateDoctor,
+    deleteDoctor,
+    createExamType,
+    updateExamType,
+    deleteExamType,
     refreshAppointments,
-    refreshExamTypes,
-    refreshDoctors,
   } = useSupabaseAppointments();
-  const { toast } = useToast();
-
-  const handleCreateDoctor = async (doctorData: any) => {
-    // Implementar criação de médico via API
-    console.log('Creating doctor:', doctorData);
-    toast({
-      title: 'Função em desenvolvimento',
-      description: 'A criação de médicos será implementada em breve.',
-    });
-  };
-
-  const handleUpdateDoctor = async (id: string, updates: any) => {
-    // Implementar atualização de médico via API
-    console.log('Updating doctor:', id, updates);
-    toast({
-      title: 'Função em desenvolvimento',
-      description: 'A atualização de médicos será implementada em breve.',
-    });
-  };
-
-  const handleDeleteDoctor = async (id: string) => {
-    // Implementar remoção de médico via API
-    console.log('Deleting doctor:', id);
-    toast({
-      title: 'Função em desenvolvimento',
-      description: 'A remoção de médicos será implementada em breve.',
-    });
-  };
-
-  const handleCreateExamType = async (examTypeData: any) => {
-    // Implementar criação de tipo de exame via API
-    console.log('Creating exam type:', examTypeData);
-    toast({
-      title: 'Função em desenvolvimento',
-      description: 'A criação de tipos de exame será implementada em breve.',
-    });
-  };
-
-  const handleUpdateExamType = async (id: string, updates: any) => {
-    // Implementar atualização de tipo de exame via API
-    console.log('Updating exam type:', id, updates);
-    toast({
-      title: 'Função em desenvolvimento',
-      description: 'A atualização de tipos de exame será implementada em breve.',
-    });
-  };
-
-  const handleDeleteExamType = async (id: string) => {
-    // Implementar remoção de tipo de exame via API
-    console.log('Deleting exam type:', id);
-    toast({
-      title: 'Função em desenvolvimento',
-      description: 'A remoção de tipos de exame será implementada em breve.',
-    });
-  };
 
   const handleSelectAppointment = (appointment: any) => {
     console.log('Selected appointment:', appointment);
-    toast({
-      title: 'Agendamento selecionado',
-      description: `Paciente: ${appointment.patient_name}`,
-    });
   };
 
   const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
@@ -133,7 +77,6 @@ const AppointmentsDashboard: React.FC = () => {
         </Button>
       </div>
 
-      {/* Estatísticas dos Agendamentos */}
       <AppointmentsStats appointments={appointments} />
 
       {showCreateForm && (
@@ -179,18 +122,18 @@ const AppointmentsDashboard: React.FC = () => {
           <DoctorManagement
             doctors={doctors}
             units={units}
-            onCreateDoctor={handleCreateDoctor}
-            onUpdateDoctor={handleUpdateDoctor}
-            onDeleteDoctor={handleDeleteDoctor}
+            onCreateDoctor={createDoctor}
+            onUpdateDoctor={updateDoctor}
+            onDeleteDoctor={deleteDoctor}
           />
         </TabsContent>
 
         <TabsContent value="exam-types">
           <ExamTypeManagement
             examTypes={examTypes}
-            onCreateExamType={handleCreateExamType}
-            onUpdateExamType={handleUpdateExamType}
-            onDeleteExamType={handleDeleteExamType}
+            onCreateExamType={createExamType}
+            onUpdateExamType={updateExamType}
+            onDeleteExamType={deleteExamType}
           />
         </TabsContent>
       </Tabs>

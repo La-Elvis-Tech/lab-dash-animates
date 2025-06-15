@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { addDays, format, isAfter, isBefore, startOfDay, getDay } from 'date-fns';
 
@@ -37,9 +37,8 @@ export const useAvailableSlots = () => {
     return slots;
   };
 
-  // Horários padrão temporários até os tipos serem atualizados
+  // Horários padrão baseados no médico (temporário até implementar tabela doctor_schedules)
   const getDefaultDoctorSchedules = (doctorId: string): DoctorSchedule[] => {
-    // Definir horários padrão baseados no ID do médico para simular diferentes horários
     const scheduleMap: Record<string, DoctorSchedule[]> = {
       // Dr. João Silva (Cardiologia) - Segunda a Sexta, 8:00-17:00
       'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa': [
@@ -74,16 +73,14 @@ export const useAvailableSlots = () => {
     targetDate: Date, 
     timeSlot: string
   ): boolean => {
-    const dayOfWeek = getDay(targetDate); // 0=Sunday, 1=Monday, etc.
+    const dayOfWeek = getDay(targetDate);
     const [hour, minute] = timeSlot.split(':').map(Number);
-    const targetTime = hour * 60 + minute; // Convert to minutes
+    const targetTime = hour * 60 + minute;
 
-    // Find schedule for this day of week
     const daySchedule = schedules.find(s => s.day_of_week === dayOfWeek && s.is_available);
     
     if (!daySchedule) return false;
 
-    // Convert schedule times to minutes
     const [startHour, startMinute] = daySchedule.start_time.split(':').map(Number);
     const [endHour, endMinute] = daySchedule.end_time.split(':').map(Number);
     const startTime = startHour * 60 + startMinute;
@@ -102,7 +99,8 @@ export const useAvailableSlots = () => {
       const targetDate = startOfDay(date);
       const nextDay = addDays(targetDate, 1);
 
-      // Buscar agendamentos existentes para a data
+      console.log('Fetching appointments for date:', targetDate.toISOString());
+
       const { data: appointments, error: appointmentsError } = await supabase
         .from('appointments')
         .select(`
@@ -115,7 +113,12 @@ export const useAvailableSlots = () => {
         .lt('scheduled_date', nextDay.toISOString())
         .neq('status', 'Cancelado');
 
-      if (appointmentsError) throw appointmentsError;
+      if (appointmentsError) {
+        console.error('Error fetching appointments:', appointmentsError);
+        throw appointmentsError;
+      }
+
+      console.log('Found appointments:', appointments?.length || 0);
 
       const timeSlots = generateTimeSlots();
       const availableSlots: TimeSlot[] = [];
@@ -132,12 +135,10 @@ export const useAvailableSlots = () => {
           const slotDateTime = new Date(date);
           slotDateTime.setHours(hour, minute, 0, 0);
 
-          // Verificar se o médico trabalha neste dia/horário
           const isDoctorWorking = isDoctorAvailableAtTime(doctorSchedules, date, timeSlot);
           
           if (!isDoctorWorking) continue;
 
-          // Verificar se o horário já está ocupado
           const isOccupied = appointments?.some(apt => {
             if (apt.doctor_id !== doctor.id) return false;
             
@@ -159,6 +160,7 @@ export const useAvailableSlots = () => {
         }
       }
 
+      console.log('Generated available slots:', availableSlots.length);
       return availableSlots;
     } catch (error) {
       console.error('Error fetching available slots:', error);
@@ -173,11 +175,9 @@ export const useAvailableSlots = () => {
     startDate: Date = new Date()
   ): Promise<{ time: string; doctorId: string; doctorName: string; date: Date } | null> => {
     try {
-      // Procurar nos próximos 30 dias
       for (let i = 0; i < 30; i++) {
         const searchDate = addDays(startOfDay(startDate), i);
         
-        // Pular fins de semana (opcional)
         if (searchDate.getDay() === 0 || searchDate.getDay() === 6) continue;
         
         const slots = await getAvailableSlots(searchDate, doctors);
