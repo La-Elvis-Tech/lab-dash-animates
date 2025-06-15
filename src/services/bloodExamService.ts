@@ -39,7 +39,7 @@ export const bloodExamService = {
   async validateMaterialsForExam(
     examTypeId: string, 
     bloodExamIds: string[] = []
-  ): Promise<DetailedMaterialValidation[]> => {
+  ): Promise<DetailedMaterialValidation[]> {
     try {
       const { data, error } = await supabase.rpc('calculate_detailed_exam_materials', {
         p_exam_type_id: examTypeId,
