@@ -27,7 +27,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
   const location = useLocation();
-  const { logout, user } = useAuth();
+  const { signOut, user } = useAuth();
   const { theme } = useTheme();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const logoContainerRef = useRef<HTMLDivElement>(null);
@@ -338,31 +338,51 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
                 : 'bg-gray-100/50 border border-gray-200/50'
             }`}
           >
-            <p className={`text-sm font-medium truncate ${
-              theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
-            }`}>
-              {user.email}
-            </p>
-            <p className={`text-xs ${
-              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-            }`}>
-              Usuário ativo
-            </p>
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <p className={`text-sm font-medium truncate ${
+                  theme === 'dark' ? 'text-gray-200' : 'text-gray-700'
+                }`}>
+                  {user.email}
+                </p>
+                <p className={`text-xs ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  Usuário ativo
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={signOut}
+                className={`ml-2 p-1 h-auto w-auto ${
+                  theme === 'dark'
+                    ? 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
+                    : 'text-gray-500 hover:text-red-600 hover:bg-red-500/10'
+                } transition-all duration-200`}
+                title="Sair"
+              >
+                <LogOut size={16} />
+              </Button>
+            </div>
           </div>
         )}
-        <Button
-          variant="ghost"
-          onClick={logout}
-          className={`w-full ${isCollapsed ? 'justify-center p-2' : 'justify-start gap-3 p-3'} rounded-xl transition-all duration-300 ${
-            theme === 'dark'
-              ? 'text-gray-300 hover:text-red-400 hover:bg-red-500/10 border border-gray-700/50 hover:border-red-500/30'
-              : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10 border border-gray-200/50 hover:border-red-400/30'
-          }`}
-          title={isCollapsed ? 'Sair' : undefined}
-        >
-          <LogOut size={isCollapsed ? 18 : 20} className="flex-shrink-0" />
-          {!isCollapsed && <span className="font-medium">Sair</span>}
-        </Button>
+        
+        {/* Botão de logout para sidebar colapsada */}
+        {isCollapsed && (
+          <Button
+            variant="ghost"
+            onClick={signOut}
+            className={`w-full justify-center p-2 rounded-xl transition-all duration-300 ${
+              theme === 'dark'
+                ? 'text-gray-300 hover:text-red-400 hover:bg-red-500/10 border border-gray-700/50 hover:border-red-500/30'
+                : 'text-gray-600 hover:text-red-600 hover:bg-red-500/10 border border-gray-200/50 hover:border-red-400/30'
+            }`}
+            title="Sair"
+          >
+            <LogOut size={18} className="flex-shrink-0" />
+          </Button>
+        )}
       </div>
     </div>
   );

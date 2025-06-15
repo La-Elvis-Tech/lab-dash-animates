@@ -4,15 +4,18 @@ import NotificationSettings from "@/components/settings/NotificationSettings";
 import SecuritySettings from "@/components/settings/SecuritySettings";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 import { gsap } from "gsap";
-import { Calendar, Settings as SettingsIcon, User } from "lucide-react";
+import { Calendar, Settings as SettingsIcon, User, LogOut } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const Settings = () => {
   const pageRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("profile");
   const { toast } = useToast();
+  const { signOut, user } = useAuth();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -26,6 +29,22 @@ const Settings = () => {
     return () => ctx.revert();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro no logout",
+        description: "Ocorreu um erro ao fazer logout. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div ref={pageRef}>
       <div className="flex items-center justify-between mb-6">
@@ -37,8 +56,18 @@ const Settings = () => {
             Ajuste as configurações do sistema
           </p>
         </div>
-        <div className="hidden sm:block bg-neutral-100 rounded-lg dark:bg-neutral-800 p-1">
-          <ThemeToggle />
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:block bg-neutral-100 rounded-lg dark:bg-neutral-800 p-1">
+            <ThemeToggle />
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950/20"
+          >
+            <LogOut size={16} />
+            <span className="hidden sm:inline">Sair da conta</span>
+          </Button>
         </div>
       </div>
 
