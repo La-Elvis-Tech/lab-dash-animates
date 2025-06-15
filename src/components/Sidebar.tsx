@@ -218,7 +218,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
                     {/* Indicador de ativo */}
                     {isActive && (
                       <div className={`absolute right-0 w-1 h-9 rounded-l-full ${
-                        theme === 'dark' ? 'bg-gray-600' : 'bg-neutral-300'
+                        theme === 'dark' ? 'bg-gray-600' : 'bg-neutral-600'
                       }`} />
                     )}
                   </Link>
