@@ -1,99 +1,137 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { InventoryItem, InventoryCategory, InventoryMovement, UserUnit } from '@/types/inventory';
+import { InventoryItem, InventoryCategory, InventoryMovement } from '@/types/inventory';
 
-export const getUserUnit = async (): Promise<UserUnit | null> => {
+export const getUserUnit = async (): Promise<{ id: string; name: string } | null> => {
   try {
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) return null;
+    console.log('Getting current user...');
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.log('No authenticated user found');
+      return null;
+    }
 
-    const { data: profile } = await supabase
+    console.log('User found:', user.email);
+
+    // Primeiro, tentar buscar a unidade do perfil do usuário
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('unit_id')
-      .eq('id', userData.user.id)
+      .eq('id', user.id)
       .single();
 
-    if (!profile?.unit_id) return null;
+    console.log('Profile query result:', { profile, profileError });
 
-    const { data: unit } = await supabase
+    if (profile?.unit_id) {
+      const { data: unit, error: unitError } = await supabase
+        .from('units')
+        .select('id, name')
+        .eq('id', profile.unit_id)
+        .single();
+
+      console.log('Unit from profile:', { unit, unitError });
+
+      if (unit && !unitError) {
+        return unit;
+      }
+    }
+
+    // Se não encontrou unidade no perfil, buscar a primeira unidade disponível
+    console.log('No unit in profile, getting first available unit...');
+    const { data: units, error: unitsError } = await supabase
       .from('units')
       .select('id, name')
-      .eq('id', profile.unit_id)
-      .single();
+      .eq('active', true)
+      .limit(1);
 
-    if (unit) {
-      return {
-        id: unit.id,
-        name: unit.name
-      };
+    console.log('Available units:', { units, unitsError });
+
+    if (units && units.length > 0 && !unitsError) {
+      return units[0];
     }
+
+    console.log('No units found');
     return null;
   } catch (error) {
-    console.error('Error getting user unit:', error);
-    return null;
+    console.error('Error in getUserUnit:', error);
+    throw error;
   }
 };
 
 export const fetchInventoryItems = async (unitId: string): Promise<InventoryItem[]> => {
-  const { data, error } = await supabase
-    .from('inventory_items')
-    .select(`
-      *,
-      categories:inventory_categories(name, description)
-    `)
-    .eq('unit_id', unitId)
-    .eq('active', true)
-    .order('name');
+  try {
+    console.log('Fetching inventory items for unit:', unitId);
+    
+    const { data, error } = await supabase
+      .from('inventory_items')
+      .select(`
+        *,
+        categories:inventory_categories(id, name, color)
+      `)
+      .eq('unit_id', unitId)
+      .eq('active', true)
+      .order('name');
 
-  if (error) throw error;
-  
-  return (data || []).map(item => ({
-    ...item,
-    unit: item.unit_measure,
-    location: item.storage_location || 'N/A',
-    categories: item.categories || undefined
-  }));
+    console.log('Inventory items query result:', { data, error });
+
+    if (error) {
+      console.error('Error fetching inventory items:', error);
+      throw error;
+    }
+
+    const items = data?.map(item => ({
+      ...item,
+      // Mapear campos de localização
+      location: item.storage_location,
+      // Mapear unidade de medida
+      unit: item.unit_measure,
+    })) || [];
+
+    console.log('Mapped inventory items:', items.length, 'items');
+    return items;
+  } catch (error) {
+    console.error('Error in fetchInventoryItems:', error);
+    throw error;
+  }
 };
 
 export const fetchInventoryCategories = async (): Promise<InventoryCategory[]> => {
-  const { data, error } = await supabase
-    .from('inventory_categories')
-    .select('*')
-    .order('name');
+  try {
+    console.log('Fetching inventory categories...');
+    
+    const { data, error } = await supabase
+      .from('inventory_categories')
+      .select('*')
+      .order('name');
 
-  if (error) throw error;
-  
-  return (data || []).map(category => ({
-    ...category,
-    active: true,
-    updated_at: category.created_at
-  }));
+    console.log('Categories query result:', { data, error });
+
+    if (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+
+    console.log('Fetched categories:', data?.length || 0, 'categories');
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchInventoryCategories:', error);
+    throw error;
+  }
 };
 
-export const fetchInventoryMovements = async (unitId: string): Promise<InventoryMovement[]> => {
-  const { data, error } = await supabase
-    .from('inventory_movements')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100);
-
-  if (error) throw error;
-  
-  return (data || []).map(movement => ({
-    ...movement,
-    movement_type: movement.movement_type as 'in' | 'out' | 'adjustment' | 'transfer'
-  }));
-};
-
-export const createInventoryItem = async (item: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>, unitId: string) => {
+export const createInventoryItem = async (
+  item: Omit<InventoryItem, 'id' | 'created_at' | 'updated_at'>,
+  unitId: string
+): Promise<InventoryItem> => {
   const { data, error } = await supabase
     .from('inventory_items')
-    .insert([{ 
-      ...item, 
+    .insert({
+      ...item,
       unit_id: unitId,
+      storage_location: item.location,
       unit_measure: item.unit,
-      storage_location: item.location
-    }])
+    })
     .select()
     .single();
 
@@ -101,21 +139,17 @@ export const createInventoryItem = async (item: Omit<InventoryItem, 'id' | 'crea
   return data;
 };
 
-export const updateInventoryItem = async (id: string, updates: Partial<InventoryItem>) => {
-  const dbUpdates = {
-    ...updates,
-    unit_measure: updates.unit,
-    storage_location: updates.location
-  };
-  
-  // Remove frontend-only fields
-  delete dbUpdates.unit;
-  delete dbUpdates.location;
-  delete dbUpdates.categories;
-
+export const updateInventoryItem = async (
+  id: string,
+  updates: Partial<InventoryItem>
+): Promise<InventoryItem> => {
   const { data, error } = await supabase
     .from('inventory_items')
-    .update(dbUpdates)
+    .update({
+      ...updates,
+      storage_location: updates.location,
+      unit_measure: updates.unit,
+    })
     .eq('id', id)
     .select()
     .single();
@@ -124,28 +158,19 @@ export const updateInventoryItem = async (id: string, updates: Partial<Inventory
   return data;
 };
 
-export const deleteInventoryItem = async (id: string) => {
+export const deleteInventoryItem = async (id: string): Promise<void> => {
   const { error } = await supabase
     .from('inventory_items')
-    .update({ active: false })
+    .delete()
     .eq('id', id);
 
   if (error) throw error;
 };
 
-export const addInventoryMovement = async (movement: Omit<InventoryMovement, 'id' | 'created_at'>) => {
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) throw new Error('User not authenticated');
-
-  const { data, error } = await supabase
+export const addInventoryMovement = async (movement: Omit<InventoryMovement, 'id' | 'created_at'>): Promise<void> => {
+  const { error } = await supabase
     .from('inventory_movements')
-    .insert([{
-      ...movement,
-      performed_by: userData.user.id
-    }])
-    .select()
-    .single();
+    .insert(movement);
 
   if (error) throw error;
-  return data;
 };

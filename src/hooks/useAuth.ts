@@ -35,18 +35,22 @@ export const useAuth = () => {
         .eq('id', userId)
         .single();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         console.error('Error fetching profile:', error);
         return { data: null, error };
       }
       
-      const mappedProfile: Profile = {
-        ...data,
-        status: data.status === 'inactive' ? 'suspended' : data.status
-      };
+      if (data) {
+        const mappedProfile: Profile = {
+          ...data,
+          status: data.status === 'inactive' ? 'suspended' : data.status
+        };
+        
+        setProfile(mappedProfile);
+        return { data: mappedProfile, error: null };
+      }
       
-      setProfile(mappedProfile);
-      return { data: mappedProfile, error: null };
+      return { data: null, error: null };
     } catch (error: any) {
       console.error('Error fetching profile:', error);
       return { data: null, error };
@@ -68,8 +72,9 @@ export const useAuth = () => {
         return { data: null, error };
       }
       
-      setRole(data?.role || null);
-      return { data: data?.role || null, error: null };
+      const userRole = data?.role || 'user';
+      setRole(userRole);
+      return { data: userRole, error: null };
     } catch (error: any) {
       console.error('Error fetching user role:', error);
       return { data: null, error };
@@ -81,6 +86,35 @@ export const useAuth = () => {
 
     const initializeAuth = async () => {
       try {
+        // Primeiro configurar o listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, session) => {
+            console.log('Auth state change:', event, session?.user?.email);
+            
+            if (!mounted) return;
+
+            setSession(session);
+            setUser(session?.user ?? null);
+            
+            if (session?.user) {
+              // Usar setTimeout para evitar loops
+              setTimeout(async () => {
+                if (mounted) {
+                  await fetchProfile(session.user.id);
+                  await fetchUserRole(session.user.id);
+                }
+              }, 0);
+            } else {
+              setProfile(null);
+              setRole(null);
+            }
+            
+            setLoading(false);
+            setInitializing(false);
+          }
+        );
+
+        // Depois verificar sessão atual
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         
         if (!mounted) return;
@@ -89,17 +123,22 @@ export const useAuth = () => {
         setUser(currentSession?.user ?? null);
         
         if (currentSession?.user) {
-          // Fetch profile and role without blocking
-          setTimeout(() => {
+          setTimeout(async () => {
             if (mounted) {
-              fetchProfile(currentSession.user.id);
-              fetchUserRole(currentSession.user.id);
+              await fetchProfile(currentSession.user.id);
+              await fetchUserRole(currentSession.user.id);
             }
           }, 0);
         }
+        
+        setLoading(false);
+        setInitializing(false);
+
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
         console.error('Auth initialization error:', error);
-      } finally {
         if (mounted) {
           setLoading(false);
           setInitializing(false);
@@ -107,115 +146,151 @@ export const useAuth = () => {
       }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth state change in useAuth hook:', event);
-        
-        if (!mounted) return;
-
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          setTimeout(() => {
-            if (mounted) {
-              fetchProfile(session.user.id);
-              fetchUserRole(session.user.id);
-            }
-          }, 0);
-        } else {
-          setProfile(null);
-          setRole(null);
-        }
-        
-        setLoading(false);
-        setInitializing(false);
-      }
-    );
-
     initializeAuth();
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const result = await supabase.auth.signInWithPassword({ email, password });
-    
-    if (result.error) {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
+      
+      if (error) {
+        console.error('Sign in error:', error);
+        toast({
+          title: 'Erro no login',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return { data: null, error };
+      }
+
+      console.log('Sign in successful:', data.user?.email);
+      return { data, error: null };
+    } catch (error: any) {
+      console.error('Sign in catch error:', error);
       toast({
         title: 'Erro no login',
-        description: result.error.message,
+        description: error.message || 'Erro desconhecido',
         variant: 'destructive',
       });
+      return { data: null, error };
+    } finally {
+      setLoading(false);
     }
-    
-    return result;
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const result = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+          emailRedirectTo: `${window.location.origin}/`,
         },
-        emailRedirectTo: `${window.location.origin}/`,
-      },
-    });
-    
-    if (result.error) {
-      toast({
-        title: 'Erro no cadastro',
-        description: result.error.message,
-        variant: 'destructive',
       });
-    } else {
+      
+      if (error) {
+        console.error('Sign up error:', error);
+        toast({
+          title: 'Erro no cadastro',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return { data: null, error };
+      }
+
+      console.log('Sign up successful:', data.user?.email);
       toast({
         title: 'Cadastro realizado',
         description: 'Verifique seu email para confirmar a conta.',
       });
+      
+      return { data, error: null };
+    } catch (error: any) {
+      console.error('Sign up catch error:', error);
+      toast({
+        title: 'Erro no cadastro',
+        description: error.message || 'Erro desconhecido',
+        variant: 'destructive',
+      });
+      return { data: null, error };
+    } finally {
+      setLoading(false);
     }
-    
-    return result;
   };
 
   const signOut = async () => {
-    const result = await supabase.auth.signOut();
-    
-    if (result.error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Sign out error:', error);
+        toast({
+          title: 'Erro ao sair',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return { error };
+      }
+
+      console.log('Sign out successful');
+      return { error: null };
+    } catch (error: any) {
+      console.error('Sign out catch error:', error);
       toast({
         title: 'Erro ao sair',
-        description: result.error.message,
+        description: error.message || 'Erro desconhecido',
         variant: 'destructive',
       });
+      return { error };
     }
-    
-    return result;
   };
 
   const resetPassword = async (email: string) => {
-    const result = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    
-    if (result.error) {
-      toast({
-        title: 'Erro',
-        description: result.error.message,
-        variant: 'destructive',
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
       });
-    } else {
+      
+      if (error) {
+        console.error('Reset password error:', error);
+        toast({
+          title: 'Erro',
+          description: error.message,
+          variant: 'destructive',
+        });
+        return { error };
+      }
+
+      console.log('Reset password email sent');
       toast({
         title: 'Email enviado',
         description: 'Verifique seu email para redefinir a senha.',
       });
+      
+      return { error: null };
+    } catch (error: any) {
+      console.error('Reset password catch error:', error);
+      toast({
+        title: 'Erro',
+        description: error.message || 'Erro desconhecido',
+        variant: 'destructive',
+      });
+      return { error };
     }
-    
-    return result;
   };
 
   const hasRole = (requiredRole: UserRole): boolean => {

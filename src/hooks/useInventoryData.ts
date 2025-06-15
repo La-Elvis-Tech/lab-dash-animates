@@ -13,7 +13,9 @@ export const useInventoryData = () => {
 
   const loadUserUnit = useCallback(async () => {
     try {
+      console.log('Loading user unit...');
       const unit = await getUserUnit();
+      console.log('User unit loaded:', unit);
       setUserUnit(unit);
       return unit;
     } catch (error) {
@@ -29,8 +31,10 @@ export const useInventoryData = () => {
 
   const loadItems = useCallback(async (unitId: string) => {
     try {
+      console.log('Loading inventory items for unit:', unitId);
       setLoading(true);
       const inventoryItems = await fetchInventoryItems(unitId);
+      console.log('Inventory items loaded:', inventoryItems.length, 'items');
       setItems(inventoryItems);
     } catch (error) {
       console.error('Error loading inventory items:', error);
@@ -46,7 +50,9 @@ export const useInventoryData = () => {
 
   const loadCategories = useCallback(async () => {
     try {
+      console.log('Loading inventory categories...');
       const inventoryCategories = await fetchInventoryCategories();
+      console.log('Categories loaded:', inventoryCategories.length, 'categories');
       setCategories(inventoryCategories);
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -60,18 +66,24 @@ export const useInventoryData = () => {
 
   const refreshItems = useCallback(async () => {
     if (userUnit?.id) {
+      console.log('Refreshing items for unit:', userUnit.id);
       await loadItems(userUnit.id);
     }
   }, [userUnit?.id, loadItems]);
 
   useEffect(() => {
     const initializeData = async () => {
+      console.log('Initializing inventory data...');
       const unit = await loadUserUnit();
       if (unit?.id) {
+        console.log('Loading items and categories for unit:', unit.id);
         await Promise.all([
           loadItems(unit.id),
           loadCategories()
         ]);
+      } else {
+        console.log('No unit found, setting loading to false');
+        setLoading(false);
       }
     };
 
