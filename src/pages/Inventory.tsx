@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertCircle, Loader2, Plus, Trash } from 'lucide-react';
@@ -34,7 +33,12 @@ const Inventory = () => {
   const { toast } = useToast();
   const { sendEmailForAlert } = useAlerts();
 
-  const filteredItems = inventoryItems.filter(item => {
+  // Remove duplicates based on name and unit_id
+  const uniqueItems = inventoryItems.filter((item, index, self) => 
+    index === self.findIndex((i) => i.name === item.name && i.unit_id === item.unit_id)
+  );
+
+  const filteredItems = uniqueItems.filter(item => {
     const categoryName = item.categories?.name || 'Sem categoria';
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -45,7 +49,7 @@ const Inventory = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const lowStockItems = inventoryItems.filter(item => item.current_stock <= item.min_stock);
+  const lowStockItems = uniqueItems.filter(item => item.current_stock <= item.min_stock);
 
   const handleSelectItem = (itemId: string) => {
     const newSelected = new Set(selectedItems);
@@ -146,7 +150,7 @@ const Inventory = () => {
 
       <LowStockAlert lowStockItems={lowStockItems} />
 
-      <InventoryStats items={inventoryItems} />
+      <InventoryStats items={uniqueItems} />
 
       <InventoryFilters
         searchTerm={searchTerm}
