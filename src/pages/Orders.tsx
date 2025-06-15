@@ -20,8 +20,8 @@ const Orders = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
-          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando agendamentos...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900 dark:border-neutral-100 mx-auto"></div>
+          <p className="mt-4 text-neutral-500 dark:text-neutral-400">Carregando agendamentos...</p>
         </div>
       </div>
     );
@@ -40,7 +40,7 @@ const Orders = () => {
         </div>
         <Button 
           onClick={() => setShowCreateForm(true)}
-          className="bg-lab-blue hover:bg-lab-blue/90 text-white"
+          className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
         >
           <Plus className="mr-2 h-4 w-4" />
           Novo Agendamento

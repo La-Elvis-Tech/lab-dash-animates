@@ -97,7 +97,7 @@ const AppointmentsDashboard: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lab-blue mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900 dark:border-neutral-100 mx-auto"></div>
           <p className="mt-4 text-neutral-500 dark:text-neutral-400">Carregando agendamentos...</p>
         </div>
       </div>
@@ -117,7 +117,7 @@ const AppointmentsDashboard: React.FC = () => {
         </div>
         <Button 
           onClick={() => setShowCreateForm(true)}
-          className="bg-lab-blue hover:bg-lab-blue/90"
+          className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
         >
           <Calendar className="mr-2 h-4 w-4" />
           Novo Agendamento
@@ -137,21 +137,21 @@ const AppointmentsDashboard: React.FC = () => {
         <TabsList className="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
           <TabsTrigger 
             value="calendar"
-            className="data-[state=active]:bg-lab-blue data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
             <Calendar className="h-4 w-4 mr-2" />
             Calendário
           </TabsTrigger>
           <TabsTrigger 
             value="doctors"
-            className="data-[state=active]:bg-lab-blue data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
             <Users className="h-4 w-4 mr-2" />
             Médicos
           </TabsTrigger>
           <TabsTrigger 
             value="exam-types"
-            className="data-[state=active]:bg-lab-blue data-[state=active]:text-white"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
             <Clock className="h-4 w-4 mr-2" />
             Tipos de Exames

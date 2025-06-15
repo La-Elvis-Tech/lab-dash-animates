@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
@@ -44,9 +45,9 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
       case 'Agendado': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
       case 'Confirmado': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
       case 'Em andamento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'Concluído': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'Concluído': return 'bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-300';
       case 'Cancelado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      default: return 'bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-300';
     }
   };
 
@@ -55,7 +56,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     return (
       <div className="p-1 text-xs">
         <div className="font-medium truncate">{appointment.patient_name}</div>
-        <div className="text-gray-600 dark:text-gray-400 truncate">
+        <div className="text-neutral-600 dark:text-neutral-400 truncate">
           {appointment.exam_types?.name}
         </div>
         <Badge className={`${getStatusColor(appointment.status)} text-xs`}>
@@ -67,7 +68,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
 
   const eventStyleGetter = (event: any) => {
     const appointment = event.resource as SupabaseAppointment;
-    let backgroundColor = '#3174ad';
+    let backgroundColor = '#3b82f6';
     
     switch (appointment.status) {
       case 'Confirmado': backgroundColor = '#16a34a'; break;
@@ -93,7 +94,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-xl text-neutral-900 dark:text-neutral-100">
-            <CalendarIcon className="h-5 w-5 text-lab-blue" />
+            <CalendarIcon className="h-5 w-5 text-blue-600" />
             Calendário de Agendamentos
           </CardTitle>
           <div className="flex gap-2">
@@ -101,7 +102,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
               variant={view === 'month' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setView('month')}
-              className="bg-lab-blue hover:bg-lab-blue/90"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Mês
             </Button>
@@ -109,7 +110,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
               variant={view === 'week' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setView('week')}
-              className="bg-lab-blue hover:bg-lab-blue/90"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Semana
             </Button>
@@ -117,7 +118,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
               variant={view === 'day' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setView('day')}
-              className="bg-lab-blue hover:bg-lab-blue/90"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               Dia
             </Button>

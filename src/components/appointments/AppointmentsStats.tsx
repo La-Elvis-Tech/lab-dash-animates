@@ -58,8 +58,8 @@ const AppointmentsStats: React.FC<AppointmentsStatsProps> = ({ appointments }) =
       title: "Receita Total",
       value: `R$ ${totalRevenue.toFixed(2)}`,
       icon: DollarSign,
-      color: "text-purple-600 dark:text-purple-400",
-      bgColor: "bg-purple-50 dark:bg-purple-950/40"
+      color: "text-indigo-600 dark:text-indigo-400",
+      bgColor: "bg-indigo-50 dark:bg-indigo-950/40"
     },
     {
       title: "Ticket Médio",
@@ -95,14 +95,14 @@ const AppointmentsStats: React.FC<AppointmentsStatsProps> = ({ appointments }) =
       <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg font-bold text-neutral-900 dark:text-neutral-100">
-            <Clock size={18} className="text-indigo-600 dark:text-indigo-400" />
+            <Clock size={18} className="text-blue-600 dark:text-blue-400" />
             Status dos Agendamentos
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
             {Object.entries(statusCounts).map(([status, count]) => (
-              <div key={status} className="flex items-center gap-2 p-3 bg-gradient-to-r from-indigo-50/80 to-blue-50/80 dark:from-indigo-950/40 dark:to-blue-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
+              <div key={status} className="flex items-center gap-2 p-3 bg-neutral-50/80 dark:bg-neutral-900/40 rounded-xl border border-neutral-100 dark:border-neutral-800/50">
                 <Badge 
                   variant="secondary" 
                   className={
@@ -123,7 +123,7 @@ const AppointmentsStats: React.FC<AppointmentsStatsProps> = ({ appointments }) =
 
       {/* Alertas de Agendamentos */}
       {todayAppointments.length > 0 && (
-        <Card className="bg-gradient-to-r from-amber-50/80 to-orange-50/80 dark:from-amber-950/40 dark:to-orange-950/40 border-amber-200 dark:border-amber-800/50 rounded-lg shadow-sm">
+        <Card className="bg-amber-50/80 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/50 rounded-lg shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg font-bold text-amber-700 dark:text-amber-300">
               <AlertTriangle size={18} className="text-amber-600 dark:text-amber-400" />

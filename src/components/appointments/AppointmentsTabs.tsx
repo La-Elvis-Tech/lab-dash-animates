@@ -22,9 +22,9 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
       case 'Agendado': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
       case 'Confirmado': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
       case 'Em andamento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'Concluído': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'Concluído': return 'bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-300';
       case 'Cancelado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      default: return 'bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-300';
     }
   };
 
@@ -50,8 +50,8 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
-          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando agendamentos...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neutral-900 dark:border-neutral-100 mx-auto"></div>
+          <p className="mt-4 text-neutral-500 dark:text-neutral-400">Carregando agendamentos...</p>
         </div>
       </div>
     );
@@ -62,19 +62,19 @@ const AppointmentsTabs: React.FC<AppointmentsTabsProps> = ({
       <TabsList className="mb-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-sm">
         <TabsTrigger 
           value="recent"
-          className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
+          className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-blue-300"
         >
           Recentes ({recentAppointments.length})
         </TabsTrigger>
         <TabsTrigger 
           value="next7days"
-          className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
+          className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-blue-300"
         >
           Próximos 7 dias ({next7DaysAppointments.length})
         </TabsTrigger>
         <TabsTrigger 
           value="restOfMonth"
-          className="data-[state=active]:bg-indigo-100 data-[state=active]:text-indigo-700 dark:data-[state=active]:bg-indigo-900 dark:data-[state=active]:text-indigo-300"
+          className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-blue-300"
         >
           Resto do mês ({restOfMonthAppointments.length})
         </TabsTrigger>
