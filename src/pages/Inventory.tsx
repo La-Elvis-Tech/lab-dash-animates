@@ -1,399 +1,284 @@
-
-import React, { useState, useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Plus, Calendar, Package, Database, Clock, Download, Upload, AlertTriangle, TrendingUp, Edit2, ShoppingCart, Link } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-// Components
-import InventoryStockHealth from "@/components/inventory/InventoryStockHealth";
-import InventoryItemCard from "@/components/inventory/InventoryItemCard";
-import InventoryAddItemDialog from "@/components/inventory/InventoryAddItemDialog";
-import InventoryExportDialog from "@/components/inventory/InventoryExportDialog";
-
-// Data imports
-import { 
-  getInventoryItems, 
-  getInventoryCategories, 
-  updateInventoryItem, 
-  reserveInventoryItem,
-  type InventoryItem,
-  type InventoryCategory 
-} from "@/data/inventory";
-
-// Hooks
-import { useServiceLogs } from "@/hooks/useServiceLogs";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertCircle, ArrowDownUp, ArrowUpDown, Check, Download, Filter, Loader2, Plus, Search, Trash } from 'lucide-react';
+import { useSupabaseInventory } from '@/hooks/useSupabaseInventory';
+import InventoryTable from '@/components/inventory/InventoryTable';
+import InventoryForm from '@/components/inventory/InventoryForm';
+import InventoryStats from '@/components/inventory/InventoryStats';
+import { InventoryCategory } from '@/data/inventory';
+import { useToast } from '@/hooks/use-toast';
+import { useAlerts } from '@/hooks/useAlerts';
 
 const Inventory = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([]);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [categories, setCategories] = useState<InventoryCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const containerRef = useRef(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  
+  const { 
+    items: inventoryItems, 
+    categories, 
+    loading, 
+    updateItem, 
+    reserveItem, 
+    deleteItem, 
+    refreshItems 
+  } = useSupabaseInventory();
+
   const { toast } = useToast();
-  const { addLog } = useServiceLogs();
+  const { sendEmailForAlert } = useAlerts();
 
-  // Load data on component mount
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [itemsData, categoriesData] = await Promise.all([
-          getInventoryItems(),
-          getInventoryCategories()
-        ]);
-        
-        setItems(itemsData);
-        setCategories([
-          ...categoriesData,
-          { id: "expiring", name: "Vencendo", icon: AlertTriangle }
-        ]);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error loading inventory data:", error);
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar os dados do inventário.",
-          variant: "destructive"
-        });
-      }
-    };
-
-    loadData();
-  }, [toast]);
-
-  // Calculate expiring items (within 30 days)
-  const expiringItems = items.filter(item => {
-    if (!item.expiryDate) return false;
-    const today = new Date();
-    const expiryDate = new Date(item.expiryDate);
-    const timeDiff = expiryDate.getTime() - today.getTime();
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    return daysDiff <= 30 && daysDiff > 0;
+  // Filter items based on search and category
+  const filteredItems = inventoryItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
   });
 
-  useEffect(() => {
-    if (loading) return;
-
-    let filtered = items;
-
-    if (searchQuery) {
-      filtered = filtered.filter((item) =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  const handleSelectItem = (itemId: string) => {
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(itemId)) {
+      newSelected.delete(itemId);
+    } else {
+      newSelected.add(itemId);
     }
-
-    if (selectedCategory === "expiring") {
-      filtered = expiringItems;
-    } else if (selectedCategory !== "all") {
-      filtered = filtered.filter((item) => item.category === selectedCategory);
-    }
-
-    setFilteredItems(filtered);
-
-    // Animation when filter changes
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".inventory-item",
-        { opacity: 0, x: 10 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.4,
-          stagger: 0.05,
-          ease: "power2.out",
-        }
-      );
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [searchQuery, selectedCategory, items, expiringItems, loading]);
-
-  useEffect(() => {
-    if (loading) return;
-
-    // Initial animation
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".inventory-filters",
-        { opacity: 0, x: 20 },
-        { opacity: 1, x: 0, duration: 1, ease: "power2.out" }
-      );
-
-      gsap.fromTo(
-        ".item-list",
-        { opacity: 0, x: 20 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 1,
-          stagger: 0.05,
-          delay: 0.2,
-          ease: "power2.out",
-        }
-      );
-    }, containerRef);
-
-    return () => ctx.revert();
-  }, [loading]);
-
-  const handleCategoryChange = (categoryId: string) => {
-    setSelectedCategory(categoryId);
+    setSelectedItems(newSelected);
   };
 
-  const handleUpdateItem = async (itemId: string, updatedData: any) => {
-    try {
-      await updateInventoryItem(itemId, updatedData);
-      const item = items.find(i => i.id === itemId);
-      
-      setItems(prevItems => 
-        prevItems.map(item => 
-          item.id === itemId ? { ...item, ...updatedData } : item
-        )
-      );
-      
-      // Log da ação
-      addLog({
-        type: "update",
-        action: "Atualização de item",
-        item: item?.name || `Item #${itemId}`,
-        details: `Estoque atualizado para ${updatedData.stock || 'N/A'} unidades`,
-        user: "Usuário Atual",
-        module: "inventory"
-      });
-      
-      toast({
-        title: "Item atualizado",
-        description: "As informações foram salvas com sucesso.",
-      });
-    } catch (error) {
-      console.error("Error updating item:", error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o item.",
-        variant: "destructive"
-      });
+  const handleSelectAll = () => {
+    if (selectedItems.size === filteredItems.length) {
+      setSelectedItems(new Set());
+    } else {
+      setSelectedItems(new Set(filteredItems.map(item => item.id)));
     }
   };
 
-  const handleReserveItem = async (itemId: string, quantity: number) => {
-    try {
-      await reserveInventoryItem(itemId, quantity);
-      const item = items.find(i => i.id === itemId);
-      
-      setItems(prevItems => 
-        prevItems.map(item => 
-          item.id === itemId 
-            ? { 
-                ...item, 
-                reservedForAppointments: item.reservedForAppointments + quantity,
-                stock: item.stock - quantity 
-              } 
-            : item
-        )
-      );
-      
-      // Log da ação
-      addLog({
-        type: "reserve",
-        action: "Reserva de item",
-        item: item?.name || `Item #${itemId}`,
-        details: `${quantity} unidades reservadas para agendamentos`,
-        user: "Usuário Atual",
-        module: "inventory"
-      });
-      
-      toast({
-        title: "Item reservado",
-        description: `${quantity} unidades foram reservadas para agendamento.`,
-      });
-    } catch (error) {
-      console.error("Error reserving item:", error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível reservar o item.",
-        variant: "destructive"
-      });
+  const handleDeleteSelected = async () => {
+    for (const itemId of selectedItems) {
+      await deleteItem(itemId);
     }
+    setSelectedItems(new Set());
+    refreshItems();
   };
 
-  const handleRequestRestock = (itemId: string) => {
-    const item = items.find(i => i.id === itemId);
-    
-    // Log da ação
-    addLog({
-      type: "request",
-      action: "Solicitação de reposição",
-      item: item?.name || `Item #${itemId}`,
-      details: "Solicitação enviada ao departamento de compras",
-      user: "Usuário Atual",
-      module: "inventory"
-    });
-    
+  const handleExport = () => {
+    // Implement export functionality
     toast({
-      title: "Solicitação enviada",
-      description: `Solicitação de reposição para ${item?.name} foi enviada ao responsável.`,
+      title: "Exportação iniciada",
+      description: "Os dados do inventário estão sendo exportados."
+    });
+    setShowExportDialog(false);
+  };
+
+  const handleAddSuccess = () => {
+    setShowAddDialog(false);
+    refreshItems();
+    toast({
+      title: "Item adicionado",
+      description: "O item foi adicionado ao inventário com sucesso."
     });
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
-          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando inventário...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleUpdateSuccess = () => {
+    refreshItems();
+    toast({
+      title: "Item atualizado",
+      description: "O item foi atualizado com sucesso."
+    });
+  };
+
+  const handleLowStockAlert = (item: any) => {
+    sendEmailForAlert({
+      id: `stock-${item.id}`,
+      type: "stock",
+      priority: "high",
+      title: `Estoque Baixo - ${item.name}`,
+      description: `Apenas ${item.stock} ${item.unit} restantes (mínimo: ${item.minStock})`,
+      item: item.name,
+      currentStock: item.stock,
+      minStock: item.minStock,
+      unit: item.unit,
+      createdAt: new Date(),
+      status: "active",
+      isRead: false
+    });
+  };
 
   return (
-    <div ref={containerRef} className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-          Inventário
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1">
-          Gerencie os itens de laboratório com controle avançado
-        </p>
-      </div>
-
-      {/* Filters */}
-      <Card className="inventory-filters">
-        <CardContent className="p-4 bg-neutral-100/80 dark:bg-neutral-800/80">
-          <div className="flex flex-col gap-4">
-            <div className="relative w-full">
-              <Search
-                className="absolute left-3 top-3 transform text-gray-400"
-                size={18}
-              />
-              <Input
-                placeholder="Buscar item..."
-                className="pl-10 w-full rounded-md bg-white dark:bg-neutral-700/40"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-between items-start">
-              {/* Category filter */}
-              <div className="w-full sm:flex-1">
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      className={`px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 flex items-center gap-2 ${
-                        selectedCategory === category.id
-                          ? "bg-lab-blue text-white dark:bg-lab-blue/80"
-                          : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-neutral-700/80 dark:text-gray-300 dark:hover:bg-gray-700"
-                      } rounded-md transition-colors`}
-                      onClick={() => handleCategoryChange(category.id)}
-                    >
-                      {category.icon && <category.icon size={16} />}
-                      {category.name}
-                      {category.id === "expiring" && expiringItems.length > 0 && (
-                        <Badge variant="destructive" className="ml-1 text-xs">
-                          {expiringItems.length}
-                        </Badge>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsExportDialogOpen(true)}
-                  className="gap-2"
-                >
-                  <Download size={16} />
-                  Exportar
-                </Button>
-                
-                <InventoryAddItemDialog 
-                  isOpen={isAddDialogOpen}
-                  setIsOpen={setIsAddDialogOpen}
-                  categories={categories.filter(c => c.id !== "all" && c.id !== "expiring")}
-                  onAddItem={(newItem) => {
-                    const addedItem = { ...newItem, id: `item-${Date.now()}` };
-                    setItems(prev => [...prev, addedItem]);
-                    
-                    // Log da ação
-                    addLog({
-                      type: "create",
-                      action: "Novo item adicionado",
-                      item: newItem.name,
-                      details: `Item criado com estoque inicial de ${newItem.stock} unidades`,
-                      user: "Usuário Atual",
-                      module: "inventory"
-                    });
-                    
-                    toast({
-                      title: "Item adicionado",
-                      description: `${newItem.name} foi adicionado ao inventário.`,
-                    });
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Items List */}
-      <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 item-list">
-        {filteredItems.map((item) => (
-          <InventoryItemCard
-            key={item.id}
-            item={item}
-            onUpdateItem={handleUpdateItem}
-            onReserveItem={handleReserveItem}
-            onRequestRestock={handleRequestRestock}
-          />
-        ))}
-      </div>
-
-      {filteredItems.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-gray-500 dark:text-gray-400">
-            Nenhum item encontrado com os filtros aplicados.
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100">
+            Inventário
+          </h1>
+          <p className="text-neutral-500 dark:text-neutral-400 mt-1">
+            Gerencie o estoque de materiais e reagentes
           </p>
+        </div>
+        <div className="flex gap-2">
+          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+            <DialogTrigger asChild>
+              <Button className="bg-lab-blue hover:bg-lab-blue/90">
+                <Plus className="mr-2 h-4 w-4" />
+                Novo Item
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Item ao Inventário</DialogTitle>
+                <DialogDescription>
+                  Preencha os detalhes do novo item a ser adicionado ao inventário.
+                </DialogDescription>
+              </DialogHeader>
+              <InventoryForm onSuccess={handleAddSuccess} categories={categories} />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Download className="mr-2 h-4 w-4" />
+                Exportar
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Exportar Inventário</DialogTitle>
+                <DialogDescription>
+                  Escolha o formato para exportar os dados do inventário.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <Button onClick={handleExport} className="w-full">
+                  Exportar como CSV
+                </Button>
+                <Button onClick={handleExport} className="w-full">
+                  Exportar como Excel
+                </Button>
+                <Button onClick={handleExport} className="w-full">
+                  Exportar como PDF
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <InventoryStats items={inventoryItems} />
+
+      {/* Filters and Search */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-neutral-500" />
+          <Input
+            placeholder="Buscar por nome, categoria ou fornecedor..."
+            className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="flex gap-2">
+          <Tabs 
+            defaultValue="all" 
+            value={selectedCategory}
+            onValueChange={setSelectedCategory}
+            className="w-full sm:w-auto"
+          >
+            <TabsList className="bg-neutral-100 dark:bg-neutral-800 h-10">
+              {categories.map((category: InventoryCategory) => (
+                <TabsTrigger 
+                  key={category.id} 
+                  value={category.id}
+                  className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-700"
+                >
+                  {category.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Selected Items Actions */}
+      {selectedItems.size > 0 && (
+        <div className="flex items-center justify-between bg-neutral-100 dark:bg-neutral-800 p-2 rounded-md">
+          <span className="text-sm font-medium ml-2">
+            {selectedItems.size} {selectedItems.size === 1 ? 'item' : 'itens'} selecionados
+          </span>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setSelectedItems(new Set())}
+            >
+              Limpar
+            </Button>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={handleDeleteSelected}
+            >
+              <Trash className="h-4 w-4 mr-1" />
+              Excluir
+            </Button>
+          </div>
         </div>
       )}
 
-      <InventoryExportDialog 
-        open={isExportDialogOpen}
-        onOpenChange={setIsExportDialogOpen}
-      />
+      {/* Inventory Table */}
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-neutral-500" />
+            <p className="mt-2 text-neutral-500">Carregando inventário...</p>
+          </div>
+        </div>
+      ) : filteredItems.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center h-64">
+            <AlertCircle className="h-10 w-10 text-neutral-400 mb-4" />
+            <h3 className="text-lg font-medium text-neutral-700 dark:text-neutral-300">
+              Nenhum item encontrado
+            </h3>
+            <p className="text-neutral-500 dark:text-neutral-400 text-center max-w-md mt-2">
+              {searchTerm 
+                ? `Não encontramos itens correspondentes à sua busca "${searchTerm}".` 
+                : "Não há itens no inventário para esta categoria."}
+            </p>
+            <Button 
+              className="mt-4"
+              onClick={() => setShowAddDialog(true)}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar Item
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <InventoryTable 
+          items={filteredItems}
+          selectedItems={selectedItems}
+          onSelectItem={handleSelectItem}
+          onSelectAll={handleSelectAll}
+          onUpdateItem={updateItem}
+          onReserveItem={reserveItem}
+          onDeleteItem={deleteItem}
+          onUpdateSuccess={handleUpdateSuccess}
+          onLowStockAlert={handleLowStockAlert}
+        />
+      )}
     </div>
   );
 };

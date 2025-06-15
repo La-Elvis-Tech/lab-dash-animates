@@ -1,198 +1,270 @@
 
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-// Mock laboratory data
-const initialLaboratoryData = {
-  name: "Laboratório Central de Análises",
-  cnpj: "12.345.678/0001-90",
-  email: "contato@labcentral.com.br",
-  phone: "(11) 3456-7890",
-  address: "Av. Paulista, 1000 - Bela Vista, São Paulo - SP, 01310-100",
-  description: "Laboratório especializado em análises clínicas com mais de 20 anos de experiência.",
-  responsibleName: "Dr. Carlos Mendes",
-  responsibleCRM: "CRM-SP 54321",
-  logo: ""
-};
+import { Badge } from "@/components/ui/badge";
+import { Building2, Mail, Phone, MapPin, Upload, User } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const LaboratoryProfile = () => {
-  const [laboratoryData, setLaboratoryData] = useState(initialLaboratoryData);
-  const [isEditing, setIsEditing] = useState(false);
+  const { profile, units, loading, updateProfile } = useUserProfile();
   const { toast } = useToast();
+  
+  const [formData, setFormData] = useState({
+    full_name: profile?.full_name || '',
+    email: profile?.email || '',
+    phone: profile?.phone || '',
+    position: profile?.position || '',
+    department: profile?.department || '',
+    unit_id: profile?.unit_id || '',
+  });
+  
+  const [saving, setSaving] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setLaboratoryData(prev => ({ ...prev, [name]: value }));
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const handleSave = () => {
-    // Here you would typically send data to an API
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await updateProfile(formData);
+    } catch (error) {
+      // Error is handled in the hook
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Here you would implement file upload logic
     toast({
-      title: "Perfil atualizado",
-      description: "As informações do laboratório foram atualizadas com sucesso."
+      title: "Upload de avatar",
+      description: "Funcionalidade de upload será implementada em breve."
     });
-    setIsEditing(false);
   };
 
-  const handleCancel = () => {
-    setLaboratoryData(initialLaboratoryData);
-    setIsEditing(false);
+  const getStatusBadge = (status: string) => {
+    const colors = {
+      active: 'bg-green-500',
+      inactive: 'bg-yellow-500',
+      suspended: 'bg-red-500'
+    };
+    
+    const labels = {
+      active: 'Ativo',
+      inactive: 'Inativo',
+      suspended: 'Suspenso'
+    };
+
+    return (
+      <Badge className={colors[status as keyof typeof colors] || 'bg-gray-500'}>
+        {labels[status as keyof typeof labels] || status}
+      </Badge>
+    );
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Carregando perfil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Profile Header */}
       <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
-            Perfil do Laboratório
+          <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Perfil do Usuário
           </CardTitle>
           <CardDescription className="text-neutral-600 dark:text-neutral-300">
-            Gerencie as informações do seu laboratório
+            Gerencie suas informações pessoais e profissionais
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={laboratoryData.logo || ""} alt={laboratoryData.name} />
-              <AvatarFallback className="bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 text-xl">
-                {laboratoryData.name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
+          {/* Avatar Section */}
+          <div className="flex items-center gap-4">
+            <Avatar className="h-20 w-20">
+              <AvatarImage src={profile?.avatar_url} />
+              <AvatarFallback className="text-lg bg-neutral-100 dark:bg-neutral-800">
+                {profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'US'}
               </AvatarFallback>
             </Avatar>
-            
-            {isEditing && (
-              <div>
-                <Button variant="outline" size="sm" className="border-neutral-200 dark:border-neutral-700">Alterar Logo</Button>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
+                  {profile?.full_name || 'Usuário'}
+                </h3>
+                {profile?.status && getStatusBadge(profile.status)}
               </div>
-            )}
+              <div className="flex items-center gap-2">
+                <label htmlFor="avatar-upload">
+                  <Button variant="outline" size="sm" className="cursor-pointer" asChild>
+                    <span>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Alterar Foto
+                    </span>
+                  </Button>
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
+              </div>
+            </div>
           </div>
-          
+
+          {/* Personal Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-neutral-900 dark:text-neutral-100">Nome do Laboratório</Label>
-              <Input 
-                id="name"
-                name="name"
-                value={laboratoryData.name}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
+              <Label htmlFor="full_name" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Nome Completo
+              </Label>
+              <Input
+                id="full_name"
+                value={formData.full_name}
+                onChange={(e) => handleInputChange('full_name', e.target.value)}
+                placeholder="Digite seu nome completo"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="cnpj" className="text-neutral-900 dark:text-neutral-100">CNPJ</Label>
-              <Input 
-                id="cnpj"
-                name="cnpj"
-                value={laboratoryData.cnpj}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-neutral-900 dark:text-neutral-100">Email</Label>
-              <Input 
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                Email
+              </Label>
+              <Input
                 id="email"
-                name="email"
                 type="email"
-                value={laboratoryData.email}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                placeholder="Digite seu email"
+                disabled // Email usually shouldn't be editable
+                className="bg-neutral-50 dark:bg-neutral-900"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-neutral-900 dark:text-neutral-100">Telefone</Label>
-              <Input 
+              <Label htmlFor="phone" className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                Telefone
+              </Label>
+              <Input
                 id="phone"
-                name="phone"
-                value={laboratoryData.phone}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="(11) 99999-9999"
               />
             </div>
-            
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="address" className="text-neutral-900 dark:text-neutral-100">Endereço</Label>
-              <Input 
-                id="address"
-                name="address"
-                value={laboratoryData.address}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
-              />
-            </div>
-            
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="description" className="text-neutral-900 dark:text-neutral-100">Descrição</Label>
-              <Textarea 
-                id="description"
-                name="description"
-                value={laboratoryData.description}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
-                rows={3}
-              />
-            </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="responsibleName" className="text-neutral-900 dark:text-neutral-100">Responsável Técnico</Label>
-              <Input 
-                id="responsibleName"
-                name="responsibleName"
-                value={laboratoryData.responsibleName}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
+              <Label htmlFor="position">Cargo</Label>
+              <Input
+                id="position"
+                value={formData.position}
+                onChange={(e) => handleInputChange('position', e.target.value)}
+                placeholder="Ex: Biomédico, Técnico em Laboratório"
               />
             </div>
-            
+
             <div className="space-y-2">
-              <Label htmlFor="responsibleCRM" className="text-neutral-900 dark:text-neutral-100">CRM</Label>
-              <Input 
-                id="responsibleCRM"
-                name="responsibleCRM"
-                value={laboratoryData.responsibleCRM}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className={isEditing ? "border-neutral-200 dark:border-neutral-700" : "bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700"}
+              <Label htmlFor="department">Departamento</Label>
+              <Input
+                id="department"
+                value={formData.department}
+                onChange={(e) => handleInputChange('department', e.target.value)}
+                placeholder="Ex: Hematologia, Bioquímica"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="unit_id" className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                Unidade
+              </Label>
+              <Select 
+                value={formData.unit_id} 
+                onValueChange={(value) => handleInputChange('unit_id', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma unidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  {units.map((unit) => (
+                    <SelectItem key={unit.id} value={unit.id}>
+                      {unit.name} ({unit.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
+          {/* Current Unit Information */}
+          {profile?.unit && (
+            <Card className="bg-neutral-50 dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-700">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  Unidade Atual
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-neutral-500" />
+                    <span className="font-medium">{profile.unit.name}</span>
+                    <Badge variant="outline">{profile.unit.code}</Badge>
+                  </div>
+                  {profile.unit.address && (
+                    <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                      <MapPin className="h-4 w-4" />
+                      <span>{profile.unit.address}</span>
+                    </div>
+                  )}
+                  {profile.unit.phone && (
+                    <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                      <Phone className="h-4 w-4" />
+                      <span>{profile.unit.phone}</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </CardContent>
         
-        <CardFooter className="flex justify-end gap-2 border-t border-neutral-200 dark:border-neutral-700 pt-4">
-          {!isEditing ? (
-            <Button 
-              onClick={() => setIsEditing(true)}
-              className="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
-            >
-              Editar Perfil
-            </Button>
-          ) : (
-            <>
-              <Button variant="outline" onClick={handleCancel} className="border-neutral-200 dark:border-neutral-700">Cancelar</Button>
-              <Button 
-                onClick={handleSave}
-                className="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
-              >
-                Salvar Alterações
-              </Button>
-            </>
-          )}
+        <CardFooter className="border-t border-neutral-200 dark:border-neutral-700 pt-4">
+          <Button 
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
+          >
+            {saving ? "Salvando..." : "Salvar Alterações"}
+          </Button>
         </CardFooter>
       </Card>
     </div>
