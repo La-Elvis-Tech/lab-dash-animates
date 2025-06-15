@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -181,7 +180,7 @@ const mockExams: ExamDetailsWithUnit[] = [
 
 const Requests = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedUnit, setSelectedUnit] = useState('all');
   // Use ExamDetailsWithUnit as our internal working type
   const [examDetailsList, setExamDetailsList] = useState<ExamDetailsWithUnit[]>([]);
   const [loading, setLoading] = useState(true);
@@ -234,22 +233,32 @@ const Requests = () => {
     );
   }
 
-  const categories = [
-    { id: 'all', name: 'Todos', count: examDetailsList.length },
-    ...Array.from(new Set(examDetailsList.map(e => e.category))).filter(Boolean)
-      .map(category => ({
-        id: category,
-        name: category,
-        count: examDetailsList.filter(e => e.category === category).length,
-      })),
+  // Pegue todas as unidades únicas presentes nos exames
+  const allUnits = [
+    { id: 'all', name: 'Todas as unidades', count: examDetailsList.length },
+    ...Array.from(
+      // Map para garantir unicidade por id
+      examDetailsList
+        .map(e => e.unit)
+        .filter((u): u is Unit => !!u)
+        .reduce((acc, unit) => {
+          if (unit && !acc.has(unit.id)) acc.set(unit.id, unit);
+          return acc;
+        }, new Map<string, Unit>())
+        .values()
+    ).map((unit) => ({
+      id: unit.id,
+      name: unit.name,
+      count: examDetailsList.filter(e => e.unit?.id === unit.id).length,
+    }))
   ];
 
   const filteredExams = examDetailsList.filter((exam) => {
     const matchesSearch =
       exam.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (exam.description && exam.description.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === 'all' || exam.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesUnit = selectedUnit === 'all' || exam.unit?.id === selectedUnit;
+    return matchesSearch && matchesUnit;
   });
 
   return (
@@ -273,26 +282,34 @@ const Requests = () => {
           </span>
         </div>
         <select
-          value={selectedCategory}
-          onChange={e => setSelectedCategory(e.target.value)}
-          className="rounded-md border px-3 py-2 bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-100 min-w-[140px]"
+          value={selectedUnit}
+          onChange={e => setSelectedUnit(e.target.value)}
+          className="rounded-md border px-3 py-2 bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-100 min-w-[180px]"
         >
-          {categories.map(c => (
-            <option key={c.id} value={c.id}>
-              {c.name} ({c.count})
+          {allUnits.map(unit => (
+            <option key={unit.id} value={unit.id}>
+              {unit.name} ({unit.count})
             </option>
           ))}
         </select>
       </div>
+      {/* Uniform grid for exam cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredExams.map((exam) => (
-          <div key={exam.id}>
-            <ExamDetailsCard
-              exam={exam}
-              onSchedule={() => { console.log('Agendar exame:', exam.name); }}
-            />
+          <div
+            key={exam.id}
+            className="h-full flex flex-col"
+            style={{ minHeight: '410px', maxHeight: '430px' }} // padronização visual nos cards
+          >
+            <div className="flex-grow flex flex-col">
+              <ExamDetailsCard
+                exam={exam}
+                onSchedule={() => { console.log('Agendar exame:', exam.name); }}
+                // Mantendo o conteúdo consistente
+              />
+            </div>
             <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 italic text-right">
-              Unidade: {(exam as ExamDetailsWithUnit).unit?.name || 'N/A'}
+              Unidade: <span className="font-medium not-italic">{exam.unit?.name || 'N/A'}</span>
             </div>
           </div>
         ))}
@@ -306,4 +323,3 @@ const Requests = () => {
   );
 };
 export default Requests;
-
