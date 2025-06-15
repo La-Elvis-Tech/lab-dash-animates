@@ -57,7 +57,7 @@ const Orders = () => {
 
       {showCreateForm && (
         <CreateAppointmentForm 
-          onClose={() => setShowCreateForm(false)}
+          onAppointmentCreated={handleCreateSuccess}
         />
       )}
     </div>

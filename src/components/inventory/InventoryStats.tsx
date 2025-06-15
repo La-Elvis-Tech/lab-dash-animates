@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Package, TrendingDown, AlertCircle, DollarSign } from 'lucide-react';
-import { InventoryItem } from '@/data/inventory';
+import { InventoryItem } from '@/types/inventory';
 
 interface InventoryStatsProps {
   items: InventoryItem[];
@@ -11,9 +11,9 @@ interface InventoryStatsProps {
 
 const InventoryStats: React.FC<InventoryStatsProps> = ({ items }) => {
   const totalItems = items.length;
-  const lowStockItems = items.filter(item => item.stock <= item.minStock).length;
-  const criticalItems = items.filter(item => item.stock === 0).length;
-  const totalValue = items.reduce((sum, item) => sum + (item.stock * item.price), 0);
+  const lowStockItems = items.filter(item => item.current_stock <= item.min_stock).length;
+  const criticalItems = items.filter(item => item.current_stock === 0).length;
+  const totalValue = items.reduce((sum, item) => sum + (item.current_stock * (item.cost_per_unit || 0)), 0);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {

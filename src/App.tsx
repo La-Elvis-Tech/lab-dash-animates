@@ -21,6 +21,7 @@ const Settings = lazy(() => import("./pages/Settings"));
 const Alerts = lazy(() => import("./pages/Alerts"));
 const Simulations = lazy(() => import("./pages/Simulations"));
 const Users = lazy(() => import("./pages/Users"));
+const InviteCodes = lazy(() => import("./pages/InviteCodes"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
@@ -109,6 +110,11 @@ const App = () => (
                   <Route path="/users" element={
                     <Suspense fallback={<PageFallback />}>
                       <Users />
+                    </Suspense>
+                  } />
+                  <Route path="/invite-codes" element={
+                    <Suspense fallback={<PageFallback />}>
+                      <InviteCodes />
                     </Suspense>
                   } />
                   <Route path="*" element={

@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { MoreHorizontal, Edit, Trash, Calendar, AlertTriangle } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { InventoryItem } from '@/data/inventory';
+import { InventoryItem } from '@/types/inventory';
 
 interface InventoryTableProps {
   items: InventoryItem[];
@@ -15,7 +15,6 @@ interface InventoryTableProps {
   onSelectItem: (itemId: string) => void;
   onSelectAll: () => void;
   onUpdateItem: (itemId: string, updates: any) => Promise<void>;
-  onReserveItem: (itemId: string, quantity: number) => Promise<void>;
   onDeleteItem: (itemId: string) => Promise<void>;
   onUpdateSuccess: () => void;
   onLowStockAlert: (item: InventoryItem) => void;
@@ -27,17 +26,16 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
   onSelectItem,
   onSelectAll,
   onUpdateItem,
-  onReserveItem,
   onDeleteItem,
   onUpdateSuccess,
   onLowStockAlert
 }) => {
   const getStatusBadge = (item: InventoryItem) => {
-    if (item.stock <= 0) {
+    if (item.current_stock <= 0) {
       return <Badge variant="destructive">Sem Estoque</Badge>;
-    } else if (item.stock <= item.minStock) {
+    } else if (item.current_stock <= item.min_stock) {
       return <Badge variant="destructive">Crítico</Badge>;
-    } else if (item.stock <= item.minStock * 1.5) {
+    } else if (item.current_stock <= item.min_stock * 1.5) {
       return <Badge className="bg-yellow-500 hover:bg-yellow-600">Baixo</Badge>;
     } else {
       return <Badge className="bg-green-500 hover:bg-green-600">Normal</Badge>;
@@ -103,7 +101,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                 </TableCell>
                 <TableCell className="font-medium text-neutral-900 dark:text-neutral-100">
                   <div className="flex items-center gap-2">
-                    {item.stock <= item.minStock && (
+                    {item.current_stock <= item.min_stock && (
                       <AlertTriangle 
                         className="h-4 w-4 text-red-500" 
                         onClick={() => onLowStockAlert(item)}
@@ -113,14 +111,14 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                   </div>
                 </TableCell>
                 <TableCell className="text-neutral-600 dark:text-neutral-300">
-                  {item.category}
+                  {item.categories?.name || 'Sem categoria'}
                 </TableCell>
                 <TableCell className="text-neutral-600 dark:text-neutral-300">
-                  <span className={item.stock <= item.minStock ? 'text-red-600 font-semibold' : ''}>
-                    {item.stock}
+                  <span className={item.current_stock <= item.min_stock ? 'text-red-600 font-semibold' : ''}>
+                    {item.current_stock}
                   </span>
                   <span className="text-neutral-400 text-sm ml-1">
-                    / min: {item.minStock}
+                    / min: {item.min_stock}
                   </span>
                 </TableCell>
                 <TableCell className="text-neutral-600 dark:text-neutral-300">
@@ -130,16 +128,16 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
                   {getStatusBadge(item)}
                 </TableCell>
                 <TableCell className="text-neutral-600 dark:text-neutral-300">
-                  {item.supplier}
+                  {item.supplier || 'N/A'}
                 </TableCell>
                 <TableCell className="text-neutral-600 dark:text-neutral-300">
-                  {item.location}
+                  {item.location || 'N/A'}
                 </TableCell>
                 <TableCell className="text-neutral-600 dark:text-neutral-300">
-                  {formatDate(item.expiryDate)}
+                  {formatDate(item.expiry_date)}
                 </TableCell>
                 <TableCell className="text-neutral-600 dark:text-neutral-300">
-                  {formatCurrency(item.price)}
+                  {formatCurrency(item.cost_per_unit || 0)}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>

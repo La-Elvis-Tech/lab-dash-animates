@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertCircle, ArrowDownUp, ArrowUpDown, Check, Download, Filter, Loader2, Plus, Search, Trash } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Plus, Search, Trash } from 'lucide-react';
 import { useSupabaseInventory } from '@/hooks/useSupabaseInventory';
 import InventoryTable from '@/components/inventory/InventoryTable';
 import InventoryForm from '@/components/inventory/InventoryForm';
 import InventoryStats from '@/components/inventory/InventoryStats';
-import { InventoryCategory } from '@/data/inventory';
 import { useToast } from '@/hooks/use-toast';
 import { useAlerts } from '@/hooks/useAlerts';
 
@@ -26,7 +25,6 @@ const Inventory = () => {
     categories, 
     loading, 
     updateItem, 
-    reserveItem, 
     deleteItem, 
     refreshItems 
   } = useSupabaseInventory();
@@ -36,11 +34,12 @@ const Inventory = () => {
 
   // Filter items based on search and category
   const filteredItems = inventoryItems.filter(item => {
+    const categoryName = item.categories?.name || 'Sem categoria';
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
+                         categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (item.supplier || '').toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || item.category_id === selectedCategory;
     
     return matchesSearch && matchesCategory;
   });
@@ -72,7 +71,6 @@ const Inventory = () => {
   };
 
   const handleExport = () => {
-    // Implement export functionality
     toast({
       title: "Exportação iniciada",
       description: "Os dados do inventário estão sendo exportados."
@@ -103,16 +101,22 @@ const Inventory = () => {
       type: "stock",
       priority: "high",
       title: `Estoque Baixo - ${item.name}`,
-      description: `Apenas ${item.stock} ${item.unit} restantes (mínimo: ${item.minStock})`,
+      description: `Apenas ${item.current_stock} ${item.unit} restantes (mínimo: ${item.min_stock})`,
       item: item.name,
-      currentStock: item.stock,
-      minStock: item.minStock,
+      currentStock: item.current_stock,
+      minStock: item.min_stock,
       unit: item.unit,
       createdAt: new Date(),
       status: "active",
       isRead: false
     });
   };
+
+  // Create categories for tabs
+  const tabCategories = [
+    { id: "all", name: "Todos" },
+    ...categories.map(cat => ({ id: cat.id, name: cat.name }))
+  ];
 
   return (
     <div className="space-y-6">
@@ -197,7 +201,7 @@ const Inventory = () => {
             className="w-full sm:w-auto"
           >
             <TabsList className="bg-neutral-100 dark:bg-neutral-800 h-10">
-              {categories.map((category: InventoryCategory) => (
+              {tabCategories.map((category) => (
                 <TabsTrigger 
                   key={category.id} 
                   value={category.id}
@@ -273,7 +277,6 @@ const Inventory = () => {
           onSelectItem={handleSelectItem}
           onSelectAll={handleSelectAll}
           onUpdateItem={updateItem}
-          onReserveItem={reserveItem}
           onDeleteItem={deleteItem}
           onUpdateSuccess={handleUpdateSuccess}
           onLowStockAlert={handleLowStockAlert}
