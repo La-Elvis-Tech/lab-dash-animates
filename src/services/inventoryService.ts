@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { InventoryItem, InventoryCategory, InventoryMovement } from '@/types/inventory';
 
@@ -82,10 +81,10 @@ export const fetchInventoryItems = async (unitId: string): Promise<InventoryItem
 
     const items = data?.map(item => ({
       ...item,
-      // Mapear campos de localização
+      // Map unit_measure to unit for type compatibility
+      unit: item.unit_measure || '',
+      // Map storage_location to location for type compatibility
       location: item.storage_location,
-      // Mapear unidade de medida
-      unit: item.unit_measure,
     })) || [];
 
     console.log('Mapped inventory items:', items.length, 'items');
@@ -102,7 +101,7 @@ export const fetchInventoryCategories = async (): Promise<InventoryCategory[]> =
     
     const { data, error } = await supabase
       .from('inventory_categories')
-      .select('*')
+      .select('id, name, description, color, icon, created_at')
       .order('name');
 
     console.log('Categories query result:', { data, error });
@@ -112,8 +111,16 @@ export const fetchInventoryCategories = async (): Promise<InventoryCategory[]> =
       throw error;
     }
 
-    console.log('Fetched categories:', data?.length || 0, 'categories');
-    return data || [];
+    // Map database data to match InventoryCategory type
+    const categories = data?.map(category => ({
+      ...category,
+      active: true, // Default value since this field doesn't exist in DB
+      updated_at: category.created_at, // Use created_at as fallback for updated_at
+      description: category.description || '', // Ensure description is not null
+    })) || [];
+
+    console.log('Fetched categories:', categories.length, 'categories');
+    return categories;
   } catch (error) {
     console.error('Error in fetchInventoryCategories:', error);
     throw error;
@@ -136,7 +143,13 @@ export const createInventoryItem = async (
     .single();
 
   if (error) throw error;
-  return data;
+  
+  // Map the returned data to match InventoryItem type
+  return {
+    ...data,
+    unit: data.unit_measure || '',
+    location: data.storage_location,
+  };
 };
 
 export const updateInventoryItem = async (
@@ -155,7 +168,13 @@ export const updateInventoryItem = async (
     .single();
 
   if (error) throw error;
-  return data;
+  
+  // Map the returned data to match InventoryItem type
+  return {
+    ...data,
+    unit: data.unit_measure || '',
+    location: data.storage_location,
+  };
 };
 
 export const deleteInventoryItem = async (id: string): Promise<void> => {
