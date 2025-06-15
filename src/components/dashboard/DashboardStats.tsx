@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, AlertCircle, Users, Calendar, DollarSign, Package } from "lucide-react";
 import { useDashboardStats } from "@/hooks/useDashboardData";
 
 const DashboardStats: React.FC = () => {
@@ -9,7 +9,7 @@ const DashboardStats: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {[1, 2, 3, 4].map((i) => (
           <Card key={i} className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
             <CardContent className="pt-4 sm:pt-5 p-3 md:p-4">
@@ -27,32 +27,44 @@ const DashboardStats: React.FC = () => {
 
   const statsData = [
     {
-      title: "Total de Itens",
-      value: stats?.totalItems || 0,
+      title: "Agendamentos Ativos",
+      value: stats?.pendingAppointments || 0,
+      icon: Calendar,
       trend: "up",
-      trendValue: "+2.5%",
-      description: "este mês"
+      trendValue: `${stats?.totalAppointments || 0} total`,
+      description: "pendentes",
+      color: "text-blue-600 dark:text-blue-400",
+      bgColor: "bg-blue-50 dark:bg-blue-950/40"
     },
     {
-      title: "Consumo Mensal",
-      value: stats?.monthlyConsumption || 0,
-      trend: "down",
-      trendValue: "-1.8%",
-      description: "este mês"
+      title: "Receita Mensal",
+      value: `R$ ${(stats?.monthlyRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      icon: DollarSign,
+      trend: "up",
+      trendValue: `R$ ${(stats?.totalRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} total`,
+      description: "este mês",
+      color: "text-green-600 dark:text-green-400",
+      bgColor: "bg-green-50 dark:bg-green-950/40"
     },
     {
-      title: "Itens Expirando",
-      value: stats?.expiringItems || 0,
+      title: "Itens em Estoque",
+      value: stats?.totalItems || 0,
+      icon: Package,
       trend: "warning",
-      trendValue: "Próximos 30 dias",
-      description: ""
+      trendValue: `${stats?.lowStockItems || 0} em baixo estoque`,
+      description: "ativos",
+      color: "text-indigo-600 dark:text-indigo-400",
+      bgColor: "bg-indigo-50 dark:bg-indigo-950/40"
     },
     {
-      title: "Em Alerta",
-      value: stats?.lowStockItems || 0,
+      title: "Alertas Críticos",
+      value: (stats?.lowStockItems || 0) + (stats?.expiringItems || 0),
+      icon: AlertTriangle,
       trend: "warning",
-      trendValue: "Requer atenção",
-      description: ""
+      trendValue: `${stats?.expiringItems || 0} expirando`,
+      description: "requer atenção",
+      color: "text-orange-600 dark:text-orange-400",
+      bgColor: "bg-orange-50 dark:bg-orange-950/40"
     }
   ];
 
@@ -75,21 +87,24 @@ const DashboardStats: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {statsData.map((stat, index) => (
         <Card key={index} className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
           <CardContent className="pt-4 sm:pt-5 p-3 md:p-4">
-            <div className="flex items-center justify-between p-2">
-              <div>
-                <p className="text-md sm:text-md font-medium text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                <stat.icon size={16} className={stat.color} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                   {stat.title}
                 </p>
-                <h3 className="text-2xl md:text-3xl font-bold mt-1 text-gray-700 dark:text-white">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-700 dark:text-white truncate">
                   {stat.value}
                 </h3>
-                <p className={`text-sm flex items-center mt-1 ${getTrendColor(stat.trend)}`}>
+                <p className={`text-xs flex items-center ${getTrendColor(stat.trend)}`}>
                   {getTrendIcon(stat.trend)}
-                  {stat.trendValue} {stat.description}
+                  <span className="truncate">{stat.trendValue}</span>
                 </p>
               </div>
             </div>

@@ -36,7 +36,14 @@ export const useAuth = () => {
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      
+      // Map the database status to our Profile type
+      const mappedProfile: Profile = {
+        ...data,
+        status: data.status === 'inactive' ? 'suspended' : data.status
+      };
+      
+      setProfile(mappedProfile);
     } catch (error: any) {
       console.error('Error fetching profile:', error);
     }
@@ -173,6 +180,19 @@ export const useAuth = () => {
     return result;
   };
 
+  // Helper functions for role checking
+  const hasRole = (requiredRole: UserRole): boolean => {
+    return role === requiredRole;
+  };
+
+  const isAdmin = (): boolean => {
+    return role === 'admin';
+  };
+
+  const isSupervisor = (): boolean => {
+    return role === 'supervisor' || role === 'admin';
+  };
+
   return {
     user,
     session,
@@ -187,5 +207,10 @@ export const useAuth = () => {
     refreshProfile: () => user && fetchProfile(user.id),
     refreshRole: () => user && fetchUserRole(user.id),
     isAuthenticated: !!session,
+    // Role management functions
+    userRole: role,
+    hasRole,
+    isAdmin,
+    isSupervisor,
   };
 };

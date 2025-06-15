@@ -1,8 +1,7 @@
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import DashboardChart from "@/components/DashboardChart.tsx";
-import { Card, CardContent } from "../components/ui/card";
 
 // Import refactored components
 import DashboardStats from "@/components/dashboard/DashboardStats";
@@ -18,11 +17,14 @@ import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
 import UnitSelectorCard from "@/components/dashboard/UnitSelectorCard";
 
 // Data imports
-import { useConsumptionData } from "@/hooks/useDashboardData";
+import { useConsumptionData, useAppointmentTrends } from "@/hooks/useDashboardData";
 
 const Dashboard: React.FC = () => {
   const dashboardRef = useRef<HTMLDivElement>(null);
-  const { data: consumptionData, isLoading: loading } = useConsumptionData();
+  const { data: consumptionData, isLoading: consumptionLoading } = useConsumptionData();
+  const { data: appointmentTrends, isLoading: trendsLoading } = useAppointmentTrends();
+
+  const loading = consumptionLoading || trendsLoading;
 
   useEffect(() => {
     if (loading) return;
@@ -78,8 +80,13 @@ const Dashboard: React.FC = () => {
           Dashboard
         </h1>
         <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
-          Visão geral do consumo de itens laboratoriais
+          Visão geral do sistema de agendamentos e inventário
         </p>
+      </div>
+
+      {/* Estatísticas principais */}
+      <div className="dashboard-card">
+        <DashboardStats />
       </div>
 
       {/* Grid principal com layout mais equilibrado */}
@@ -91,29 +98,23 @@ const Dashboard: React.FC = () => {
           </div>
           
           <div className="dashboard-card">
-            <DashboardStats />
-          </div>
-          
-          <div className="dashboard-card">
             <InventoryGauges />
           </div>
         </div>
 
         {/* Coluna central - Analytics avançados */}
         <div className="xl:col-span-4 space-y-6">
-          <div className="grid grid-cols-1 gap-6">
-            <div className="dashboard-card">
-              <DemandForecastCard />
-            </div>
-            
-            <div className="dashboard-card">
-              <ForecastPerformanceCard />
-            </div>
-          </div>
-
-          {/* Gráfico principal */}
           <div className="dashboard-chart">
-            <RiskAlertsCard />
+            <DashboardChart
+              type="area"
+              data={appointmentTrends || []}
+              title="Tendência de Agendamentos"
+              description="Agendamentos realizados nos últimos 6 meses"
+            />
+          </div>
+          
+          <div className="dashboard-card">
+            <ForecastPerformanceCard />
           </div>
         </div>
 
@@ -126,20 +127,26 @@ const Dashboard: React.FC = () => {
           <div className="dashboard-card">
             <RecentActivities />
           </div>
+
+          <div className="dashboard-card">
+            <DemandForecastCard />
+          </div>
         </div>
       </div>
 
-      {/* Seção de alertas de risco - largura total */}
-      
+      {/* Seção de alertas de risco */}
+      <div className="dashboard-chart">
+        <RiskAlertsCard />
+      </div>
+
+      {/* Gráfico de consumo */}
       <div className="dashboard-card">
-        
-                <DashboardChart
-                  type="area"
-                  data={consumptionData || []}
-                  title="Consumo de Itens"
-                  description="Itens consumidos nos últimos 7 meses"
-                />
-              
+        <DashboardChart
+          type="bar"
+          data={consumptionData || []}
+          title="Consumo de Materiais"
+          description="Materiais consumidos nos últimos 7 meses"
+        />
       </div>
 
       {/* Tabela de estoque baixo - largura total */}

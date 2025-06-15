@@ -1,13 +1,15 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
-export interface ActivityItem {
+interface RecentActivity {
   title: string;
   description: string;
+  time: string;
   day: string;
   date: string;
-  time: string;
   paciente?: string;
   responsavel?: string;
 }
@@ -15,58 +17,68 @@ export interface ActivityItem {
 export const useRecentActivity = () => {
   return useQuery({
     queryKey: ['recent-activity'],
-    queryFn: async (): Promise<ActivityItem[]> => {
-      // Buscar últimos agendamentos
+    queryFn: async (): Promise<RecentActivity[]> => {
+      // Buscar agendamentos recentes
       const { data: appointments } = await supabase
         .from('appointments')
         .select(`
+          id,
           patient_name,
           scheduled_date,
-          exam_types(name)
+          status,
+          created_at,
+          exam_types(name),
+          doctors(name)
         `)
         .order('created_at', { ascending: false })
-        .limit(4);
+        .limit(5);
 
-      // Buscar últimas movimentações de estoque
+      // Buscar movimentações de estoque recentes
       const { data: movements } = await supabase
         .from('inventory_movements')
         .select(`
+          id,
           movement_type,
-          reason,
+          quantity,
           created_at,
-          inventory_items(name)
+          reason,
+          inventory_items(name),
+          profiles(full_name)
         `)
         .order('created_at', { ascending: false })
-        .limit(4);
+        .limit(5);
 
-      const activities: ActivityItem[] = [];
+      const activities: RecentActivity[] = [];
 
-      // Adicionar agendamentos
+      // Processar agendamentos
       appointments?.forEach(appointment => {
-        const date = new Date(appointment.scheduled_date);
+        const date = new Date(appointment.created_at);
         activities.push({
-          title: "Exame",
-          description: appointment.exam_types?.name || "Exame",
-          day: date.toLocaleDateString('pt-BR', { weekday: 'long' }),
-          date: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-          time: date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          paciente: appointment.patient_name
+          title: `Agendamento ${appointment.status}`,
+          description: `${appointment.exam_types?.name || 'Exame'} agendado`,
+          time: format(date, 'HH:mm'),
+          day: format(date, 'EEEE', { locale: ptBR }),
+          date: format(date, 'dd/MM'),
+          paciente: appointment.patient_name,
+          responsavel: appointment.doctors?.name
         });
       });
 
-      // Adicionar movimentações
+      // Processar movimentações
       movements?.forEach(movement => {
         const date = new Date(movement.created_at);
+        const isInput = movement.movement_type === 'entrada';
         activities.push({
-          title: movement.movement_type === 'in' ? "Reposição" : "Consumo",
-          description: `${movement.movement_type === 'in' ? 'Reposição' : 'Uso'} de ${movement.inventory_items?.name}`,
-          day: date.toLocaleDateString('pt-BR', { weekday: 'long' }),
-          date: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-          time: date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-          responsavel: "Sistema"
+          title: `${isInput ? 'Entrada' : 'Saída'} de Estoque`,
+          description: `${movement.quantity} unidades - ${movement.inventory_items?.name}`,
+          time: format(date, 'HH:mm'),
+          day: format(date, 'EEEE', { locale: ptBR }),
+          date: format(date, 'dd/MM'),
+          responsavel: movement.profiles?.full_name
         });
       });
 
+      // Ordenar por data mais recente e limitar
       return activities
         .sort((a, b) => new Date(`${b.date} ${b.time}`).getTime() - new Date(`${a.date} ${a.time}`).getTime())
         .slice(0, 8);
