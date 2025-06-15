@@ -264,7 +264,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
       {/* Navigation */}
       <ScrollArea className="flex-1 p-2">
         <nav>
-          <ul className="space-y-1">
+          <ul className={`${isCollapsed ? 'space-y-2' : 'space-y-1'} `}>
             {menuItems.map((item, index) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -277,7 +277,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
                 >
                   <Link
                     to={item.path}
-                    className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-3'} rounded-xl transition-all duration-300 group relative overflow-hidden ${
+                    className={`flex items-center ${isCollapsed ? 'justify-center p-3' : 'gap-3 p-3'} rounded-xl transition-all duration-300 group relative overflow-hidden ${
                       isActive 
                         ? theme === 'dark'
                           ? 'bg-gradient-to-r from-gray-800/60 to-gray-700/60 text-white border border-gray-600/40 shadow-lg'
