@@ -128,21 +128,26 @@ export const useSupabaseAuth = () => {
   };
 
   const signIn = async (email: string, password: string) => {
-    // Verificar se o usuário está ativo antes de fazer login
+    // Verificar se o usuário existe e seu status ANTES de fazer login
     const { data: profileData } = await supabase
       .from('profiles')
-      .select('status')
+      .select('status, full_name')
       .eq('email', email)
       .single();
 
-    if (profileData && profileData.status === 'pending') {
+    if (!profileData) {
+      throw new Error('Usuário não encontrado no sistema.');
+    }
+
+    if (profileData.status === 'pending') {
       throw new Error('Sua conta ainda está pendente de aprovação. Aguarde a aprovação de um administrador.');
     }
 
-    if (profileData && profileData.status === 'inactive') {
+    if (profileData.status === 'inactive') {
       throw new Error('Sua conta foi desativada. Entre em contato com um administrador.');
     }
 
+    // Só faz login se o status for 'active'
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,

@@ -1,15 +1,28 @@
 
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UserCheck, Users as UsersIcon } from 'lucide-react';
+import { UserCheck, Users as UsersIcon, Shield } from 'lucide-react';
 import PendingUsersTable from '@/components/users/PendingUsersTable';
+import ActiveUsersTable from '@/components/users/ActiveUsersTable';
+import { useAuth } from '@/context/AuthContext';
 
 const UsersPage = () => {
+  const { isAdmin } = useAuth();
+
+  // Verificar se o usuário é admin antes de permitir acesso
+  if (!isAdmin()) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gerenciamento de Usuários</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <Shield className="h-8 w-8 text-blue-500" />
+          Gerenciamento de Usuários
+        </h1>
         <p className="text-gray-600 dark:text-gray-400">Gerencie aprovações de usuários e perfis</p>
       </div>
 
@@ -31,10 +44,7 @@ const UsersPage = () => {
         </TabsContent>
 
         <TabsContent value="active" className="space-y-6">
-          <div className="text-center py-8">
-            <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">Lista de usuários ativos será implementada em breve</p>
-          </div>
+          <ActiveUsersTable />
         </TabsContent>
       </Tabs>
     </div>
