@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, User } from 'lucide-react';
+import { Clock, User, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -35,21 +35,21 @@ const AvailableTimesGrid: React.FC<AvailableTimesGridProps> = ({
 }) => {
   const morningSlots = timeSlots.filter(slot => {
     const hour = parseInt(slot.time.split(':')[0]);
-    return hour >= 9 && hour < 12;
+    return hour >= 8 && hour < 12;
   });
 
   const afternoonSlots = timeSlots.filter(slot => {
     const hour = parseInt(slot.time.split(':')[0]);
-    return hour >= 12 && hour < 19;
+    return hour >= 12 && hour < 18;
   });
 
   const renderTimeGrid = (slots: TimeSlot[], title: string) => (
-    <div className="space-y-3">
-      <h4 className="font-medium text-neutral-700 dark:text-neutral-300 flex items-center gap-2">
-        <Clock className="h-4 w-4" />
+    <div className="space-y-4">
+      <h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2 text-lg">
+        <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
         {title}
       </h4>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
         {slots.map((slot) => {
           const isRecommended = recommendedSlot && 
             slot.time === recommendedSlot.time && 
@@ -62,24 +62,31 @@ const AvailableTimesGrid: React.FC<AvailableTimesGridProps> = ({
               size="sm"
               disabled={!slot.available}
               onClick={() => onSelectTime(slot.time, slot.doctorId)}
-              className={`relative h-16 flex flex-col ${
+              className={`relative h-20 flex flex-col p-3 transition-all duration-200 ${
                 slot.available 
                   ? isRecommended 
-                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-md ring-2 ring-green-300' 
-                    : 'hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-neutral-800'
-                  : 'opacity-50 cursor-not-allowed'
+                    ? 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg ring-2 ring-green-300 dark:ring-green-500 transform scale-105' 
+                    : 'hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-gray-700 dark:border-gray-600 shadow-sm hover:shadow-md'
+                  : 'opacity-40 cursor-not-allowed bg-gray-100 dark:bg-gray-800'
               }`}
             >
-              <div className="text-center">
-                <div className="font-medium">{slot.time}</div>
+              <div className="text-center space-y-1">
+                <div className={`font-bold text-lg ${isRecommended ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
+                  {slot.time}
+                </div>
                 {slot.doctorName && (
-                  <div className="text-xs text-neutral-600 dark:text-neutral-400 truncate max-w-full">
-                    {slot.doctorName}
+                  <div className={`text-xs truncate max-w-full ${
+                    isRecommended 
+                      ? 'text-green-100' 
+                      : 'text-gray-600 dark:text-gray-400'
+                  }`}>
+                    Dr. {slot.doctorName.split(' ')[0]}
                   </div>
                 )}
               </div>
               {isRecommended && (
-                <Badge className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-1 py-0">
+                <Badge className="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 shadow-lg">
+                  <Sparkles className="h-3 w-3 mr-1" />
                   Recomendado
                 </Badge>
               )}
@@ -87,24 +94,41 @@ const AvailableTimesGrid: React.FC<AvailableTimesGridProps> = ({
           );
         })}
       </div>
+      {slots.length === 0 && (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p>Nenhum horário disponível neste período</p>
+        </div>
+      )}
     </div>
   );
 
   return (
-    <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-          <Clock className="h-5 w-5 text-blue-600" />
-          Horários Disponíveis - {format(selectedDate, 'dd \'de\' MMMM', { locale: ptBR })}
+    <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 shadow-lg">
+      <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700">
+        <CardTitle className="text-xl text-gray-900 dark:text-gray-100 flex items-center gap-3">
+          <div className="p-2 bg-blue-600 rounded-lg">
+            <Clock className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <div>Horários Disponíveis</div>
+            <div className="text-sm font-normal text-gray-600 dark:text-gray-400">
+              {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+            </div>
+          </div>
         </CardTitle>
         
         {/* Doctor Filter */}
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="flex flex-wrap gap-2 mt-4">
           <Button
             variant={!selectedDoctor ? "default" : "outline"}
             size="sm"
             onClick={() => onDoctorChange('')}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className={`${
+              !selectedDoctor 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`}
           >
             Todos os Médicos
           </Button>
@@ -114,34 +138,51 @@ const AvailableTimesGrid: React.FC<AvailableTimesGridProps> = ({
               variant={selectedDoctor === doctor.id ? "default" : "outline"}
               size="sm"
               onClick={() => onDoctorChange(doctor.id)}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className={`${
+                selectedDoctor === doctor.id 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  : 'border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
             >
-              <User className="h-3 w-3 mr-1" />
-              {doctor.name}
+              <User className="h-3 w-3 mr-2" />
+              Dr. {doctor.name.split(' ')[0]}
             </Button>
           ))}
         </div>
 
         {/* Recommended Slot Alert */}
         {recommendedSlot && (
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3 mt-3">
-            <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
-              <Clock className="h-4 w-4" />
-              <span className="font-medium">Horário Recomendado:</span>
-              <span>{recommendedSlot.time} com {recommendedSlot.doctorName}</span>
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4 mt-4">
+            <div className="flex items-center gap-3 text-green-800 dark:text-green-200">
+              <div className="p-2 bg-green-100 dark:bg-green-800 rounded-full">
+                <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <span className="font-semibold">Horário Recomendado:</span>
+                <div className="text-sm">
+                  {recommendedSlot.time} com Dr. {recommendedSlot.doctorName}
+                </div>
+              </div>
             </div>
           </div>
         )}
       </CardHeader>
       
-      <CardContent className="space-y-6">
-        {morningSlots.length > 0 && renderTimeGrid(morningSlots, "Manhã (9:00 - 12:00)")}
-        {afternoonSlots.length > 0 && renderTimeGrid(afternoonSlots, "Tarde (12:00 - 19:00)")}
+      <CardContent className="space-y-8 p-6">
+        {morningSlots.length > 0 && renderTimeGrid(morningSlots, "Manhã (08:00 - 12:00)")}
+        {afternoonSlots.length > 0 && renderTimeGrid(afternoonSlots, "Tarde (12:00 - 18:00)")}
         
         {timeSlots.length === 0 && (
-          <div className="text-center py-8 text-neutral-500 dark:text-neutral-400">
-            <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p>Nenhum horário disponível para esta data</p>
+          <div className="text-center py-12">
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-10 w-10 text-gray-400 dark:text-gray-600" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">
+              Nenhum horário disponível para esta data
+            </p>
+            <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+              Selecione uma data diferente ou outro médico
+            </p>
           </div>
         )}
       </CardContent>

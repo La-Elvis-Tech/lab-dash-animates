@@ -6,12 +6,13 @@ import { ptBR } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, User, MapPin, Calendar as CalendarIcon, Sparkles } from 'lucide-react';
+import { Clock, User, MapPin, Calendar as CalendarIcon, Sparkles, Moon, Sun } from 'lucide-react';
 import { SupabaseAppointment } from '@/hooks/useSupabaseAppointments';
 import AvailableTimesGrid from './AvailableTimesGrid';
 import { useAvailableSlots } from '@/hooks/useAvailableSlots';
 import { useDoctors } from '@/hooks/useDoctors';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/hooks/use-theme';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 const localizer = dateFnsLocalizer({
@@ -33,7 +34,6 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   onSelectAppointment,
   onSelectSlot,
 }) => {
-  const [view, setView] = useState<'month' | 'week' | 'day'>('month');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<string>('');
@@ -43,6 +43,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   const { getAvailableSlots, findNextAvailableSlot, loading } = useAvailableSlots();
   const { doctors } = useDoctors();
   const { toast } = useToast();
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (selectedDate && doctors.length > 0) {
@@ -51,7 +52,6 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   }, [selectedDate, selectedDoctor, doctors]);
 
   useEffect(() => {
-    // Buscar horário recomendado quando os médicos carregarem
     if (doctors.length > 0) {
       findRecommendedSlot();
     }
@@ -71,7 +71,6 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     if (recommended) {
       setRecommendedSlot(recommended);
       
-      // Se a data recomendada for hoje ou em breve, mostrar no calendário
       if (isSameDay(recommended.date, new Date()) || 
           Math.abs(recommended.date.getTime() - new Date().getTime()) < 7 * 24 * 60 * 60 * 1000) {
         setSelectedDate(recommended.date);
@@ -89,24 +88,24 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Agendado': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-      case 'Confirmado': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'Em andamento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'Concluído': return 'bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-300';
-      case 'Cancelado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      default: return 'bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-300';
+      case 'Agendado': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
+      case 'Confirmado': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
+      case 'Em andamento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
+      case 'Concluído': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+      case 'Cancelado': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
     }
   };
 
   const EventComponent = ({ event }: { event: any }) => {
     const appointment = event.resource as SupabaseAppointment;
     return (
-      <div className="p-1 text-xs">
-        <div className="font-medium truncate">{appointment.patient_name}</div>
-        <div className="text-neutral-600 dark:text-neutral-400 truncate">
+      <div className="p-2 text-xs">
+        <div className="font-semibold truncate text-white">{appointment.patient_name}</div>
+        <div className="text-gray-200 truncate">
           {appointment.exam_types?.name}
         </div>
-        <Badge className={`${getStatusColor(appointment.status)} text-xs`}>
+        <Badge className={`${getStatusColor(appointment.status)} text-xs mt-1`}>
           {appointment.status}
         </Badge>
       </div>
@@ -127,12 +126,14 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     return {
       style: {
         backgroundColor,
-        borderRadius: '6px',
+        borderRadius: '8px',
         opacity: 0.9,
         color: 'white',
         border: '0px',
         display: 'block',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        boxShadow: theme === 'dark' 
+          ? '0 4px 6px rgba(0,0,0,0.3)' 
+          : '0 2px 4px rgba(0,0,0,0.1)'
       }
     };
   };
@@ -144,7 +145,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     const startTime = new Date(selectedDate);
     startTime.setHours(hour, minute, 0, 0);
     
-    const endTime = new Date(startTime.getTime() + (30 * 60000)); // 30 minutes default
+    const endTime = new Date(startTime.getTime() + (30 * 60000));
     
     onSelectSlot?.({
       start: startTime,
@@ -171,24 +172,28 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     <div className="space-y-6">
       {/* Recommended Slot Banner */}
       {recommendedSlot && (
-        <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800">
-          <CardContent className="p-4">
+        <Card className="bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/20 dark:via-emerald-900/20 dark:to-teal-900/20 border-green-200 dark:border-green-700 shadow-lg">
+          <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Sparkles className="h-5 w-5 text-green-600" />
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-100 dark:bg-green-800 rounded-full">
+                  <Sparkles className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
                 <div>
-                  <p className="font-medium text-green-800 dark:text-green-200">
+                  <p className="font-semibold text-green-800 dark:text-green-200 text-lg">
                     Próximo horário disponível
                   </p>
-                  <p className="text-sm text-green-600 dark:text-green-300">
-                    {format(recommendedSlot.date, 'dd/MM/yyyy')} às {recommendedSlot.time} com {recommendedSlot.doctorName}
+                  <p className="text-green-600 dark:text-green-300">
+                    {format(recommendedSlot.date, 'dd/MM/yyyy')} às {recommendedSlot.time} com Dr. {recommendedSlot.doctorName}
                   </p>
                 </div>
               </div>
               <Button 
                 onClick={handleRecommendedSlotClick}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
+                size="lg"
               >
+                <CalendarIcon className="h-4 w-4 mr-2" />
                 Agendar Agora
               </Button>
             </div>
@@ -196,23 +201,39 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         </Card>
       )}
 
-      <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl text-neutral-900 dark:text-neutral-100">
-            <CalendarIcon className="h-5 w-5 text-blue-600" />
-            Calendário de Agendamentos
+      <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 shadow-xl">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700">
+          <CardTitle className="flex items-center justify-between text-2xl text-gray-900 dark:text-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-600 rounded-lg">
+                <CalendarIcon className="h-6 w-6 text-white" />
+              </div>
+              Calendário de Agendamentos
+            </div>
+            <div className="flex items-center gap-2">
+              {theme === 'dark' ? (
+                <Moon className="h-5 w-5 text-gray-400" />
+              ) : (
+                <Sun className="h-5 w-5 text-gray-600" />
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div style={{ height: '600px' }} className="rounded-lg overflow-hidden">
+        <CardContent className="p-6">
+          <div 
+            style={{ height: '600px' }} 
+            className={`rounded-xl overflow-hidden ${
+              theme === 'dark' 
+                ? 'bg-gray-800 border border-gray-700' 
+                : 'bg-white border border-gray-200'
+            }`}
+          >
             <Calendar
               localizer={localizer}
               events={events}
               startAccessor="start"
               endAccessor="end"
               style={{ height: '100%' }}
-              view={view}
-              onView={setView}
               date={currentDate}
               onNavigate={setCurrentDate}
               onSelectEvent={(event) => onSelectAppointment?.(event.resource)}
@@ -240,7 +261,11 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                 noEventsInRange: 'Não há agendamentos neste período',
                 showMore: (total) => `+ Ver mais (${total})`,
               }}
-              className="bg-white dark:bg-neutral-800 rounded-lg"
+              className={`${
+                theme === 'dark' 
+                  ? 'rbc-calendar-dark' 
+                  : 'rbc-calendar-light'
+              } rounded-lg`}
             />
           </div>
         </CardContent>
