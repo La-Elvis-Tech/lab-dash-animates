@@ -1,4 +1,3 @@
-
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -339,7 +338,11 @@ const Reports = () => {
         </TabsContent>
 
         <TabsContent value="export" className="mt-0">
-          <ExportControls onExport={handleExport} />
+          <ExportControls 
+            data={appointments} 
+            reportType={reportType} 
+            onExport={handleExport} 
+          />
         </TabsContent>
       </Tabs>
     </div>
