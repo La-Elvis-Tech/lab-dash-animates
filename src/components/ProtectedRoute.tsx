@@ -6,6 +6,8 @@ export const ProtectedRoute = () => {
   const { isAuthenticated, loading, profile } = useAuth();
   const location = useLocation();
 
+  console.log('ProtectedRoute check:', { isAuthenticated, loading, profile: profile?.status });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -17,12 +19,10 @@ export const ProtectedRoute = () => {
     );
   }
 
-  // Verificar se está autenticado
   if (!isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Verificar se o perfil existe e se o status é ativo
   if (profile && profile.status !== 'active') {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }

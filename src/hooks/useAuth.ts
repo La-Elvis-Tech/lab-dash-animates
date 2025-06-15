@@ -35,9 +35,11 @@ export const useAuth = () => {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return { data: null, error };
+      }
       
-      // Map the database status to our Profile type
       const mappedProfile: Profile = {
         ...data,
         status: data.status === 'inactive' ? 'suspended' : data.status
@@ -61,7 +63,11 @@ export const useAuth = () => {
         .limit(1)
         .single();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching user role:', error);
+        return { data: null, error };
+      }
+      
       setRole(data?.role || null);
       return { data: data?.role || null, error: null };
     } catch (error: any) {
@@ -71,15 +77,51 @@ export const useAuth = () => {
   };
 
   useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user) {
+          // Fetch profile and role without blocking
+          setTimeout(() => {
+            if (mounted) {
+              fetchProfile(currentSession.user.id);
+              fetchUserRole(currentSession.user.id);
+            }
+          }, 0);
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+          setInitializing(false);
+        }
+      }
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('Auth state change in useAuth hook:', event);
+        
+        if (!mounted) return;
+
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           setTimeout(() => {
-            fetchProfile(session.user.id);
-            fetchUserRole(session.user.id);
+            if (mounted) {
+              fetchProfile(session.user.id);
+              fetchUserRole(session.user.id);
+            }
           }, 0);
         } else {
           setProfile(null);
@@ -91,20 +133,12 @@ export const useAuth = () => {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchProfile(session.user.id);
-        fetchUserRole(session.user.id);
-      }
-      
-      setLoading(false);
-      setInitializing(false);
-    });
+    initializeAuth();
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -184,7 +218,6 @@ export const useAuth = () => {
     return result;
   };
 
-  // Helper functions for role checking
   const hasRole = (requiredRole: UserRole): boolean => {
     return role === requiredRole;
   };
@@ -211,7 +244,6 @@ export const useAuth = () => {
     refreshProfile: () => user && fetchProfile(user.id),
     refreshRole: () => user && fetchUserRole(user.id),
     isAuthenticated: !!session,
-    // Role management functions
     userRole: role,
     hasRole,
     isAdmin,
