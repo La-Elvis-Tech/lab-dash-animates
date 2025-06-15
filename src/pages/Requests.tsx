@@ -8,6 +8,7 @@ import ExamsStats from '@/components/exams/ExamsStats';
 import ExamDetailsCard from '@/components/exams/ExamDetailsCard';
 import { examDetailsService } from '@/services/examDetailsService';
 import { ExamDetails, ExamMaterial } from '@/types/examDetails';
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Add a local Unit interface for illustrative purposes
 interface Unit {
@@ -178,6 +179,40 @@ const mockExams: ExamDetailsWithUnit[] = [
   },
 ];
 
+// Componente skeleton para o card dos exames (use o mesmo layout do ExamDetailsCard, mas só skeletons)
+function ExamDetailsCardSkeleton() {
+  return (
+    <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 h-full flex flex-col">
+      <div className="pb-4 border-b border-neutral-100 dark:border-neutral-700">
+        <div className="flex justify-between items-start px-6 pt-6">
+          <div>
+            <Skeleton className="h-5 w-36 mb-2" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+          <div className="text-right">
+            <Skeleton className="h-5 w-16 mb-2" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+        </div>
+      </div>
+      <CardContent className="flex-1 space-y-5 flex flex-col justify-between px-6 py-4">
+        <div className="overflow-auto max-h-[160px] space-y-4">
+          <Skeleton className="h-4 w-full mb-2" />
+          <Skeleton className="h-4 w-3/5" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-4/6" />
+          <Skeleton className="h-3 w-2/5" />
+        </div>
+        <div className="pt-3 border-t border-neutral-200 dark:border-neutral-700 flex justify-between items-center">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-8 w-24 rounded-md" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 const Requests = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUnit, setSelectedUnit] = useState('all');
@@ -295,30 +330,43 @@ const Requests = () => {
       </div>
       {/* Uniform grid for exam cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredExams.map((exam) => (
-          <div
-            key={exam.id}
-            className="h-full flex flex-col"
-            style={{ minHeight: '410px', maxHeight: '430px' }} // padronização visual nos cards
-          >
-            <div className="flex-grow flex flex-col">
-              <ExamDetailsCard
-                exam={exam}
-                onSchedule={() => { console.log('Agendar exame:', exam.name); }}
-                // Mantendo o conteúdo consistente
-              />
-            </div>
-            <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 italic text-right">
-              Unidade: <span className="font-medium not-italic">{exam.unit?.name || 'N/A'}</span>
-            </div>
-          </div>
-        ))}
+        {loading
+          ? [...Array(6)].map((_, idx) => (
+              <div key={idx} className="h-full flex flex-col" style={{ minHeight: '430px', maxHeight: '430px' }}>
+                <ExamDetailsCardSkeleton />
+                <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 italic text-right">
+                  <Skeleton className="h-3 w-24 inline-block" />
+                </div>
+              </div>
+            ))
+          : filteredExams.length > 0
+            ? filteredExams.map((exam) => (
+                <div
+                  key={exam.id}
+                  className="h-full flex flex-col"
+                  style={{ minHeight: '430px', maxHeight: '430px' }}
+                >
+                  {/* Card central é sempre do mesmo tamanho, conteúdo dentro pode ser scrollável */}
+                  <div className="flex-grow flex flex-col">
+                    <div className="overflow-auto max-h-[310px]">
+                      <ExamDetailsCard
+                        exam={exam}
+                        onSchedule={() => { console.log('Agendar exame:', exam.name); }}
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 italic text-right">
+                    Unidade: <span className="font-medium not-italic">{exam.unit?.name || 'N/A'}</span>
+                  </div>
+                </div>
+              ))
+            : (
+                <div className="col-span-full text-center py-10">
+                  <p className="text-gray-500 dark:text-gray-400">Nenhum exame encontrado com os filtros aplicados.</p>
+                </div>
+              )
+        }
       </div>
-      {filteredExams.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-gray-500 dark:text-gray-400">Nenhum exame encontrado com os filtros aplicados.</p>
-        </div>
-      )}
     </div>
   );
 };
