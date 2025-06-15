@@ -30,7 +30,7 @@ const Auth = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
 
-  const { login, register, isAuthenticated } = useAuth();
+  const { login, register, isAuthenticated, profile } = useAuth();
   const { resetPassword } = useSupabaseAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -39,10 +39,11 @@ const Auth = () => {
   const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
-    if (isAuthenticated) {
+    // Só redireciona se estiver autenticado E com perfil ativo
+    if (isAuthenticated && profile?.status === 'active') {
       navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, profile?.status, navigate, from]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

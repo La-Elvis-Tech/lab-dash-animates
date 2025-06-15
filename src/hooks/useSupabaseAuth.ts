@@ -28,64 +28,24 @@ export const useSupabaseAuth = () => {
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    let mounted = true;
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return;
+        
         console.log('Auth state change:', event, session?.user?.email);
         
         if (session?.user) {
-          // Verificar status do usuário ANTES de aceitar o login
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('status, full_name')
-            .eq('id', session.user.id)
-            .single();
-
-          if (!profileData) {
-            console.log('Profile not found, signing out');
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-            setUserRole(null);
-            setLoading(false);
-            setInitializing(false);
-            return;
-          }
-
-          // Se o usuário está pendente ou inativo, fazer logout
-          if (profileData.status === 'pending') {
-            console.log('User status is pending, signing out');
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-            setUserRole(null);
-            setLoading(false);
-            setInitializing(false);
-            throw new Error('Sua conta ainda está pendente de aprovação. Aguarde a aprovação de um administrador.');
-          }
-
-          if (profileData.status === 'inactive') {
-            console.log('User status is inactive, signing out');
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-            setUserRole(null);
-            setLoading(false);
-            setInitializing(false);
-            throw new Error('Sua conta foi desativada. Entre em contato com um administrador.');
-          }
-
-          // Se chegou aqui, usuário é válido
           setSession(session);
           setUser(session.user);
           
-          // Buscar perfil e role em background
+          // Fetch profile in background without blocking
           setTimeout(async () => {
-            await fetchUserProfile(session.user.id);
-            await fetchUserRole(session.user.id);
+            if (mounted) {
+              await fetchUserData(session.user.id);
+            }
           }, 0);
         } else {
           setSession(null);
@@ -94,86 +54,61 @@ export const useSupabaseAuth = () => {
           setUserRole(null);
         }
         
-        setLoading(false);
-        setInitializing(false);
+        if (mounted) {
+          setLoading(false);
+          setInitializing(false);
+        }
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
       console.log('Initial session check:', session?.user?.email);
       
       if (session?.user) {
-        // Verificar status do usuário na sessão inicial
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('status, full_name')
-          .eq('id', session.user.id)
-          .single();
-
-        if (!profileData || profileData.status !== 'active') {
-          console.log('User not active in initial session, signing out');
-          await supabase.auth.signOut();
-          setSession(null);
-          setUser(null);
-          setProfile(null);
-          setUserRole(null);
-          setLoading(false);
-          setInitializing(false);
-          return;
-        }
-
         setSession(session);
         setUser(session.user);
-        fetchUserProfile(session.user.id);
-        fetchUserRole(session.user.id);
+        fetchUserData(session.user.id);
       }
       
       setLoading(false);
       setInitializing(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const fetchUserProfile = async (userId: string) => {
+  const fetchUserData = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      // Fetch profile and role in parallel
+      const [profileResult, roleResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single(),
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .order('role')
+          .limit(1)
+      ]);
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
-        return;
+      if (profileResult.data) {
+        setProfile(profileResult.data);
       }
 
-      setProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
-
-  const fetchUserRole = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .order('role')
-        .limit(1);
-
-      if (error) {
-        console.error('Error fetching user role:', error);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        setUserRole({ role: data[0].role });
+      if (roleResult.data && roleResult.data.length > 0) {
+        setUserRole({ role: roleResult.data[0].role });
       }
     } catch (error) {
-      console.error('Error fetching user role:', error);
+      console.error('Error fetching user data:', error);
     }
   };
 

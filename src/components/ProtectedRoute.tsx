@@ -23,7 +23,7 @@ export const ProtectedRoute = () => {
   }
 
   // Verificar se o perfil existe e se o status é ativo
-  if (!profile || profile.status !== 'active') {
+  if (profile && profile.status !== 'active') {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
