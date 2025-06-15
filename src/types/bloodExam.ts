@@ -8,7 +8,7 @@ export interface BloodExamType {
   tube_type: string;
   preparation_required: boolean;
   preparation_instructions?: string;
-  reference_values?: Record<string, string>;
+  reference_values?: Record<string, string> | null;
   active: boolean;
   created_at: string;
 }
@@ -31,7 +31,12 @@ export interface PanelExam {
 export interface BloodVolumeCalculation {
   total_volume_ml: number;
   tubes_needed: number;
-  exam_details: BloodExamType[];
+  exam_details: Array<{
+    exam_id: string;
+    name: string;
+    volume_ml: number;
+    tube_type: string;
+  }>;
 }
 
 export interface DetailedMaterialValidation {

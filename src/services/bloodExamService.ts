@@ -10,7 +10,17 @@ export const bloodExamService = {
       });
 
       if (error) throw error;
-      return data?.[0] || null;
+      
+      if (data && data[0]) {
+        const result = data[0];
+        return {
+          total_volume_ml: result.total_volume_ml,
+          tubes_needed: result.tubes_needed,
+          exam_details: Array.isArray(result.exam_details) ? result.exam_details : []
+        };
+      }
+      
+      return null;
     } catch (error) {
       console.error('Error calculating blood volume:', error);
       throw error;
@@ -82,16 +92,28 @@ export const bloodExamService = {
 
       // Atualizar estoque para cada material
       for (const material of reservedMaterials || []) {
+        // First get current stock
+        const { data: currentItem, error: getCurrentError } = await supabase
+          .from('inventory_items')
+          .select('current_stock')
+          .eq('id', material.inventory_item_id)
+          .single();
+
+        if (getCurrentError) throw getCurrentError;
+
+        // Calculate new stock
+        const newStock = currentItem.current_stock - material.quantity_used;
+
+        // Update stock
         const { error: updateError } = await supabase
           .from('inventory_items')
-          .update({
-            current_stock: supabase.raw(`current_stock - ${material.quantity_used}`)
-          })
+          .update({ current_stock: newStock })
           .eq('id', material.inventory_item_id);
 
         if (updateError) throw updateError;
 
         // Registrar movimento de saída
+        const { data: userData } = await supabase.auth.getUser();
         const { error: movementError } = await supabase
           .from('inventory_movements')
           .insert({
@@ -103,7 +125,7 @@ export const bloodExamService = {
             reason: `Consumo em exame - Agendamento ${appointmentId}`,
             reference_type: 'appointment',
             reference_id: appointmentId,
-            performed_by: (await supabase.auth.getUser()).data.user?.id || ''
+            performed_by: userData.user?.id || ''
           });
 
         if (movementError) throw movementError;

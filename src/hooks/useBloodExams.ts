@@ -19,7 +19,14 @@ export const useBloodExams = () => {
         .order('category', { ascending: true });
 
       if (error) throw error;
-      setBloodExamTypes(data || []);
+      
+      // Transform the data to match our type
+      const transformedData: BloodExamType[] = (data || []).map(item => ({
+        ...item,
+        reference_values: item.reference_values as Record<string, string> | null
+      }));
+      
+      setBloodExamTypes(transformedData);
     } catch (error: any) {
       console.error('Error fetching blood exam types:', error);
       toast({
@@ -58,7 +65,16 @@ export const useBloodExams = () => {
 
       if (error) throw error;
 
-      return data?.[0] || null;
+      if (data && data[0]) {
+        const result = data[0];
+        return {
+          total_volume_ml: result.total_volume_ml,
+          tubes_needed: result.tubes_needed,
+          exam_details: Array.isArray(result.exam_details) ? result.exam_details : []
+        };
+      }
+
+      return null;
     } catch (error: any) {
       console.error('Error calculating blood volume:', error);
       toast({
