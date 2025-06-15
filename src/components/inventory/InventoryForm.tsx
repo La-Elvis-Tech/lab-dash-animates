@@ -71,13 +71,20 @@ const InventoryForm: React.FC<InventoryFormProps> = ({
   const onSubmit = async (values: InventoryFormValues) => {
     try {
       const itemData = {
-        ...values,
+        name: values.name,
+        description: values.description || '',
+        category_id: values.category_id,
+        current_stock: values.current_stock,
+        min_stock: values.min_stock,
+        max_stock: values.max_stock,
+        unit: values.unit,
+        cost_per_unit: values.cost_per_unit || 0,
+        supplier: values.supplier || '',
+        lot_number: values.lot_number || '',
         expiry_date: values.expiry_date?.toISOString().split('T')[0],
+        location: values.location || '',
         active: true,
         unit_id: '', // Will be set by the hook
-        category_id: values.category_id,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       };
 
       await addItem(itemData);
