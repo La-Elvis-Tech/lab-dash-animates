@@ -24,6 +24,13 @@ export interface InventoryPercentItem {
   value: number;
 }
 
+// Simple consumption data structure for Dashboard compatibility
+export interface ConsumptionDataItem {
+  month: string;
+  consumed: number;
+  cost: number;
+}
+
 export const useDashboardStats = () => {
   return useQuery({
     queryKey: ['dashboard-stats'],
@@ -151,6 +158,42 @@ export const useInventoryPercent = () => {
         name: cat.name,
         value: totalStock > 0 ? Math.round((cat.value / totalStock) * 100) : 0
       }));
+    }
+  });
+};
+
+// Add consumption data hook for Dashboard compatibility
+export const useConsumptionData = () => {
+  return useQuery({
+    queryKey: ['consumption-data'],
+    queryFn: async (): Promise<ConsumptionDataItem[]> => {
+      const { data: consumptionData } = await supabase
+        .from('consumption_data')
+        .select('*')
+        .gte('period_start', new Date(Date.now() - 7 * 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      if (!consumptionData) return [];
+
+      const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const monthlyData: { [key: string]: { consumed: number; cost: number } } = {};
+
+      consumptionData.forEach(item => {
+        const date = new Date(item.period_start);
+        const monthKey = months[date.getMonth()];
+        
+        if (!monthlyData[monthKey]) {
+          monthlyData[monthKey] = { consumed: 0, cost: 0 };
+        }
+        
+        monthlyData[monthKey].consumed += item.quantity_consumed;
+        monthlyData[monthKey].cost += item.total_cost || 0;
+      });
+
+      return months.map(month => ({
+        month,
+        consumed: monthlyData[month]?.consumed || 0,
+        cost: monthlyData[month]?.cost || 0
+      })).slice(-7);
     }
   });
 };

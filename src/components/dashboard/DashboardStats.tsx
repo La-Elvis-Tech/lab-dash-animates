@@ -50,19 +50,19 @@ const DashboardStats: React.FC = () => {
       title: "Itens em Estoque",
       value: stats?.totalItems || 0,
       icon: Package,
-      trend: "warning",
-      trendValue: `${stats?.lowStockItems || 0} em baixo estoque`,
+      trend: "up",
+      trendValue: `${stats?.activeExamTypes || 0} tipos de exames`,
       description: "ativos",
       color: "text-indigo-600 dark:text-indigo-400",
       bgColor: "bg-indigo-50 dark:bg-indigo-950/40"
     },
     {
-      title: "Alertas Críticos",
-      value: (stats?.lowStockItems || 0) + (stats?.expiringItems || 0),
+      title: "Tipos de Exames",
+      value: stats?.activeExamTypes || 0,
       icon: AlertTriangle,
-      trend: "warning",
-      trendValue: `${stats?.expiringItems || 0} expirando`,
-      description: "requer atenção",
+      trend: "up",
+      trendValue: `${stats?.totalExamTypes || 0} total`,
+      description: "disponíveis",
       color: "text-orange-600 dark:text-orange-400",
       bgColor: "bg-orange-50 dark:bg-orange-950/40"
     }
