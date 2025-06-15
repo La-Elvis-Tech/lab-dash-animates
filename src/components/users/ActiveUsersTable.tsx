@@ -1,13 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, UserMinus, Settings, Crown, UserCheck, Eye } from 'lucide-react';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Users, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import UserTableRow from './UserTableRow';
 
 interface ActiveUser {
   id: string;
@@ -39,14 +37,12 @@ const ActiveUsersTable = () => {
 
       if (profilesError) throw profilesError;
 
-      // Buscar roles dos usuários
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('user_id, role');
 
       if (rolesError) throw rolesError;
 
-      // Combinar dados dos perfis com roles
       const usersWithRoles = profiles?.map(profile => ({
         ...profile,
         role: roles?.find(role => role.user_id === profile.id)?.role || 'user'
@@ -67,13 +63,11 @@ const ActiveUsersTable = () => {
 
   const handleRoleChange = async (userId: string, newRole: 'admin' | 'user' | 'supervisor') => {
     try {
-      // Remover role existente
       await supabase
         .from('user_roles')
         .delete()
         .eq('user_id', userId);
 
-      // Adicionar nova role
       const { error } = await supabase
         .from('user_roles')
         .insert({ user_id: userId, role: newRole });
@@ -82,7 +76,7 @@ const ActiveUsersTable = () => {
 
       toast({
         title: 'Role atualizada!',
-        description: `Usuário agora tem o papel de ${getRoleLabel(newRole)}.`,
+        description: `Usuário agora tem o papel de ${newRole === 'admin' ? 'Administrador' : newRole === 'supervisor' ? 'Supervisor' : 'Funcionário'}.`,
       });
 
       fetchActiveUsers();
@@ -119,49 +113,6 @@ const ActiveUsersTable = () => {
         variant: 'destructive',
       });
     }
-  };
-
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'Administrador';
-      case 'supervisor':
-        return 'Supervisor';
-      case 'user':
-        return 'Funcionário';
-      default:
-        return 'Funcionário';
-    }
-  };
-
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-red-100 text-red-800';
-      case 'supervisor':
-        return 'bg-blue-100 text-blue-800';
-      case 'user':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return <Crown className="h-3 w-3" />;
-      case 'supervisor':
-        return <Settings className="h-3 w-3" />;
-      case 'user':
-        return <UserCheck className="h-3 w-3" />;
-      default:
-        return <UserCheck className="h-3 w-3" />;
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('pt-BR');
   };
 
   if (loading) {
@@ -209,57 +160,12 @@ const ActiveUsersTable = () => {
               </TableHeader>
               <TableBody>
                 {activeUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.full_name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        {user.position && <div className="font-medium">{user.position}</div>}
-                        {user.department && <div className="text-gray-500">{user.department}</div>}
-                        {!user.position && !user.department && (
-                          <span className="text-gray-400">Não informado</span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className={getRoleBadgeColor(user.role || 'user')}>
-                        <span className="flex items-center gap-1">
-                          {getRoleIcon(user.role || 'user')}
-                          {getRoleLabel(user.role || 'user')}
-                        </span>
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{formatDate(user.created_at)}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Select
-                          value={user.role || 'user'}
-                          onValueChange={(value: 'admin' | 'user' | 'supervisor') => 
-                            handleRoleChange(user.id, value)
-                          }
-                        >
-                          <SelectTrigger className="w-32 h-8">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="user">Funcionário</SelectItem>
-                            <SelectItem value="supervisor">Supervisor</SelectItem>
-                            <SelectItem value="admin">Administrador</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => handleDeactivateUser(user.id, user.email)}
-                        >
-                          <UserMinus className="h-4 w-4 mr-1" />
-                          Desativar
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  <UserTableRow
+                    key={user.id}
+                    user={user}
+                    onRoleChange={handleRoleChange}
+                    onDeactivateUser={handleDeactivateUser}
+                  />
                 ))}
               </TableBody>
             </Table>

@@ -1,18 +1,17 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertCircle, Download, Loader2, Plus, Search, Trash, Package, AlertTriangle } from 'lucide-react';
+import { AlertCircle, Loader2, Plus, Trash } from 'lucide-react';
 import { useSupabaseInventory } from '@/hooks/useSupabaseInventory';
-import InventoryTable from '@/components/inventory/InventoryTable';
-import InventoryForm from '@/components/inventory/InventoryForm';
-import InventoryStats from '@/components/inventory/InventoryStats';
 import { useToast } from '@/hooks/use-toast';
 import { useAlerts } from '@/hooks/useAlerts';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Package } from 'lucide-react';
+import InventoryTable from '@/components/inventory/InventoryTable';
+import InventoryStats from '@/components/inventory/InventoryStats';
+import InventoryHeader from '@/components/inventory/InventoryHeader';
+import InventoryFilters from '@/components/inventory/InventoryFilters';
+import LowStockAlert from '@/components/inventory/LowStockAlert';
 
 const Inventory = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -35,7 +34,6 @@ const Inventory = () => {
   const { toast } = useToast();
   const { sendEmailForAlert } = useAlerts();
 
-  // Filter items based on search and category
   const filteredItems = inventoryItems.filter(item => {
     const categoryName = item.categories?.name || 'Sem categoria';
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -47,7 +45,6 @@ const Inventory = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Get low stock items
   const lowStockItems = inventoryItems.filter(item => item.current_stock <= item.min_stock);
 
   const handleSelectItem = (itemId: string) => {
@@ -118,12 +115,6 @@ const Inventory = () => {
     });
   };
 
-  // Create categories for tabs
-  const tabCategories = [
-    { id: "all", name: "Todos" },
-    ...categories.map(cat => ({ id: cat.id, name: cat.name }))
-  ];
-
   if (!userUnit) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -142,123 +133,29 @@ const Inventory = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-            <Package className="h-8 w-8 text-blue-500" />
-            Inventário - {userUnit.name}
-          </h1>
-          <p className="text-neutral-500 dark:text-neutral-400 mt-1">
-            Gerencie o estoque de materiais e reagentes
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <DialogTrigger asChild>
-              <Button className="bg-lab-blue hover:bg-lab-blue/90">
-                <Plus className="mr-2 h-4 w-4" />
-                Novo Item
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Adicionar Item ao Inventário</DialogTitle>
-                <DialogDescription>
-                  Preencha os detalhes do novo item a ser adicionado ao inventário.
-                </DialogDescription>
-              </DialogHeader>
-              <InventoryForm onSuccess={handleAddSuccess} categories={categories} />
-            </DialogContent>
-          </Dialog>
+      <InventoryHeader
+        unitName={userUnit.name}
+        categories={categories}
+        onAddSuccess={handleAddSuccess}
+        onExport={handleExport}
+        showAddDialog={showAddDialog}
+        setShowAddDialog={setShowAddDialog}
+        showExportDialog={showExportDialog}
+        setShowExportDialog={setShowExportDialog}
+      />
 
-          <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Exportar
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Exportar Inventário</DialogTitle>
-                <DialogDescription>
-                  Escolha o formato para exportar os dados do inventário.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <Button onClick={handleExport} className="w-full">
-                  Exportar como CSV
-                </Button>
-                <Button onClick={handleExport} className="w-full">
-                  Exportar como Excel
-                </Button>
-                <Button onClick={handleExport} className="w-full">
-                  Exportar como PDF
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+      <LowStockAlert lowStockItems={lowStockItems} />
 
-      {/* Low Stock Alert */}
-      {lowStockItems.length > 0 && (
-        <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800">
-          <CardContent className="flex items-center gap-3 p-4">
-            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-            <div className="flex-1">
-              <h3 className="font-semibold text-amber-800 dark:text-amber-200">
-                Atenção: Estoque Baixo
-              </h3>
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                {lowStockItems.length} {lowStockItems.length === 1 ? 'item está' : 'itens estão'} com estoque abaixo do mínimo
-              </p>
-            </div>
-            <Badge variant="outline" className="border-amber-400 text-amber-700 dark:text-amber-300">
-              {lowStockItems.length} itens
-            </Badge>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Stats Cards */}
       <InventoryStats items={inventoryItems} />
 
-      {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-neutral-500" />
-          <Input
-            placeholder="Buscar por nome, categoria ou fornecedor..."
-            className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-2">
-          <Tabs 
-            defaultValue="all" 
-            value={selectedCategory}
-            onValueChange={setSelectedCategory}
-            className="w-full sm:w-auto"
-          >
-            <TabsList className="bg-neutral-100 dark:bg-neutral-800 h-10">
-              {tabCategories.map((category) => (
-                <TabsTrigger 
-                  key={category.id} 
-                  value={category.id}
-                  className="data-[state=active]:bg-white dark:data-[state=active]:bg-neutral-700"
-                >
-                  {category.name}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-      </div>
+      <InventoryFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        categories={categories}
+      />
 
-      {/* Selected Items Actions */}
       {selectedItems.size > 0 && (
         <div className="flex items-center justify-between bg-neutral-100 dark:bg-neutral-800 p-2 rounded-md">
           <span className="text-sm font-medium ml-2">
@@ -284,7 +181,6 @@ const Inventory = () => {
         </div>
       )}
 
-      {/* Inventory Table */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
