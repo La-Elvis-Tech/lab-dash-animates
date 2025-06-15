@@ -6,64 +6,32 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, Shield, Key, Clock, Activity, Eye, EyeOff } from 'lucide-react';
+import { Shield, Key, Clock, AlertTriangle, Smartphone } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
-import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 interface SecuritySettings {
   two_factor_enabled: boolean;
-  session_timeout: number;
-  password_complexity: boolean;
-  login_notifications: boolean;
-  suspicious_activity_alerts: boolean;
-  device_management: boolean;
-}
-
-interface LoginSession {
-  id: string;
-  device: string;
-  location: string;
-  last_active: string;
-  current: boolean;
+  session_timeout_minutes: number;
+  login_alerts: boolean;
+  password_changed_at?: string;
+  last_password_check?: string;
+  failed_login_attempts: number;
 }
 
 const SecuritySettings = () => {
   const [settings, setSettings] = useState<SecuritySettings>({
     two_factor_enabled: false,
-    session_timeout: 30,
-    password_complexity: true,
-    login_notifications: true,
-    suspicious_activity_alerts: true,
-    device_management: true
+    session_timeout_minutes: 480,
+    login_alerts: true,
+    failed_login_attempts: 0
   });
-
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPasswords, setShowPasswords] = useState(false);
+  
   const [loading, setLoading] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
-  const [activeSessions] = useState<LoginSession[]>([
-    {
-      id: '1',
-      device: 'Chrome - Windows 10',
-      location: 'São Paulo, SP',
-      last_active: '2024-12-15 14:30',
-      current: true
-    },
-    {
-      id: '2',
-      device: 'Safari - iPhone 13',
-      location: 'São Paulo, SP',
-      last_active: '2024-12-15 12:15',
-      current: false
-    }
-  ]);
-
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const { toast } = useToast();
-  const { user } = useSupabaseAuth();
 
   useEffect(() => {
     loadSecuritySettings();
@@ -74,19 +42,27 @@ const SecuritySettings = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) return;
 
+      // Using raw SQL query since the table is not in the generated types yet
       const { data, error } = await supabase
-        .from('security_settings')
-        .select('*')
-        .eq('user_id', userData.user.id)
-        .single();
+        .rpc('exec_sql', { 
+          sql: `SELECT * FROM security_settings WHERE user_id = '${userData.user.id}'`
+        });
 
-      if (error && error.code !== 'PGRST116') {
+      if (error && error.message !== 'No rows returned') {
         console.error('Error loading security settings:', error);
         return;
       }
 
-      if (data) {
-        setSettings(data);
+      if (data && data.length > 0) {
+        const securityData = data[0];
+        setSettings({
+          two_factor_enabled: securityData.two_factor_enabled,
+          session_timeout_minutes: securityData.session_timeout_minutes,
+          login_alerts: securityData.login_alerts,
+          password_changed_at: securityData.password_changed_at,
+          last_password_check: securityData.last_password_check,
+          failed_login_attempts: securityData.failed_login_attempts
+        });
       }
     } catch (error) {
       console.error('Error loading security settings:', error);
@@ -96,50 +72,34 @@ const SecuritySettings = () => {
   const handleToggle = (setting: keyof SecuritySettings) => {
     setSettings(prev => ({
       ...prev,
-      [setting]: !prev[setting as keyof typeof prev]
+      [setting]: typeof prev[setting] === 'boolean' ? !prev[setting] : prev[setting]
     }));
   };
 
-  const handleSessionTimeoutChange = (value: number) => {
-    setSettings(prev => ({
-      ...prev,
-      session_timeout: value
-    }));
-  };
-
-  const validatePasswordStrength = (password: string): boolean => {
-    const minLength = password.length >= 8;
-    const hasUpper = /[A-Z]/.test(password);
-    const hasLower = /[a-z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
-    return minLength && hasUpper && hasLower && hasNumber && hasSpecial;
+  const handleSessionTimeoutChange = (value: string) => {
+    const timeout = parseInt(value);
+    if (!isNaN(timeout) && timeout > 0) {
+      setSettings(prev => ({
+        ...prev,
+        session_timeout_minutes: timeout
+      }));
+    }
   };
 
   const handleChangePassword = async () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Preencha todos os campos de senha.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (newPassword !== confirmPassword) {
       toast({
-        title: "Senhas não coincidem",
-        description: "A nova senha e confirmação devem ser iguais.",
+        title: "Erro",
+        description: "As senhas não coincidem.",
         variant: "destructive"
       });
       return;
     }
 
-    if (settings.password_complexity && !validatePasswordStrength(newPassword)) {
+    if (newPassword.length < 6) {
       toast({
-        title: "Senha fraca",
-        description: "A senha deve ter pelo menos 8 caracteres com maiúscula, minúscula, número e símbolo.",
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres.",
         variant: "destructive"
       });
       return;
@@ -153,7 +113,21 @@ const SecuritySettings = () => {
 
       if (error) throw error;
 
-      setCurrentPassword('');
+      // Update password changed timestamp
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        await supabase
+          .rpc('exec_sql', { 
+            sql: `
+              INSERT INTO security_settings (user_id, password_changed_at) 
+              VALUES ('${userData.user.id}', now())
+              ON CONFLICT (user_id) DO UPDATE SET 
+                password_changed_at = now(),
+                updated_at = now()
+            `
+          });
+      }
+
       setNewPassword('');
       setConfirmPassword('');
       
@@ -162,30 +136,13 @@ const SecuritySettings = () => {
         description: "Sua senha foi alterada com sucesso."
       });
     } catch (error: any) {
-      console.error('Error changing password:', error);
       toast({
-        title: "Erro ao alterar senha",
-        description: error.message || "Não foi possível alterar a senha.",
+        title: "Erro",
+        description: "Não foi possível alterar a senha.",
         variant: "destructive"
       });
     } finally {
       setChangingPassword(false);
-    }
-  };
-
-  const handleTerminateSession = async (sessionId: string) => {
-    try {
-      // Em uma implementação real, terminaria a sessão específica
-      toast({
-        title: "Sessão terminada",
-        description: "A sessão foi terminada com sucesso."
-      });
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Não foi possível terminar a sessão.",
-        variant: "destructive"
-      });
     }
   };
 
@@ -195,11 +152,28 @@ const SecuritySettings = () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('User not authenticated');
 
+      const settingsData = {
+        user_id: userData.user.id,
+        ...settings
+      };
+
       const { error } = await supabase
-        .from('security_settings')
-        .upsert({
-          user_id: userData.user.id,
-          ...settings
+        .rpc('exec_sql', { 
+          sql: `
+            INSERT INTO security_settings (
+              user_id, two_factor_enabled, session_timeout_minutes, login_alerts
+            ) VALUES (
+              '${settingsData.user_id}', 
+              ${settingsData.two_factor_enabled}, 
+              ${settingsData.session_timeout_minutes}, 
+              ${settingsData.login_alerts}
+            )
+            ON CONFLICT (user_id) DO UPDATE SET
+              two_factor_enabled = EXCLUDED.two_factor_enabled,
+              session_timeout_minutes = EXCLUDED.session_timeout_minutes,
+              login_alerts = EXCLUDED.login_alerts,
+              updated_at = now()
+          `
         });
 
       if (error) throw error;
@@ -220,248 +194,205 @@ const SecuritySettings = () => {
     }
   };
 
+  const getSecurityScore = () => {
+    let score = 0;
+    if (settings.two_factor_enabled) score += 30;
+    if (settings.login_alerts) score += 20;
+    if (settings.session_timeout_minutes <= 240) score += 25;
+    if (settings.password_changed_at) {
+      const lastChange = new Date(settings.password_changed_at);
+      const monthsAgo = (Date.now() - lastChange.getTime()) / (1000 * 60 * 60 * 24 * 30);
+      if (monthsAgo < 3) score += 25;
+    }
+    return Math.min(score, 100);
+  };
+
+  const securityScore = getSecurityScore();
+
   return (
     <div className="space-y-6">
-      {/* Security Settings */}
+      {/* Security Score */}
       <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
         <CardHeader>
           <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
             <Shield className="h-5 w-5" />
+            Pontuação de Segurança
+          </CardTitle>
+          <CardDescription className="text-neutral-600 dark:text-neutral-300">
+            Avaliação da segurança da sua conta
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <div className="flex justify-between mb-2">
+                <span className="text-sm font-medium">Nível de Segurança</span>
+                <span className="text-sm font-medium">{securityScore}%</span>
+              </div>
+              <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    securityScore >= 80 ? 'bg-green-500' : 
+                    securityScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                  }`}
+                  style={{ width: `${securityScore}%` }}
+                ></div>
+              </div>
+            </div>
+            <Badge 
+              variant={securityScore >= 80 ? "default" : securityScore >= 60 ? "secondary" : "destructive"}
+            >
+              {securityScore >= 80 ? 'Excelente' : securityScore >= 60 ? 'Bom' : 'Precisa melhorar'}
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Security Settings */}
+      <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+            <Key className="h-5 w-5" />
             Configurações de Segurança
           </CardTitle>
           <CardDescription className="text-neutral-600 dark:text-neutral-300">
-            Mantenha sua conta segura com essas configurações
+            Configure as opções de segurança da sua conta
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-6">
+          {/* Two Factor Authentication */}
           <div className="space-y-4">
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <Smartphone className="h-4 w-4" />
+              Autenticação de Dois Fatores
+            </h3>
+            
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                  <Key className="h-4 w-4" />
-                  Autenticação de Dois Fatores
+                <Label htmlFor="twoFactor" className="text-neutral-900 dark:text-neutral-100">
+                  Ativar 2FA
                 </Label>
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
                   Adicione uma camada extra de segurança à sua conta
                 </p>
               </div>
               <Switch 
+                id="twoFactor"
                 checked={settings.two_factor_enabled}
                 onCheckedChange={() => handleToggle('two_factor_enabled')}
               />
             </div>
+          </div>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label className="text-neutral-900 dark:text-neutral-100">
-                  Complexidade de Senha
-                </Label>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                  Exigir senhas fortes com caracteres especiais
-                </p>
+          {/* Session Management */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Gerenciamento de Sessão
+            </h3>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="loginAlerts" className="text-neutral-900 dark:text-neutral-100">
+                    Alertas de Login
+                  </Label>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                    Receba notificações quando sua conta for acessada
+                  </p>
+                </div>
+                <Switch 
+                  id="loginAlerts"
+                  checked={settings.login_alerts}
+                  onCheckedChange={() => handleToggle('login_alerts')}
+                />
               </div>
-              <Switch 
-                checked={settings.password_complexity}
-                onCheckedChange={() => handleToggle('password_complexity')}
-              />
-            </div>
 
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label className="text-neutral-900 dark:text-neutral-100">
-                  Notificações de Login
+              <div className="space-y-2">
+                <Label htmlFor="sessionTimeout" className="text-neutral-900 dark:text-neutral-100">
+                  Timeout de Sessão (minutos)
                 </Label>
+                <Input
+                  id="sessionTimeout"
+                  type="number"
+                  min="30"
+                  max="1440"
+                  value={settings.session_timeout_minutes}
+                  onChange={(e) => handleSessionTimeoutChange(e.target.value)}
+                  className="max-w-xs"
+                />
                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                  Receba notificações quando alguém fizer login na sua conta
+                  Sua sessão expirará após este período de inatividade
                 </p>
-              </div>
-              <Switch 
-                checked={settings.login_notifications}
-                onCheckedChange={() => handleToggle('login_notifications')}
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label className="text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Alertas de Atividade Suspeita
-                </Label>
-                <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                  Detectar e alertar sobre atividades suspeitas
-                </p>
-              </div>
-              <Switch 
-                checked={settings.suspicious_activity_alerts}
-                onCheckedChange={() => handleToggle('suspicious_activity_alerts')}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                Timeout de Sessão (minutos)
-              </Label>
-              <div className="flex gap-2">
-                {[15, 30, 60, 120].map((minutes) => (
-                  <Badge
-                    key={minutes}
-                    variant={settings.session_timeout === minutes ? "default" : "outline"}
-                    className="cursor-pointer"
-                    onClick={() => handleSessionTimeoutChange(minutes)}
-                  >
-                    {minutes}min
-                  </Badge>
-                ))}
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Change Password */}
-      <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100">
-            Alterar Senha
-          </CardTitle>
-          <CardDescription className="text-neutral-600 dark:text-neutral-300">
-            Mantenha sua senha segura e atualizada
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="current-password">Senha Atual</Label>
-            <div className="relative">
-              <Input
-                id="current-password"
-                type={showPasswords ? "text" : "password"}
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Digite sua senha atual"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={() => setShowPasswords(!showPasswords)}
+          {/* Password Change */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              Alteração de Senha
+            </h3>
+            
+            <div className="space-y-3 max-w-md">
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">Nova Senha</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Digite sua nova senha"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirme sua nova senha"
+                />
+              </div>
+              
+              <Button 
+                onClick={handleChangePassword}
+                disabled={changingPassword || !newPassword || !confirmPassword}
+                variant="outline"
               >
-                {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {changingPassword ? "Alterando..." : "Alterar Senha"}
               </Button>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="new-password">Nova Senha</Label>
-            <Input
-              id="new-password"
-              type={showPasswords ? "text" : "password"}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Digite sua nova senha"
-            />
-            {settings.password_complexity && newPassword && (
-              <div className="text-xs space-y-1">
-                <p className={`${newPassword.length >= 8 ? 'text-green-600' : 'text-red-600'}`}>
-                  ✓ Pelo menos 8 caracteres
-                </p>
-                <p className={`${/[A-Z]/.test(newPassword) ? 'text-green-600' : 'text-red-600'}`}>
-                  ✓ Pelo menos uma letra maiúscula
-                </p>
-                <p className={`${/[a-z]/.test(newPassword) ? 'text-green-600' : 'text-red-600'}`}>
-                  ✓ Pelo menos uma letra minúscula
-                </p>
-                <p className={`${/\d/.test(newPassword) ? 'text-green-600' : 'text-red-600'}`}>
-                  ✓ Pelo menos um número
-                </p>
-                <p className={`${/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-600' : 'text-red-600'}`}>
-                  ✓ Pelo menos um caractere especial
+          {/* Security Status */}
+          {settings.failed_login_attempts > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                Status de Segurança
+              </h3>
+              
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  <strong>Atenção:</strong> Foram detectadas {settings.failed_login_attempts} tentativas de login falhadas em sua conta.
                 </p>
               </div>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirmar Nova Senha</Label>
-            <Input
-              id="confirm-password"
-              type={showPasswords ? "text" : "password"}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirme sua nova senha"
-            />
-          </div>
-
-          <Button 
-            onClick={handleChangePassword}
-            disabled={changingPassword}
-            className="w-full"
-          >
-            {changingPassword ? "Alterando..." : "Alterar Senha"}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Active Sessions */}
-      <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-xl text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-            <Activity className="h-5 w-5" />
-            Sessões Ativas
-          </CardTitle>
-          <CardDescription className="text-neutral-600 dark:text-neutral-300">
-            Gerencie dispositivos conectados à sua conta
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          {activeSessions.map((session, index) => (
-            <div key={session.id}>
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-neutral-900 dark:text-neutral-100">
-                      {session.device}
-                    </p>
-                    {session.current && (
-                      <Badge variant="default" className="text-xs">
-                        Atual
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    {session.location} • Último acesso: {session.last_active}
-                  </p>
-                </div>
-                {!session.current && (
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleTerminateSession(session.id)}
-                    className="text-red-600 border-red-200 hover:bg-red-50"
-                  >
-                    Terminar
-                  </Button>
-                )}
-              </div>
-              {index < activeSessions.length - 1 && <Separator className="mt-4" />}
             </div>
-          ))}
+          )}
         </CardContent>
-      </Card>
-
-      {/* Save Button */}
-      <Card className="border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900/50 shadow-sm">
-        <CardFooter className="pt-6">
+        
+        <CardFooter className="border-t border-neutral-200 dark:border-neutral-700 pt-4">
           <Button 
             onClick={handleSave}
             disabled={loading}
             className="w-full bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
           >
-            {loading ? "Salvando..." : "Salvar Configurações de Segurança"}
+            {loading ? "Salvando..." : "Salvar Configurações"}
           </Button>
         </CardFooter>
       </Card>
