@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle, XCircle, AlertTriangle, Package } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Package, Droplets, TestTube } from 'lucide-react';
 
 interface ExamMaterial {
   inventory_item_id: string;
@@ -13,6 +13,7 @@ interface ExamMaterial {
   available_stock: number;
   sufficient_stock: boolean;
   estimated_cost: number;
+  material_type?: string;
 }
 
 interface MaterialValidation {
@@ -25,9 +26,16 @@ interface MaterialValidation {
 interface MaterialValidationProps {
   validation: MaterialValidation | null;
   loading: boolean;
+  bloodVolume?: number;
+  estimatedTubes?: number;
 }
 
-const MaterialValidation: React.FC<MaterialValidationProps> = ({ validation, loading }) => {
+const MaterialValidation: React.FC<MaterialValidationProps> = ({ 
+  validation, 
+  loading, 
+  bloodVolume, 
+  estimatedTubes 
+}) => {
   if (loading) {
     return (
       <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
@@ -53,6 +61,37 @@ const MaterialValidation: React.FC<MaterialValidationProps> = ({ validation, loa
     return null;
   }
 
+  const getMaterialIcon = (materialType?: string) => {
+    switch (materialType) {
+      case 'blood_tube':
+        return <TestTube className="h-4 w-4 text-red-500" />;
+      case 'reagent':
+        return <Droplets className="h-4 w-4 text-blue-500" />;
+      default:
+        return <Package className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getMaterialTypeLabel = (materialType?: string) => {
+    switch (materialType) {
+      case 'blood_tube':
+        return 'Tubo de Sangue';
+      case 'reagent':
+        return 'Reagente';
+      default:
+        return 'Consumível';
+    }
+  };
+
+  const groupedMaterials = validation.materials.reduce((acc, material) => {
+    const type = material.material_type || 'consumable';
+    if (!acc[type]) {
+      acc[type] = [];
+    }
+    acc[type].push(material);
+    return acc;
+  }, {} as Record<string, ExamMaterial[]>);
+
   return (
     <Card className="bg-white dark:bg-neutral-900/50 border-neutral-200 dark:border-neutral-800">
       <CardHeader>
@@ -67,6 +106,24 @@ const MaterialValidation: React.FC<MaterialValidationProps> = ({ validation, loa
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Informações da coleta de sangue */}
+        {(bloodVolume || estimatedTubes) && (
+          <div className="grid grid-cols-2 gap-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+            {bloodVolume && (
+              <div className="text-center">
+                <div className="text-lg font-bold text-red-600">{bloodVolume.toFixed(1)}ml</div>
+                <div className="text-sm text-red-800 dark:text-red-300">Volume Total</div>
+              </div>
+            )}
+            {estimatedTubes && (
+              <div className="text-center">
+                <div className="text-lg font-bold text-red-600">{estimatedTubes}</div>
+                <div className="text-sm text-red-800 dark:text-red-300">Tubos Necessários</div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Status geral */}
         <Alert className={validation.canSchedule ? 'border-green-200 bg-green-50 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:bg-red-900/20'}>
           <AlertTriangle className="h-4 w-4" />
@@ -78,37 +135,47 @@ const MaterialValidation: React.FC<MaterialValidationProps> = ({ validation, loa
           </AlertDescription>
         </Alert>
 
-        {/* Lista de materiais */}
+        {/* Lista de materiais por tipo */}
         {validation.materials.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <h4 className="font-medium text-neutral-900 dark:text-neutral-100">
               Materiais Necessários:
             </h4>
-            {validation.materials.map((material) => (
-              <div
-                key={material.inventory_item_id}
-                className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                      {material.item_name}
-                    </span>
-                    <Badge variant={material.sufficient_stock ? 'default' : 'destructive'}>
-                      {material.sufficient_stock ? 'Disponível' : 'Insuficiente'}
-                    </Badge>
-                  </div>
-                  <div className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-                    Necessário: {material.quantity_required} | 
-                    Disponível: {material.available_stock} | 
-                    Estoque total: {material.current_stock}
-                  </div>
+            
+            {Object.entries(groupedMaterials).map(([materialType, materials]) => (
+              <div key={materialType} className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  {getMaterialIcon(materialType)}
+                  {getMaterialTypeLabel(materialType)}
                 </div>
-                <div className="text-right">
-                  <div className="font-medium text-neutral-900 dark:text-neutral-100">
-                    R$ {material.estimated_cost.toFixed(2)}
+                
+                {materials.map((material) => (
+                  <div
+                    key={material.inventory_item_id}
+                    className="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg ml-6"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                          {material.item_name}
+                        </span>
+                        <Badge variant={material.sufficient_stock ? 'default' : 'destructive'}>
+                          {material.sufficient_stock ? 'Disponível' : 'Insuficiente'}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                        Necessário: {material.quantity_required} | 
+                        Disponível: {material.available_stock} | 
+                        Estoque total: {material.current_stock}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-medium text-neutral-900 dark:text-neutral-100">
+                        R$ {material.estimated_cost.toFixed(2)}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             ))}
             

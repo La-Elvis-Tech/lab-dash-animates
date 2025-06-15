@@ -3,6 +3,7 @@ import { useAppointments } from './useAppointments';
 import { useExamTypes } from './useExamTypes';
 import { useDoctors } from './useDoctors';
 import { useUnits } from './useUnits';
+import { useBloodExams } from './useBloodExams';
 import { appointmentService } from '@/services/appointmentService';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +13,12 @@ export const useSupabaseAppointments = () => {
   const { examTypes, refreshExamTypes } = useExamTypes();
   const { doctors, refreshDoctors } = useDoctors();
   const { units, refreshUnits } = useUnits();
+  const { 
+    bloodExamTypes, 
+    bloodExamPanels, 
+    calculateBloodVolume, 
+    calculateDetailedMaterials 
+  } = useBloodExams();
   const { toast } = useToast();
 
   const createAppointment = async (appointment: Parameters<typeof appointmentService.createAppointment>[0]) => {
@@ -54,6 +61,11 @@ export const useSupabaseAppointments = () => {
         toast({
           title: 'Agendamento cancelado',
           description: 'O agendamento foi cancelado e os materiais foram liberados.',
+        });
+      } else if (updates.status === 'Concluído') {
+        toast({
+          title: 'Exame concluído',
+          description: 'O exame foi concluído e o estoque foi atualizado automaticamente.',
         });
       } else {
         toast({
@@ -299,6 +311,8 @@ export const useSupabaseAppointments = () => {
     examTypes,
     doctors,
     units,
+    bloodExamTypes,
+    bloodExamPanels,
     loading: appointmentsLoading,
     createAppointment,
     updateAppointment,
@@ -310,6 +324,8 @@ export const useSupabaseAppointments = () => {
     updateExamType,
     deleteExamType,
     calculateExamMaterials: appointmentService.calculateExamMaterials,
+    calculateBloodVolume,
+    calculateDetailedMaterials,
     refreshAppointments,
     refreshExamTypes,
     refreshDoctors,

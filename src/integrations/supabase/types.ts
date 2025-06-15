@@ -92,11 +92,13 @@ export type Database = {
       }
       appointments: {
         Row: {
+          blood_exams: Json | null
           cost: number | null
           created_at: string | null
           created_by: string
           doctor_id: string
           duration_minutes: number | null
+          estimated_tubes_needed: number | null
           exam_type_id: string
           id: string
           notes: string | null
@@ -105,15 +107,18 @@ export type Database = {
           patient_phone: string | null
           scheduled_date: string
           status: string | null
+          total_blood_volume_ml: number | null
           unit_id: string
           updated_at: string | null
         }
         Insert: {
+          blood_exams?: Json | null
           cost?: number | null
           created_at?: string | null
           created_by: string
           doctor_id: string
           duration_minutes?: number | null
+          estimated_tubes_needed?: number | null
           exam_type_id: string
           id?: string
           notes?: string | null
@@ -122,15 +127,18 @@ export type Database = {
           patient_phone?: string | null
           scheduled_date: string
           status?: string | null
+          total_blood_volume_ml?: number | null
           unit_id: string
           updated_at?: string | null
         }
         Update: {
+          blood_exams?: Json | null
           cost?: number | null
           created_at?: string | null
           created_by?: string
           doctor_id?: string
           duration_minutes?: number | null
+          estimated_tubes_needed?: number | null
           exam_type_id?: string
           id?: string
           notes?: string | null
@@ -139,6 +147,7 @@ export type Database = {
           patient_phone?: string | null
           scheduled_date?: string
           status?: string | null
+          total_blood_volume_ml?: number | null
           unit_id?: string
           updated_at?: string | null
         }
@@ -165,6 +174,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      blood_exam_panels: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          total_volume_ml: number
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          total_volume_ml?: number
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          total_volume_ml?: number
+        }
+        Relationships: []
+      }
+      blood_exam_types: {
+        Row: {
+          active: boolean | null
+          category: string
+          code: string | null
+          created_at: string | null
+          id: string
+          name: string
+          preparation_instructions: string | null
+          preparation_required: boolean | null
+          reference_values: Json | null
+          sample_volume_ml: number
+          tube_type: string
+        }
+        Insert: {
+          active?: boolean | null
+          category?: string
+          code?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          preparation_instructions?: string | null
+          preparation_required?: boolean | null
+          reference_values?: Json | null
+          sample_volume_ml?: number
+          tube_type?: string
+        }
+        Update: {
+          active?: boolean | null
+          category?: string
+          code?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          preparation_instructions?: string | null
+          preparation_required?: boolean | null
+          reference_values?: Json | null
+          sample_volume_ml?: number
+          tube_type?: string
+        }
+        Relationships: []
       }
       consumption_data: {
         Row: {
@@ -268,8 +346,10 @@ export type Database = {
           id: string
           inventory_item_id: string
           is_optional: boolean | null
+          material_type: string | null
           notes: string | null
           quantity_required: number
+          volume_per_exam: number | null
         }
         Insert: {
           created_at?: string | null
@@ -277,8 +357,10 @@ export type Database = {
           id?: string
           inventory_item_id: string
           is_optional?: boolean | null
+          material_type?: string | null
           notes?: string | null
           quantity_required?: number
+          volume_per_exam?: number | null
         }
         Update: {
           created_at?: string | null
@@ -286,8 +368,10 @@ export type Database = {
           id?: string
           inventory_item_id?: string
           is_optional?: boolean | null
+          material_type?: string | null
           notes?: string | null
           quantity_required?: number
+          volume_per_exam?: number | null
         }
         Relationships: [
           {
@@ -500,6 +584,39 @@ export type Database = {
           },
         ]
       }
+      panel_exams: {
+        Row: {
+          exam_type_id: string | null
+          id: string
+          panel_id: string | null
+        }
+        Insert: {
+          exam_type_id?: string | null
+          id?: string
+          panel_id?: string | null
+        }
+        Update: {
+          exam_type_id?: string | null
+          id?: string
+          panel_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "panel_exams_exam_type_id_fkey"
+            columns: ["exam_type_id"]
+            isOneToOne: false
+            referencedRelation: "blood_exam_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "panel_exams_panel_id_fkey"
+            columns: ["panel_id"]
+            isOneToOne: false
+            referencedRelation: "blood_exam_panels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -690,6 +807,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_blood_volume_needed: {
+        Args: { p_exam_ids: string[] }
+        Returns: {
+          total_volume_ml: number
+          tubes_needed: number
+          exam_details: Json
+        }[]
+      }
+      calculate_detailed_exam_materials: {
+        Args: { p_exam_type_id: string; p_blood_exams?: string[] }
+        Returns: {
+          inventory_item_id: string
+          item_name: string
+          quantity_required: number
+          current_stock: number
+          reserved_stock: number
+          available_stock: number
+          sufficient_stock: boolean
+          estimated_cost: number
+          material_type: string
+        }[]
+      }
       calculate_exam_materials: {
         Args: { p_exam_type_id: string }
         Returns: {
