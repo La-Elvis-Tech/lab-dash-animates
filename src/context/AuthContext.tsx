@@ -4,16 +4,32 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-export interface AuthUser extends User {
+export interface AuthUser {
+  id: string;
+  email: string;
   user_metadata?: {
     full_name?: string;
     avatar_url?: string;
   };
+  // Add other User properties as needed
+}
+
+export interface Profile {
+  id: string;
+  full_name: string;
+  email: string;
+  status: 'active' | 'pending' | 'suspended';
+  department?: string;
+  position?: string;
+  phone?: string;
+  avatar_url?: string;
+  unit_id?: string;
 }
 
 export interface AuthContextType {
   user: AuthUser | null;
   session: Session | null;
+  profile: Profile | null;
   loading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
@@ -21,9 +37,14 @@ export interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ data: any; error: any }>;
   updateProfile: (updates: { full_name?: string; avatar_url?: string }) => Promise<{ data: any; error: any }>;
+  // Add aliases for backward compatibility
+  login: (email: string, password: string) => Promise<{ data: any; error: any }>;
+  register: (email: string, password: string, fullName?: string) => Promise<{ data: any; error: any }>;
+  logout: () => Promise<void>;
+  isAdmin: () => boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -40,15 +61,48 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      
+      const mappedProfile: Profile = {
+        ...data,
+        status: data.status === 'inactive' ? 'suspended' : data.status
+      };
+      
+      setProfile(mappedProfile);
+      return { data: mappedProfile, error: null };
+    } catch (error: any) {
+      console.error('Error fetching profile:', error);
+      return { data: null, error };
+    }
+  };
 
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-      setUser(session?.user as AuthUser || null);
+      const authUser = session?.user ? {
+        id: session.user.id,
+        email: session.user.email!,
+        user_metadata: session.user.user_metadata
+      } as AuthUser : null;
+      setUser(authUser);
+      
+      if (session?.user) {
+        await fetchProfile(session.user.id);
+      }
       setLoading(false);
     };
 
@@ -58,7 +112,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session);
-        setUser(session?.user as AuthUser || null);
+        const authUser = session?.user ? {
+          id: session.user.id,
+          email: session.user.email!,
+          user_metadata: session.user.user_metadata
+        } as AuthUser : null;
+        setUser(authUser);
+        
+        if (session?.user) {
+          await fetchProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
         setLoading(false);
       }
     );
@@ -153,9 +218,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return result;
   };
 
+  const isAdmin = () => {
+    // Simple admin check - you can enhance this with proper role checking
+    return profile?.status === 'active' && user?.email?.includes('admin');
+  };
+
   const value: AuthContextType = {
     user,
     session,
+    profile,
     loading,
     isAuthenticated: !!user,
     signIn,
@@ -163,6 +234,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signOut,
     resetPassword,
     updateProfile,
+    // Aliases for backward compatibility
+    login: signIn,
+    register: signUp,
+    logout: signOut,
+    isAdmin,
   };
 
   return (

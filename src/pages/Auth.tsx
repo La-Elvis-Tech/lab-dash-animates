@@ -31,7 +31,7 @@ const Auth = () => {
   // Reset password form state
   const [resetEmail, setResetEmail] = useState('');
 
-  const { login, register, isAuthenticated, profile } = useAuth();
+  const { signIn, signUp, isAuthenticated, profile } = useAuth();
   const { resetPassword } = useSupabaseAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ const Auth = () => {
     try {
       setLoading(true);
       setAuthError('');
-      await login(loginEmail, loginPassword);
+      await signIn(loginEmail, loginPassword);
       
       toast({
         title: 'Login realizado com sucesso!',
@@ -86,7 +86,7 @@ const Auth = () => {
       setLoading(true);
       setAuthError('');
       
-      await register(registerEmail, registerPassword, registerName);
+      await signUp(registerEmail, registerPassword, registerName);
       
       toast({
         title: 'Cadastro realizado com sucesso!',
