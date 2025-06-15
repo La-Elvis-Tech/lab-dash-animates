@@ -60,7 +60,7 @@ export const appointmentService = {
 
     const { data, error } = await supabase
       .from('appointments')
-      .insert([appointmentData])
+      .insert(appointmentData)
       .select()
       .single();
 

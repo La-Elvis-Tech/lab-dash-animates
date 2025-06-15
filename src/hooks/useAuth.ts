@@ -2,188 +2,190 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export interface Profile {
   id: string;
   full_name: string;
   email: string;
-  position?: string;
+  status: 'active' | 'pending' | 'suspended';
   department?: string;
-  unit_id?: string;
+  position?: string;
   phone?: string;
   avatar_url?: string;
-  status: 'active' | 'inactive' | 'pending';
+  unit_id?: string;
 }
 
-export interface UserRole {
-  role: 'admin' | 'user' | 'supervisor';
-}
+export type UserRole = 'admin' | 'supervisor' | 'user';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initializing, setInitializing] = useState(true);
+  const { toast } = useToast();
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      setProfile(data);
+    } catch (error: any) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .order('granted_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      setRole(data?.role || null);
+    } catch (error: any) {
+      console.error('Error fetching user role:', error);
+    }
+  };
 
   useEffect(() => {
-    let mounted = true;
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!mounted) return;
+        setSession(session);
+        setUser(session?.user ?? null);
         
         if (session?.user) {
-          setSession(session);
-          setUser(session.user);
-          
-          setTimeout(async () => {
-            if (mounted) {
-              await fetchUserData(session.user.id);
-            }
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+            fetchUserRole(session.user.id);
           }, 0);
         } else {
-          setSession(null);
-          setUser(null);
           setProfile(null);
-          setUserRole(null);
+          setRole(null);
         }
         
-        if (mounted) {
-          setLoading(false);
-        }
+        setLoading(false);
+        setInitializing(false);
       }
     );
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
+      setSession(session);
+      setUser(session?.user ?? null);
       
       if (session?.user) {
-        setSession(session);
-        setUser(session.user);
-        fetchUserData(session.user.id);
+        fetchProfile(session.user.id);
+        fetchUserRole(session.user.id);
       }
       
       setLoading(false);
+      setInitializing(false);
     });
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserData = async (userId: string) => {
-    try {
-      const [profileResult, roleResult] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', userId).single(),
-        supabase.from('user_roles').select('role').eq('user_id', userId).order('role').limit(1)
-      ]);
-
-      if (profileResult.data) {
-        setProfile(profileResult.data);
-      }
-
-      if (roleResult.data && roleResult.data.length > 0) {
-        setUserRole({ role: roleResult.data[0].role });
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
-
   const signIn = async (email: string, password: string) => {
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('status, full_name')
-      .eq('email', email)
-      .single();
-
-    if (!profileData) {
-      throw new Error('Usuário não encontrado no sistema.');
+    const result = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (result.error) {
+      toast({
+        title: 'Erro no login',
+        description: result.error.message,
+        variant: 'destructive',
+      });
     }
-
-    if (profileData.status === 'pending') {
-      throw new Error('Sua conta ainda está pendente de aprovação. Aguarde a aprovação de um administrador.');
-    }
-
-    if (profileData.status === 'inactive') {
-      throw new Error('Sua conta foi desativada. Entre em contato com um administrador.');
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    return { data, error };
+    
+    return result;
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `https://laelvistech.netlify.app/`;
-    
-    const { data, error } = await supabase.auth.signUp({
+    const result = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
-        }
-      }
+        },
+        emailRedirectTo: `${window.location.origin}/`,
+      },
     });
-
-    return { data, error };
+    
+    if (result.error) {
+      toast({
+        title: 'Erro no cadastro',
+        description: result.error.message,
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: 'Cadastro realizado',
+        description: 'Verifique seu email para confirmar a conta.',
+      });
+    }
+    
+    return result;
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      setUserRole(null);
+    const result = await supabase.auth.signOut();
+    
+    if (result.error) {
+      toast({
+        title: 'Erro ao sair',
+        description: result.error.message,
+        variant: 'destructive',
+      });
     }
-    return { error };
+    
+    return result;
   };
 
   const resetPassword = async (email: string) => {
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('email')
-      .eq('email', email)
-      .single();
-
-    if (profileError || !profileData) {
-      throw new Error('Email não encontrado no sistema.');
-    }
-
-    const redirectUrl = `https://laelvistech.netlify.app/reset-password`;
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl,
+    const result = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
-
-    return { error };
-  };
-
-  const hasRole = (role: 'admin' | 'user' | 'supervisor'): boolean => {
-    return userRole?.role === role;
+    
+    if (result.error) {
+      toast({
+        title: 'Erro',
+        description: result.error.message,
+        variant: 'destructive',
+      });
+    } else {
+      toast({
+        title: 'Email enviado',
+        description: 'Verifique seu email para redefinir a senha.',
+      });
+    }
+    
+    return result;
   };
 
   return {
     user,
     session,
     profile,
-    userRole,
+    role,
     loading,
-    signUp,
+    initializing,
     signIn,
+    signUp,
     signOut,
     resetPassword,
-    hasRole,
-    isAdmin: () => hasRole('admin'),
-    isSupervisor: () => hasRole('supervisor') || hasRole('admin'),
-    isAuthenticated: !!user && !!session,
+    refreshProfile: () => user && fetchProfile(user.id),
+    refreshRole: () => user && fetchUserRole(user.id),
+    isAuthenticated: !!session,
   };
 };

@@ -10,7 +10,7 @@ import {
   DollarSign,
   AlertTriangle
 } from 'lucide-react';
-import { SupabaseAppointment } from '@/hooks/useSupabaseAppointments';
+import { SupabaseAppointment } from '@/types/appointment';
 import { format, startOfDay, endOfDay } from 'date-fns';
 
 interface AppointmentsStatsProps {
