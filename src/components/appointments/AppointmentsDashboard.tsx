@@ -46,6 +46,31 @@ const AppointmentsDashboard: React.FC = () => {
     await refreshAppointments();
   };
 
+  // Wrap the functions to match expected interface
+  const handleCreateDoctor = async (doctorData: any) => {
+    await createDoctor(doctorData);
+  };
+
+  const handleUpdateDoctor = async (id: string, updates: any) => {
+    await updateDoctor(id, updates);
+  };
+
+  const handleDeleteDoctor = async (id: string) => {
+    await deleteDoctor(id);
+  };
+
+  const handleCreateExamType = async (examTypeData: any) => {
+    await createExamType(examTypeData);
+  };
+
+  const handleUpdateExamType = async (id: string, updates: any) => {
+    await updateExamType(id, updates);
+  };
+
+  const handleDeleteExamType = async (id: string) => {
+    await deleteExamType(id);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -122,18 +147,18 @@ const AppointmentsDashboard: React.FC = () => {
           <DoctorManagement
             doctors={doctors}
             units={units}
-            onCreateDoctor={createDoctor}
-            onUpdateDoctor={updateDoctor}
-            onDeleteDoctor={deleteDoctor}
+            onCreateDoctor={handleCreateDoctor}
+            onUpdateDoctor={handleUpdateDoctor}
+            onDeleteDoctor={handleDeleteDoctor}
           />
         </TabsContent>
 
         <TabsContent value="exam-types">
           <ExamTypeManagement
             examTypes={examTypes}
-            onCreateExamType={createExamType}
-            onUpdateExamType={updateExamType}
-            onDeleteExamType={deleteExamType}
+            onCreateExamType={handleCreateExamType}
+            onUpdateExamType={handleUpdateExamType}
+            onDeleteExamType={handleDeleteExamType}
           />
         </TabsContent>
       </Tabs>

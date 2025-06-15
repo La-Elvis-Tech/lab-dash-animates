@@ -94,11 +94,10 @@ export const useSupabaseAppointments = () => {
     }
   };
 
-  // Implementar as funções que estavam em desenvolvimento
   const createDoctor = async (doctorData: {
     name: string;
-    specialty: string;
-    crm: string;
+    specialty?: string;
+    crm?: string;
     email?: string;
     phone?: string;
     unit_id?: string;
@@ -121,8 +120,6 @@ export const useSupabaseAppointments = () => {
         title: 'Médico criado',
         description: `Dr(a). ${doctorData.name} foi adicionado com sucesso.`,
       });
-
-      return data;
     } catch (error: any) {
       console.error('Error creating doctor:', error);
       toast({
@@ -134,14 +131,14 @@ export const useSupabaseAppointments = () => {
     }
   };
 
-  const updateDoctor = async (id: string, updates: Partial<{
-    name: string;
-    specialty: string;
-    crm: string;
-    email: string;
-    phone: string;
-    unit_id: string;
-  }>) => {
+  const updateDoctor = async (id: string, updates: {
+    name?: string;
+    specialty?: string;
+    crm?: string;
+    email?: string;
+    phone?: string;
+    unit_id?: string;
+  }) => {
     try {
       const { data, error } = await supabase
         .from('doctors')
@@ -158,8 +155,6 @@ export const useSupabaseAppointments = () => {
         title: 'Médico atualizado',
         description: 'As informações do médico foram atualizadas com sucesso.',
       });
-
-      return data;
     } catch (error: any) {
       console.error('Error updating doctor:', error);
       toast({
@@ -199,11 +194,11 @@ export const useSupabaseAppointments = () => {
 
   const createExamType = async (examTypeData: {
     name: string;
-    category: string;
+    category?: string;
     description?: string;
-    duration_minutes: number;
+    duration_minutes?: number;
     cost?: number;
-    requires_preparation: boolean;
+    requires_preparation?: boolean;
     preparation_instructions?: string;
   }) => {
     try {
@@ -211,6 +206,8 @@ export const useSupabaseAppointments = () => {
         .from('exam_types')
         .insert({
           ...examTypeData,
+          duration_minutes: examTypeData.duration_minutes || 30,
+          requires_preparation: examTypeData.requires_preparation || false,
           active: true,
         })
         .select()
@@ -224,8 +221,6 @@ export const useSupabaseAppointments = () => {
         title: 'Tipo de exame criado',
         description: `${examTypeData.name} foi adicionado com sucesso.`,
       });
-
-      return data;
     } catch (error: any) {
       console.error('Error creating exam type:', error);
       toast({
@@ -237,15 +232,15 @@ export const useSupabaseAppointments = () => {
     }
   };
 
-  const updateExamType = async (id: string, updates: Partial<{
-    name: string;
-    category: string;
-    description: string;
-    duration_minutes: number;
-    cost: number;
-    requires_preparation: boolean;
-    preparation_instructions: string;
-  }>) => {
+  const updateExamType = async (id: string, updates: {
+    name?: string;
+    category?: string;
+    description?: string;
+    duration_minutes?: number;
+    cost?: number;
+    requires_preparation?: boolean;
+    preparation_instructions?: string;
+  }) => {
     try {
       const { data, error } = await supabase
         .from('exam_types')
@@ -262,8 +257,6 @@ export const useSupabaseAppointments = () => {
         title: 'Tipo de exame atualizado',
         description: 'As informações foram atualizadas com sucesso.',
       });
-
-      return data;
     } catch (error: any) {
       console.error('Error updating exam type:', error);
       toast({
