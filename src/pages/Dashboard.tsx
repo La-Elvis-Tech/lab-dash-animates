@@ -96,10 +96,9 @@ const Dashboard: React.FC = () => {
           <div className="dashboard-card h-[400px]">
             <UnitSelectorCard />
           </div>
-          
-          <div className="dashboard-card">
-            <InventoryGauges />
-          </div>
+          <div className="dashboard-chart">
+        <RiskAlertsCard />
+      </div>
         </div>
 
         {/* Coluna central - Analytics avançados */}
@@ -135,24 +134,9 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Seção de alertas de risco */}
-      <div className="dashboard-chart">
-        <RiskAlertsCard />
-      </div>
-
-      {/* Gráfico de consumo */}
       <div className="dashboard-card">
-        <DashboardChart
-          type="bar"
-          data={consumptionData || []}
-          title="Consumo de Materiais"
-          description="Materiais consumidos nos últimos 7 meses"
-        />
-      </div>
-
-      {/* Tabela de estoque baixo - largura total */}
-      <div className="dashboard-chart">
-        <LowStockTable />
-      </div>
+            <InventoryGauges />
+          </div>
     </div>
   );
 };

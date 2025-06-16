@@ -150,7 +150,7 @@ const Inventory = () => {
 
       <LowStockAlert lowStockItems={lowStockItems} />
 
-      <InventoryStats items={uniqueItems} />
+      {/* <InventoryStats items={uniqueItems} /> */}
 
       <InventoryFilters
         searchTerm={searchTerm}
