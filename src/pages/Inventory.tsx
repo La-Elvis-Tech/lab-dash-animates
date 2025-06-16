@@ -1,230 +1,377 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { AlertCircle, Loader2, Plus, Trash } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Plus, Search, Filter, Package } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useSupabaseInventory } from '@/hooks/useSupabaseInventory';
 import { useToast } from '@/hooks/use-toast';
-import { useAlerts } from '@/hooks/useAlerts';
-import { Button } from '@/components/ui/button';
-import { Package } from 'lucide-react';
 import InventoryTable from '@/components/inventory/InventoryTable';
 import InventoryStats from '@/components/inventory/InventoryStats';
-import InventoryHeader from '@/components/inventory/InventoryHeader';
 import InventoryFilters from '@/components/inventory/InventoryFilters';
-import LowStockAlert from '@/components/inventory/LowStockAlert';
+import InventoryStockHealth from '@/components/inventory/InventoryStockHealth';
+import { SkeletonInventory } from '@/components/ui/skeleton-inventory';
+import { useAuthContext } from '@/context/AuthContext';
+import { InventoryItem } from '@/types/inventory';
 
 const Inventory = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [stockFilter, setStockFilter] = useState('all');
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  
-  const { 
-    items: inventoryItems, 
-    categories, 
-    loading, 
-    userUnit,
-    addItem,
-    updateItem, 
-    deleteItem, 
-    refreshItems 
+  const { toast } = useToast();
+  const { profile } = useAuthContext();
+
+  const {
+    items: inventoryItems,
+    categories,
+    loading,
+    addItem: addInventoryItem,
+    updateItem: updateInventoryItem,
+    deleteItem: deleteInventoryItem,
+    refreshItems
   } = useSupabaseInventory();
 
-  const { toast } = useToast();
-  const { sendEmailForAlert } = useAlerts();
-
-  // Remove duplicates based on name and unit_id
-  const uniqueItems = inventoryItems.filter((item, index, self) => 
-    index === self.findIndex((i) => i.name === item.name && i.unit_id === item.unit_id)
-  );
-
-  const filteredItems = uniqueItems.filter(item => {
-    const categoryName = item.categories?.name || 'Sem categoria';
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (item.supplier || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = selectedCategory === "all" || item.category_id === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
+  const [newItem, setNewItem] = useState({
+    name: '',
+    description: '',
+    category_id: '',
+    current_stock: 0,
+    min_stock: 0,
+    max_stock: 100,
+    unit_measure: '',
+    cost_per_unit: 0,
+    supplier: '',
+    sku: '',
+    storage_location: '',
+    expiry_date: '',
+    lot_number: ''
   });
 
-  const lowStockItems = uniqueItems.filter(item => item.current_stock <= item.min_stock);
+  const resetForm = () => {
+    setNewItem({
+      name: '',
+      description: '',
+      category_id: '',
+      current_stock: 0,
+      min_stock: 0,
+      max_stock: 100,
+      unit_measure: '',
+      cost_per_unit: 0,
+      supplier: '',
+      sku: '',
+      storage_location: '',
+      expiry_date: '',
+      lot_number: ''
+    });
+  };
+
+  const handleAddItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const itemData = {
+        ...newItem,
+        unit: newItem.unit_measure, // Map unit_measure to unit
+        unit_id: profile?.unit_id || '', // Add unit_id from user profile
+        active: true, // Add active field
+        expiry_date: newItem.expiry_date || null
+      };
+      
+      await addInventoryItem(itemData);
+      
+      toast({
+        title: 'Item adicionado',
+        description: 'O item foi adicionado ao inventário com sucesso.',
+      });
+      
+      setIsAddDialogOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error adding item:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível adicionar o item ao inventário.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const handleSelectItem = (itemId: string) => {
-    const newSelected = new Set(selectedItems);
-    if (newSelected.has(itemId)) {
-      newSelected.delete(itemId);
+    const newSelectedItems = new Set(selectedItems);
+    if (newSelectedItems.has(itemId)) {
+      newSelectedItems.delete(itemId);
     } else {
-      newSelected.add(itemId);
+      newSelectedItems.add(itemId);
     }
-    setSelectedItems(newSelected);
+    setSelectedItems(newSelectedItems);
   };
 
   const handleSelectAll = () => {
-    if (selectedItems.size === filteredItems.length) {
+    if (selectedItems.size === filteredItems.length && filteredItems.length > 0) {
       setSelectedItems(new Set());
     } else {
       setSelectedItems(new Set(filteredItems.map(item => item.id)));
     }
   };
 
-  const handleDeleteSelected = async () => {
-    for (const itemId of selectedItems) {
-      await deleteItem(itemId);
-    }
-    setSelectedItems(new Set());
-    refreshItems();
-  };
-
-  const handleExport = () => {
-    toast({
-      title: "Exportação iniciada",
-      description: "Os dados do inventário estão sendo exportados."
-    });
-    setShowExportDialog(false);
-  };
-
-  const handleAddSuccess = () => {
-    setShowAddDialog(false);
-    refreshItems();
-    toast({
-      title: "Item adicionado",
-      description: "O item foi adicionado ao inventário com sucesso."
-    });
-  };
-
   const handleUpdateSuccess = () => {
+    // Refresh the items after successful update
     refreshItems();
+  };
+
+  const handleLowStockAlert = (item: InventoryItem) => {
     toast({
-      title: "Item atualizado",
-      description: "O item foi atualizado com sucesso."
+      title: 'Estoque Baixo',
+      description: `O item "${item.name}" está com estoque baixo (${item.current_stock} unidades).`,
+      variant: 'destructive',
     });
   };
 
-  const handleLowStockAlert = (item: any) => {
-    sendEmailForAlert({
-      id: `stock-${item.id}`,
-      type: "stock",
-      priority: "high",
-      title: `Estoque Baixo - ${item.name}`,
-      description: `Apenas ${item.current_stock} ${item.unit} restantes (mínimo: ${item.min_stock})`,
-      item: item.name,
-      currentStock: item.current_stock,
-      minStock: item.min_stock,
-      unit: item.unit,
-      createdAt: new Date(),
-      status: "active",
-      isRead: false
-    });
-  };
+  const filteredItems = inventoryItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory === 'all' || item.category_id === selectedCategory;
+    
+    let matchesStock = true;
+    if (stockFilter === 'low') {
+      matchesStock = item.current_stock <= item.min_stock;
+    } else if (stockFilter === 'normal') {
+      matchesStock = item.current_stock > item.min_stock;
+    }
+    
+    return matchesSearch && matchesCategory && matchesStock;
+  });
 
-  if (!userUnit) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <Package className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-neutral-700 dark:text-neutral-300">
-            Unidade não encontrada
-          </h3>
-          <p className="text-neutral-500 dark:text-neutral-400">
-            Você precisa estar associado a uma unidade para acessar o inventário.
-          </p>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <SkeletonInventory />;
   }
 
   return (
     <div className="space-y-6">
-      <InventoryHeader
-        unitName={userUnit.name}
-        categories={categories}
-        onAddSuccess={handleAddSuccess}
-        onExport={handleExport}
-        showAddDialog={showAddDialog}
-        setShowAddDialog={setShowAddDialog}
-        showExportDialog={showExportDialog}
-        setShowExportDialog={setShowExportDialog}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+          Inventário
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">
+          Gerencie o estoque de materiais e suprimentos do laboratório
+        </p>
+      </div>
+
+      <InventoryStats items={inventoryItems} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <InventoryFilters
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            categories={categories}
+          />
+        </div>
+        <div>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar Item
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Item</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleAddItem} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Nome *</Label>
+                    <Input
+                      id="name"
+                      value={newItem.name}
+                      onChange={(e) => setNewItem(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Nome do item"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Categoria *</Label>
+                    <Select 
+                      value={newItem.category_id} 
+                      onValueChange={(value) => setNewItem(prev => ({ ...prev, category_id: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.filter(category => category.id).map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Descrição</Label>
+                  <Textarea
+                    id="description"
+                    value={newItem.description}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Descrição do item"
+                    rows={2}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="current_stock">Estoque Atual *</Label>
+                    <Input
+                      id="current_stock"
+                      type="number"
+                      min="0"
+                      value={newItem.current_stock}
+                      onChange={(e) => setNewItem(prev => ({ ...prev, current_stock: parseInt(e.target.value) || 0 }))}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="unit_measure">Unidade de Medida *</Label>
+                    <Input
+                      id="unit_measure"
+                      value={newItem.unit_measure}
+                      onChange={(e) => setNewItem(prev => ({ ...prev, unit_measure: e.target.value }))}
+                      placeholder="Ex: mL, Kg, Unidade"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="min_stock">Estoque Mínimo *</Label>
+                    <Input
+                      id="min_stock"
+                      type="number"
+                      min="0"
+                      value={newItem.min_stock}
+                      onChange={(e) => setNewItem(prev => ({ ...prev, min_stock: parseInt(e.target.value) || 0 }))}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cost_per_unit">Custo por Unidade *</Label>
+                    <Input
+                      id="cost_per_unit"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={newItem.cost_per_unit}
+                      onChange={(e) => setNewItem(prev => ({ ...prev, cost_per_unit: parseFloat(e.target.value) || 0 }))}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="supplier">Fornecedor</Label>
+                  <Input
+                    id="supplier"
+                    value={newItem.supplier}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, supplier: e.target.value }))}
+                    placeholder="Nome do fornecedor"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="sku">SKU</Label>
+                    <Input
+                      id="sku"
+                      value={newItem.sku}
+                      onChange={(e) => setNewItem(prev => ({ ...prev, sku: e.target.value }))}
+                      placeholder="Código SKU"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="storage_location">Local de Armazenamento</Label>
+                    <Input
+                      id="storage_location"
+                      value={newItem.storage_location}
+                      onChange={(e) => setNewItem(prev => ({ ...prev, storage_location: e.target.value }))}
+                      placeholder="Ex: Prateleira A, Geladeira"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="expiry_date">Data de Validade</Label>
+                  <Input
+                    id="expiry_date"
+                    type="date"
+                    value={newItem.expiry_date}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, expiry_date: e.target.value }))}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="lot_number">Número do Lote</Label>
+                  <Input
+                    id="lot_number"
+                    value={newItem.lot_number}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, lot_number: e.target.value }))}
+                    placeholder="Número do lote"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsAddDialogOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Adicionar Item
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <InventoryStockHealth 
+        items={inventoryItems} 
+        expiringItems={inventoryItems.filter(item => {
+          if (!item.expiry_date) return false;
+          const expiryDate = new Date(item.expiry_date);
+          const thirtyDaysFromNow = new Date();
+          thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+          return expiryDate <= thirtyDaysFromNow;
+        })} 
       />
 
-      <LowStockAlert lowStockItems={lowStockItems} />
-
-      {/* <InventoryStats items={uniqueItems} /> */}
-
-      <InventoryFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        categories={categories}
+      <InventoryTable
+        items={filteredItems}
+        selectedItems={selectedItems}
+        onSelectItem={handleSelectItem}
+        onSelectAll={handleSelectAll}
+        onUpdateItem={updateInventoryItem}
+        onDeleteItem={deleteInventoryItem}
+        onUpdateSuccess={handleUpdateSuccess}
+        onLowStockAlert={handleLowStockAlert}
       />
-
-      {selectedItems.size > 0 && (
-        <div className="flex items-center justify-between bg-neutral-100 dark:bg-neutral-800 p-2 rounded-md">
-          <span className="text-sm font-medium ml-2">
-            {selectedItems.size} {selectedItems.size === 1 ? 'item' : 'itens'} selecionados
-          </span>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setSelectedItems(new Set())}
-            >
-              Limpar
-            </Button>
-            <Button 
-              variant="destructive" 
-              size="sm"
-              onClick={handleDeleteSelected}
-            >
-              <Trash className="h-4 w-4 mr-1" />
-              Excluir
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-neutral-500" />
-            <p className="mt-2 text-neutral-500">Carregando inventário...</p>
-          </div>
-        </div>
-      ) : filteredItems.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center h-64">
-            <AlertCircle className="h-10 w-10 text-neutral-400 mb-4" />
-            <h3 className="text-lg font-medium text-neutral-700 dark:text-neutral-300">
-              Nenhum item encontrado
-            </h3>
-            <p className="text-neutral-500 dark:text-neutral-400 text-center max-w-md mt-2">
-              {searchTerm 
-                ? `Não encontramos itens correspondentes à sua busca "${searchTerm}".` 
-                : "Não há itens no inventário para esta categoria."}
-            </p>
-            <Button 
-              className="mt-4"
-              onClick={() => setShowAddDialog(true)}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Adicionar Item
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <InventoryTable 
-          items={filteredItems}
-          selectedItems={selectedItems}
-          onSelectItem={handleSelectItem}
-          onSelectAll={handleSelectAll}
-          onUpdateItem={updateItem}
-          onDeleteItem={deleteItem}
-          onUpdateSuccess={handleUpdateSuccess}
-          onLowStockAlert={handleLowStockAlert}
-        />
-      )}
     </div>
   );
 };

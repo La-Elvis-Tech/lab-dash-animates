@@ -1,4 +1,7 @@
-// Utility functions for exporting data without xlsx dependency
+
+import * as XLSX from 'xlsx';
+
+// Utility functions for exporting data
 export const exportToCSV = (data: any[], filename: string) => {
   if (!data || data.length === 0) {
     console.warn('No data to export');
@@ -61,32 +64,47 @@ export const exportToJSON = (data: any[], filename: string) => {
   URL.revokeObjectURL(url);
 };
 
-// NOVO: Exportar para Excel XLSX
-import * as XLSX from "xlsx";
-
-export const exportToXLSX = (data: any[], filename: string) => {
+export const exportToExcel = (data: any[], filename: string, sheetName: string = 'Dados') => {
   if (!data || data.length === 0) {
     console.warn('No data to export');
     return;
   }
 
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Relatório");
+  try {
+    // Create a new workbook
+    const workbook = XLSX.utils.book_new();
+    
+    // Convert data to worksheet
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    
+    // Generate Excel file and trigger download
+    XLSX.writeFile(workbook, `${filename}.xlsx`);
+  } catch (error) {
+    console.error('Erro ao exportar para Excel:', error);
+    throw new Error('Falha ao exportar dados para Excel');
+  }
+};
 
-  const xlsxBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  const blob = new Blob([xlsxBuffer], { type: 'application/octet-stream' });
-
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-
-  link.href = url;
-  link.download = `${filename}.xlsx`;
-  link.style.visibility = 'hidden';
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  URL.revokeObjectURL(url);
+export const exportMultipleSheets = (
+  sheets: Array<{ data: any[]; name: string }>, 
+  filename: string
+) => {
+  try {
+    const workbook = XLSX.utils.book_new();
+    
+    sheets.forEach(sheet => {
+      if (sheet.data && sheet.data.length > 0) {
+        const worksheet = XLSX.utils.json_to_sheet(sheet.data);
+        XLSX.utils.book_append_sheet(workbook, worksheet, sheet.name);
+      }
+    });
+    
+    XLSX.writeFile(workbook, `${filename}.xlsx`);
+  } catch (error) {
+    console.error('Erro ao exportar múltiplas abas:', error);
+    throw new Error('Falha ao exportar dados para Excel');
+  }
 };

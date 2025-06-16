@@ -1,230 +1,291 @@
 
-import { useState, useEffect } from "react";
-import { toast } from "@/hooks/use-toast";
-import { useEmailAlerts } from "./useEmailAlerts";
-import { useUserProfile } from "./useUserProfile";
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useEmailAlerts } from '@/hooks/useEmailAlerts';
 
 export interface Alert {
   id: string;
-  type: "stock" | "expiry" | "prediction";
-  priority: "critical" | "high" | "medium";
+  type: 'stock' | 'expiry' | 'forecast' | 'system';
   title: string;
   description: string;
-  item: string;
-  unit_id?: string;
-  unit_name?: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  timestamp: string;
+  resolved: boolean;
+  isRead: boolean;
+  status: 'active' | 'resolved';
+  createdAt: string;
+  item?: string;
   currentStock?: number;
   minStock?: number;
   unit?: string;
-  expiryDate?: Date;
+  expiryDate?: string;
   lot?: string;
-  predictedDate?: Date;
-  createdAt: Date;
-  status: "active" | "resolved";
-  isRead: boolean;
-}
-
-export interface ResolvedAlert {
-  id: string;
-  type: "stock" | "expiry" | "prediction";
-  title: string;
-  resolvedAt: Date;
-  resolvedBy: string;
-  action: string;
-  status: "resolved";
+  forecastDate?: string;
+  unitId?: string;
 }
 
 export const useAlerts = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [hasShownToast, setHasShownToast] = useState(false);
-  const { sendAlertEmail } = useEmailAlerts();
-  const { profile } = useUserProfile();
+  const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const { toast } = useToast();
+  const { sendStockAlert, sendForecastAlert } = useEmailAlerts();
 
-  // Mock data com status de leitura filtrado por unidade
-  const generateMockAlerts = (): Alert[] => {
-    const baseAlerts: Alert[] = [
-      {
-        id: "A001",
-        type: "stock",
-        priority: "critical",
-        title: "Estoque Crítico - Etanol Absoluto",
-        description: "Apenas 2L restantes (mínimo: 5L)",
-        item: "Etanol Absoluto",
-        unit_id: "550e8400-e29b-41d4-a716-446655440101",
-        unit_name: "Matriz - Centro",
-        currentStock: 2,
-        minStock: 5,
-        unit: "L",
-        createdAt: new Date(2024, 5, 10, 14, 30),
-        status: "active",
-        isRead: false
-      },
-      {
-        id: "A002",
-        type: "expiry",
-        priority: "high",
-        title: "Vencimento Próximo - Reagente X",
-        description: "Vence em 3 dias (Lote: LT-2024-001)",
-        item: "Reagente X",
-        unit_id: "550e8400-e29b-41d4-a716-446655440101",
-        unit_name: "Matriz - Centro",
-        expiryDate: new Date(2024, 5, 15),
-        lot: "LT-2024-001",
-        createdAt: new Date(2024, 5, 10, 9, 15),
-        status: "active",
-        isRead: true
-      },
-      {
-        id: "A003",
-        type: "prediction",
-        priority: "medium",
-        title: "Predição de Ruptura - Luvas Nitrila",
-        description: "Estoque pode esgotar em 7 dias baseado no consumo atual",
-        item: "Luvas Nitrila",
-        unit_id: "550e8400-e29b-41d4-a716-446655440102",
-        unit_name: "Filial - Zona Sul",
-        predictedDate: new Date(2024, 5, 19),
-        createdAt: new Date(2024, 5, 10, 16, 45),
-        status: "active",
-        isRead: false
-      },
-      {
-        id: "A004",
-        type: "stock",
-        priority: "high",
-        title: "Estoque Baixo - Tubos de Ensaio",
-        description: "Apenas 15 unidades restantes (mínimo: 50)",
-        item: "Tubos de Ensaio",
-        unit_id: "550e8400-e29b-41d4-a716-446655440101",
-        unit_name: "Matriz - Centro",
-        currentStock: 15,
-        minStock: 50,
-        unit: "unidades",
-        createdAt: new Date(2024, 5, 12, 8, 20),
-        status: "active",
-        isRead: false
-      },
-      {
-        id: "A005",
-        type: "stock",
-        priority: "medium",
-        title: "Estoque Baixo - Ponteiras 1000μl",
-        description: "Apenas 80 unidades restantes (mínimo: 200)",
-        item: "Ponteiras 1000μl",
-        unit_id: "550e8400-e29b-41d4-a716-446655440102",
-        unit_name: "Filial - Zona Sul",
-        currentStock: 80,
-        minStock: 200,
-        unit: "unidades",
-        createdAt: new Date(2024, 5, 13, 10, 30),
-        status: "active",
-        isRead: false
+  const generatePredictionAlerts = async () => {
+    try {
+      // Buscar itens com consumo alto mas estoque baixo
+      const { data: highDemandItems, error } = await supabase
+        .from('inventory_items')
+        .select('*')
+        .lt('current_stock', 100)
+        .eq('active', true);
+
+      if (error) throw error;
+
+      const predictionAlerts: Alert[] = highDemandItems?.map(item => ({
+        id: `forecast-${item.id}`,
+        type: 'forecast' as const,
+        title: 'Previsão de Demanda Alta',
+        description: `Item ${item.name} pode ter demanda alta nas próximas semanas`,
+        priority: 'medium' as const,
+        timestamp: new Date().toISOString(),
+        resolved: false,
+        isRead: false,
+        status: 'active' as const,
+        createdAt: new Date().toISOString(),
+        item: item.name,
+        currentStock: item.current_stock,
+        unit: item.unit_measure,
+        forecastDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        unitId: item.unit_id
+      })) || [];
+
+      // Enviar alertas por email se habilitado
+      for (const alert of predictionAlerts) {
+        if (alert.item) {
+          await sendForecastAlert({
+            item: alert.item,
+            predicted_date: alert.forecastDate || '',
+            unit_id: alert.unitId
+          });
+        }
       }
-    ];
 
-    // Filtrar alertas por unidade do usuário se disponível
-    if (profile?.unit_id) {
-      return baseAlerts.filter(alert => alert.unit_id === profile.unit_id);
+      return predictionAlerts;
+    } catch (error) {
+      console.error('Erro ao gerar alertas de previsão:', error);
+      return [];
     }
+  };
 
-    // Se for admin ou não tiver unidade específica, mostrar todos
-    return baseAlerts;
+  const fetchAlerts = async () => {
+    try {
+      setLoading(true);
+      
+      const stockAlerts = await generateStockAlerts();
+      const expiryAlerts = await generateExpiryAlerts();
+      const predictionAlerts = await generatePredictionAlerts();
+      
+      const allAlerts = [...stockAlerts, ...expiryAlerts, ...predictionAlerts];
+      
+      setAlerts(allAlerts);
+      setUnreadCount(allAlerts.filter(alert => !alert.isRead).length);
+    } catch (error) {
+      console.error('Erro ao buscar alertas:', error);
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível carregar os alertas.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateStockAlerts = async () => {
+    try {
+      const { data: lowStockItems, error } = await supabase
+        .from('inventory_items')
+        .select('*')
+        .filter('current_stock', 'lte', 'min_stock')
+        .eq('active', true);
+
+      if (error) throw error;
+
+      const stockAlerts: Alert[] = lowStockItems?.map(item => ({
+        id: `stock-${item.id}`,
+        type: 'stock' as const,
+        title: 'Estoque Baixo',
+        description: `${item.name} está com estoque abaixo do mínimo`,
+        priority: item.current_stock === 0 ? 'critical' as const : 'high' as const,
+        timestamp: new Date().toISOString(),
+        resolved: false,
+        isRead: false,
+        status: 'active' as const,
+        createdAt: new Date().toISOString(),
+        item: item.name,
+        currentStock: item.current_stock,
+        minStock: item.min_stock,
+        unit: item.unit_measure,
+        unitId: item.unit_id
+      })) || [];
+
+      // Enviar alertas por email se habilitado
+      for (const alert of stockAlerts) {
+        const item = lowStockItems?.find(item => item.name === alert.item);
+        if (item) {
+          await sendStockAlert(item, 'low_stock');
+        }
+      }
+
+      return stockAlerts;
+    } catch (error) {
+      console.error('Erro ao gerar alertas de estoque:', error);
+      return [];
+    }
+  };
+
+  const generateExpiryAlerts = async () => {
+    try {
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+      const { data: expiringItems, error } = await supabase
+        .from('inventory_items')
+        .select('*')
+        .lte('expiry_date', thirtyDaysFromNow.toISOString())
+        .eq('active', true);
+
+      if (error) throw error;
+
+      const expiryAlerts: Alert[] = expiringItems?.map(item => {
+        const expiryDate = new Date(item.expiry_date);
+        const today = new Date();
+        const isExpired = expiryDate < today;
+        const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+        return {
+          id: `expiry-${item.id}`,
+          type: 'expiry' as const,
+          title: isExpired ? 'Item Vencido' : 'Item Próximo ao Vencimento',
+          description: isExpired 
+            ? `${item.name} venceu em ${expiryDate.toLocaleDateString()}`
+            : `${item.name} vence em ${daysUntilExpiry} dias`,
+          priority: isExpired ? 'critical' as const : daysUntilExpiry <= 7 ? 'high' as const : 'medium' as const,
+          timestamp: new Date().toISOString(),
+          resolved: false,
+          isRead: false,
+          status: 'active' as const,
+          createdAt: new Date().toISOString(),
+          item: item.name,
+          expiryDate: item.expiry_date,
+          lot: item.lot_number,
+          unit: item.unit_measure,
+          unitId: item.unit_id
+        };
+      }) || [];
+
+      // Enviar alertas por email se habilitado
+      for (const alert of expiryAlerts) {
+        const item = expiringItems?.find(item => item.name === alert.item);
+        if (item) {
+          const today = new Date();
+          const expiryDate = new Date(item.expiry_date);
+          const alertType = expiryDate < today ? 'expired' : 'expiring_soon';
+          await sendStockAlert(item, alertType);
+        }
+      }
+
+      return expiryAlerts;
+    } catch (error) {
+      console.error('Erro ao gerar alertas de vencimento:', error);
+      return [];
+    }
   };
 
   useEffect(() => {
-    if (profile) {
-      const filteredAlerts = generateMockAlerts();
-      setAlerts(filteredAlerts);
-    }
-  }, [profile]);
+    fetchAlerts();
+    
+    // Atualizar alertas a cada 5 minutos
+    const interval = setInterval(fetchAlerts, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const markAsResolved = (alertId: string) => {
+    setAlerts(prev => prev.map(alert => 
+      alert.id === alertId ? { ...alert, resolved: true, status: 'resolved' as const } : alert
+    ));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  };
+
+  const markAllAsResolved = () => {
+    setAlerts(prev => prev.map(alert => ({ ...alert, resolved: true, status: 'resolved' as const })));
+    setUnreadCount(0);
+  };
 
   const markAsRead = (alertId: string) => {
-    setAlerts(prev => 
-      prev.map(alert => 
-        alert.id === alertId ? { ...alert, isRead: true } : alert
-      )
-    );
+    setAlerts(prev => prev.map(alert => 
+      alert.id === alertId ? { ...alert, isRead: true } : alert
+    ));
+    setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
   const markAllAsRead = () => {
-    setAlerts(prev => 
-      prev.map(alert => ({ ...alert, isRead: true }))
-    );
+    setAlerts(prev => prev.map(alert => ({ ...alert, isRead: true })));
+    setUnreadCount(0);
   };
 
   const getUnreadCount = () => {
-    return alerts.filter(alert => !alert.isRead && alert.status === "active").length;
+    return alerts.filter(alert => !alert.isRead).length;
   };
 
-  const getUnreadAlerts = () => {
-    return alerts.filter(alert => !alert.isRead && alert.status === "active");
-  };
-
-  const getCriticalUnreadAlerts = () => {
-    return alerts.filter(alert => 
-      !alert.isRead && 
-      alert.status === "active" && 
-      (alert.priority === "critical" || alert.priority === "high")
-    );
-  };
-
-  // Enviar alertas por email automaticamente
   const sendEmailForAlert = async (alert: Alert) => {
-    await sendAlertEmail({
-      type: alert.type,
-      title: alert.title,
-      description: alert.description,
-      item: alert.item,
-      priority: alert.priority,
-      currentStock: alert.currentStock,
-      minStock: alert.minStock,
-      unit: alert.unit,
-      expiryDate: alert.expiryDate?.toISOString().split('T')[0],
-      lot: alert.lot,
-      predictedDate: alert.predictedDate?.toISOString().split('T')[0],
-    });
-  };
-
-  // Mostrar toast com alertas não lidos ao carregar a página
-  useEffect(() => {
-    if (!hasShownToast && alerts.length > 0) {
-      const criticalAlerts = getCriticalUnreadAlerts();
-      const unreadCount = getUnreadCount();
-      
-      if (criticalAlerts.length > 0) {
-        // Enviar alertas críticos por email
-        criticalAlerts.forEach(alert => {
-          sendEmailForAlert(alert);
-        });
-
-        const unitInfo = profile?.unit?.name ? ` na unidade ${profile.unit.name}` : '';
-        
-        toast({
-          title: `${criticalAlerts.length} Alerta${criticalAlerts.length > 1 ? 's' : ''} Crítico${criticalAlerts.length > 1 ? 's' : ''}`,
-          description: `${unreadCount} notificação${unreadCount > 1 ? 'ões' : ''} não lida${unreadCount > 1 ? 's' : ''}${unitInfo}. Alertas enviados por email.`,
-          variant: "destructive",
-        });
-      } else if (unreadCount > 0) {
-        const unitInfo = profile?.unit?.name ? ` na unidade ${profile.unit.name}` : '';
-        
-        toast({
-          title: "Novas Notificações",
-          description: `Você tem ${unreadCount} notificação${unreadCount > 1 ? 'ões' : ''} não lida${unreadCount > 1 ? 's' : ''}${unitInfo}.`,
+    try {
+      if (alert.type === 'stock' && alert.item) {
+        const mockItem = {
+          name: alert.item,
+          current_stock: alert.currentStock || 0,
+          min_stock: alert.minStock || 0,
+          unit_measure: alert.unit || '',
+          expiry_date: alert.expiryDate,
+          lot_number: alert.lot,
+          unit_id: alert.unitId
+        };
+        await sendStockAlert(mockItem, 'low_stock');
+      } else if (alert.type === 'forecast' && alert.item) {
+        await sendForecastAlert({
+          item: alert.item,
+          predicted_date: alert.forecastDate || '',
+          unit_id: alert.unitId
         });
       }
       
-      setHasShownToast(true);
+      toast({
+        title: 'Email enviado',
+        description: `Alerta sobre ${alert.item || alert.title} foi enviado por email`,
+      });
+    } catch (error) {
+      console.error('Erro ao enviar alerta por email:', error);
+      toast({
+        title: 'Erro ao enviar email',
+        description: 'Não foi possível enviar o alerta por email.',
+        variant: 'destructive',
+      });
     }
-  }, [hasShownToast, alerts, profile]);
+  };
 
   return {
     alerts,
+    loading,
+    unreadCount,
+    fetchAlerts,
+    markAsResolved,
+    markAllAsResolved,
     markAsRead,
     markAllAsRead,
     getUnreadCount,
-    getUnreadAlerts,
-    getCriticalUnreadAlerts,
     sendEmailForAlert,
-    userUnit: profile?.unit
   };
 };

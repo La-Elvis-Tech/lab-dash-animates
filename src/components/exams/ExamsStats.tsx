@@ -2,20 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Calendar, Activity } from 'lucide-react';
-
-interface ExamType {
-  id: string;
-  name: string;
-  category: string;
-  description?: string;
-  duration_minutes: number;
-  cost?: number;
-  requires_preparation: boolean;
-  preparation_instructions?: string;
-}
+import { ExamDetails } from '@/types/examDetails';
 
 interface ExamsStatsProps {
-  examTypes: ExamType[];
+  examTypes: ExamDetails[];
 }
 
 const ExamsStats: React.FC<ExamsStatsProps> = ({ examTypes }) => {
@@ -37,7 +27,7 @@ const ExamsStats: React.FC<ExamsStatsProps> = ({ examTypes }) => {
   const mostCommonCategory = Object.entries(categoryCounts)
     .sort(([,a], [,b]) => b - a)[0]?.[0] || 'N/A';
 
-  const examsWithPreparation = examTypes.filter(exam => exam.requires_preparation).length;
+  const examsWithPreparation = examTypes.filter(exam => exam.preparation.requires_preparation).length;
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

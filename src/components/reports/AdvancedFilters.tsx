@@ -11,6 +11,8 @@ import { Slider } from "@/components/ui/slider";
 import { Calendar as CalendarIcon, Filter, X } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { useExamTypes } from "@/hooks/useExamTypes";
+import { useUnits } from "@/hooks/useUnits";
 
 interface FilterState {
   dateRange: DateRange | undefined;
@@ -33,8 +35,23 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
     costRange: [0, 1000]
   });
 
-  const examTypes = ["Coleta de Sangue", "Ultrassom", "Raio-X", "Tomografia", "Mamografia"];
-  const units = ["Unidade Centro", "Unidade Norte", "Unidade Sul", "Unidade Leste"];
+  const { examTypes } = useExamTypes();
+  const { units } = useUnits();
+
+  // Filter to ensure only valid items with non-empty IDs and names
+  const validExamTypes = examTypes.filter(examType => 
+    examType.id && 
+    examType.name && 
+    examType.id.trim() !== '' && 
+    examType.name.trim() !== ''
+  );
+
+  const validUnits = units.filter(unit => 
+    unit.id && 
+    unit.name && 
+    unit.id.trim() !== '' && 
+    unit.name.trim() !== ''
+  );
 
   const handleExamTypeChange = (examType: string, checked: boolean) => {
     const newExamTypes = checked 
@@ -117,14 +134,14 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
           <div className="space-y-2">
             <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Tipos de Exame</label>
             <div className="space-y-2 max-h-32 overflow-y-auto">
-              {examTypes.map((examType) => (
-                <div key={examType} className="flex items-center space-x-2">
+              {validExamTypes.map((examType) => (
+                <div key={examType.id} className="flex items-center space-x-2">
                   <Checkbox
-                    id={examType}
-                    checked={filters.examTypes.includes(examType)}
-                    onCheckedChange={(checked) => handleExamTypeChange(examType, !!checked)}
+                    id={examType.id}
+                    checked={filters.examTypes.includes(examType.id)}
+                    onCheckedChange={(checked) => handleExamTypeChange(examType.id, !!checked)}
                   />
-                  <label htmlFor={examType} className="text-sm text-neutral-700 dark:text-neutral-300">{examType}</label>
+                  <label htmlFor={examType.id} className="text-sm text-neutral-700 dark:text-neutral-300">{examType.name}</label>
                 </div>
               ))}
             </div>
@@ -133,14 +150,14 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
           <div className="space-y-2">
             <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Unidades</label>
             <div className="space-y-2">
-              {units.map((unit) => (
-                <div key={unit} className="flex items-center space-x-2">
+              {validUnits.map((unit) => (
+                <div key={unit.id} className="flex items-center space-x-2">
                   <Checkbox
-                    id={unit}
-                    checked={filters.units.includes(unit)}
-                    onCheckedChange={(checked) => handleUnitChange(unit, !!checked)}
+                    id={unit.id}
+                    checked={filters.units.includes(unit.id)}
+                    onCheckedChange={(checked) => handleUnitChange(unit.id, !!checked)}
                   />
-                  <label htmlFor={unit} className="text-sm text-neutral-700 dark:text-neutral-300">{unit}</label>
+                  <label htmlFor={unit.id} className="text-sm text-neutral-700 dark:text-neutral-300">{unit.name}</label>
                 </div>
               ))}
             </div>
@@ -167,18 +184,24 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ onFiltersChange }) =>
 
         <div className="mt-4 flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">Filtros ativos:</span>
-          {filters.examTypes.map((type) => (
-            <Badge key={type} variant="secondary" className="flex items-center gap-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-              {type}
-              <X size={12} className="cursor-pointer" onClick={() => handleExamTypeChange(type, false)} />
-            </Badge>
-          ))}
-          {filters.units.map((unit) => (
-            <Badge key={unit} variant="secondary" className="flex items-center gap-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200">
-              {unit}
-              <X size={12} className="cursor-pointer" onClick={() => handleUnitChange(unit, false)} />
-            </Badge>
-          ))}
+          {filters.examTypes.map((typeId) => {
+            const examType = validExamTypes.find(e => e.id === typeId);
+            return examType ? (
+              <Badge key={typeId} variant="secondary" className="flex items-center gap-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                {examType.name}
+                <X size={12} className="cursor-pointer" onClick={() => handleExamTypeChange(typeId, false)} />
+              </Badge>
+            ) : null;
+          })}
+          {filters.units.map((unitId) => {
+            const unit = validUnits.find(u => u.id === unitId);
+            return unit ? (
+              <Badge key={unitId} variant="secondary" className="flex items-center gap-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200">
+                {unit.name}
+                <X size={12} className="cursor-pointer" onClick={() => handleUnitChange(unitId, false)} />
+              </Badge>
+            ) : null;
+          })}
           {(filters.examTypes.length > 0 || filters.units.length > 0) && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="text-neutral-600 dark:text-neutral-400">
               Limpar filtros

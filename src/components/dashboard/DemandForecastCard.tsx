@@ -1,135 +1,235 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { TrendingUp, AlertTriangle, Calendar, Package, Play, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useEmailAlerts } from '@/hooks/useEmailAlerts';
 
-const DemandForecastCard: React.FC = () => {
-  const [isSimulationOpen, setIsSimulationOpen] = useState(false);
-  const [growthRate, setGrowthRate] = useState([5]);
-  const [seasonality, setSeasonality] = useState([0]);
+interface ForecastData {
+  item_name: string;
+  current_stock: number;
+  predicted_shortage_date: string;
+  predicted_demand: number;
+  confidence_level: number;
+  unit_measure: string;
+  category: string;
+  priority: 'high' | 'medium' | 'low';
+}
 
-  const forecastData = {
-    nextMonth: 215,
-    confidence: { min: 195, max: 235 },
-    trend: "up",
-    trendPercent: 8.3,
-    currentEstimate: 215 + (growthRate[0] * 2) + (seasonality[0] * 1.5)
+const DemandForecastCard = () => {
+  const [forecastData, setForecastData] = useState<ForecastData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const { toast } = useToast();
+  const { sendForecastAlert } = useEmailAlerts();
+
+  // Simular dados de previsão (em produção, viria do Supabase)
+  const generateMockForecast = (): ForecastData[] => {
+    const items = [
+      { name: 'Seringa 5ml', stock: 45, category: 'Descartáveis' },
+      { name: 'Tubo EDTA', stock: 120, category: 'Coleta' },
+      { name: 'Álcool 70%', stock: 8, category: 'Antissépticos' },
+      { name: 'Luvas Nitrilo M', stock: 200, category: 'EPI' },
+      { name: 'Reagente Glicose', stock: 25, category: 'Reagentes' }
+    ];
+
+    return items.map(item => {
+      const demandRate = Math.random() * 50 + 10; // 10-60 unidades por dia
+      const daysUntilShortage = Math.floor(item.stock / demandRate);
+      const shortageDate = new Date();
+      shortageDate.setDate(shortageDate.getDate() + daysUntilShortage);
+
+      return {
+        item_name: item.name,
+        current_stock: item.stock,
+        predicted_shortage_date: shortageDate.toISOString().split('T')[0],
+        predicted_demand: Math.round(demandRate),
+        confidence_level: Math.random() * 30 + 70, // 70-100%
+        unit_measure: 'un',
+        category: item.category,
+        priority: daysUntilShortage <= 3 ? 'high' : daysUntilShortage <= 7 ? 'medium' : 'low'
+      };
+    });
   };
 
+  const runForecastAnalysis = async () => {
+    setAnalyzing(true);
+    try {
+      // Simular processamento de análise
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const forecast = generateMockForecast();
+      setForecastData(forecast);
+
+      // Enviar alertas para itens com alta prioridade
+      const highPriorityItems = forecast.filter(item => item.priority === 'high');
+      for (const item of highPriorityItems) {
+        await sendForecastAlert({
+          item: item.item_name,
+          predicted_date: item.predicted_shortage_date,
+          unit_id: 'current_unit'
+        });
+      }
+
+      toast({
+        title: 'Análise concluída',
+        description: `Previsão gerada para ${forecast.length} itens. ${highPriorityItems.length} alertas enviados.`,
+      });
+    } catch (error) {
+      console.error('Erro na análise de previsão:', error);
+      toast({
+        title: 'Erro na análise',
+        description: 'Não foi possível gerar a previsão de demanda.',
+        variant: 'destructive',
+      });
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
+  };
+
+  const getDaysUntilShortage = (date: string) => {
+    const today = new Date();
+    const shortageDate = new Date(date);
+    const diffTime = shortageDate.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  useEffect(() => {
+    // Carregar dados salvos se existirem
+    const savedForecast = localStorage.getItem('forecast_data');
+    if (savedForecast) {
+      try {
+        setForecastData(JSON.parse(savedForecast));
+      } catch (error) {
+        console.error('Erro ao carregar dados de previsão:', error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    // Salvar dados quando atualizados
+    if (forecastData.length > 0) {
+      localStorage.setItem('forecast_data', JSON.stringify(forecastData));
+    }
+  }, [forecastData]);
+
   return (
-    <>
-      <Card className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg ">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg font-bold text-gray-800 dark:text-gray-100">
-            <BarChart3
-              size={18}
-              className="text-indigo-600 dark:text-indigo-400"
-            />
-            Previsão de Demanda
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 my-2 bg-gray-100/40 dark:bg-neutral-800/60 rounded-xl border border-gray-200 dark:border-neutral-900 shadow-sm">
-              <div>
-                <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                  {forecastData.nextMonth}
-                </span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  itens próximo mês
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                {forecastData.trend === "up" ? (
-                  <TrendingUp size={16} className="text-green-500" />
-                ) : (
-                  <TrendingDown size={16} className="text-red-500" />
-                )}
-                <span className="text-sm font-medium text-green-500">
-                  +{forecastData.trendPercent}%
-                </span>
-              </div>
-            </div>
-            
-            <div className="text-sm text-gray-600 dark:text-gray-400 px-3 py-2">
-              Intervalo: {forecastData.confidence.min} - {forecastData.confidence.max} itens
-            </div>
-
-            <Dialog open={isSimulationOpen} onOpenChange={setIsSimulationOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full text-indigo-700 dark:text-indigo-50 bg-indigo-100 dark:bg-neutral-800/60 border-transparent hover:bg-indigo-50 dark:hover:bg-neutral-700/40 rounded-xl">
-                  Simular Cenário
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md bg-white dark:bg-neutral-800/100 border-neutral-200 dark:border-neutral-800">
-                <DialogHeader>
-                  <DialogTitle>Simulação de Demanda</DialogTitle>
-                  <DialogDescription>
-                    Ajuste os parâmetros para ver o impacto na previsão
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="space-y-4 py-4">
-                  <div className="space-y-4">
-                    <Label>Taxa de Crescimento: {growthRate[0]}%</Label>
-                    <Slider
-                      value={growthRate}
-                      onValueChange={setGrowthRate}
-                      min={-20}
-                      max={50}
-                      step={1}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label>Sazonalidade: {seasonality[0] > 0 ? '+' : ''}{seasonality[0]}%</Label>
-                    <Slider
-                      value={seasonality}
-                      onValueChange={setSeasonality}
-                      min={-30}
-                      max={30}
-                      step={1}
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="my-6 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="text-sm font-medium">Resultado da Simulação:</div>
-                    <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
-                      {Math.round(forecastData.currentEstimate)} itens
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Impacto: {Math.round(forecastData.currentEstimate - forecastData.nextMonth) > 0 ? '+' : ''}
-                      {Math.round(forecastData.currentEstimate - forecastData.nextMonth)} itens
-                    </div>
-                  </div>
-                </div>
-
-                <DialogFooter>
-                  <Button onClick={() => setIsSimulationOpen(false)}>
-                    Fechar
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-blue-500" />
+              Análise de Demanda e Forecast (ADF)
+            </CardTitle>
+            <CardDescription>
+              Previsão inteligente de demanda e alertas de reposição
+            </CardDescription>
           </div>
-        </CardContent>
-      </Card>
-    </>
+          <Button 
+            onClick={runForecastAnalysis} 
+            disabled={analyzing}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {analyzing ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Analisando...
+              </>
+            ) : (
+              <>
+                <Play className="h-4 w-4 mr-2" />
+                Executar ADF
+              </>
+            )}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {forecastData.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p>Nenhuma análise de demanda disponível</p>
+            <p className="text-sm">Execute a ADF para gerar previsões</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {forecastData.filter(item => item.priority === 'high').length}
+                </div>
+                <div className="text-sm text-blue-600 dark:text-blue-400">Alertas Críticos</div>
+              </div>
+              <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                  {forecastData.filter(item => item.priority === 'medium').length}
+                </div>
+                <div className="text-sm text-yellow-600 dark:text-yellow-400">Atenção</div>
+              </div>
+              <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {Math.round(forecastData.reduce((acc, item) => acc + item.confidence_level, 0) / forecastData.length)}%
+                </div>
+                <div className="text-sm text-green-600 dark:text-green-400">Confiança Média</div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {forecastData.map((item, index) => {
+                const daysUntilShortage = getDaysUntilShortage(item.predicted_shortage_date);
+                return (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-gray-800">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h4 className="font-medium">{item.item_name}</h4>
+                        <Badge className={getPriorityColor(item.priority)}>
+                          {item.priority === 'high' ? 'Crítico' : 
+                           item.priority === 'medium' ? 'Médio' : 'Baixo'}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <Package className="h-4 w-4" />
+                          {item.current_stock} {item.unit_measure}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {daysUntilShortage > 0 ? `${daysUntilShortage} dias` : 'Estoque crítico'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <TrendingUp className="h-4 w-4" />
+                          {item.predicted_demand}/dia
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium">
+                        {Math.round(item.confidence_level)}% confiança
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(item.predicted_shortage_date).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

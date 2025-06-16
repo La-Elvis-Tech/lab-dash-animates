@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -80,50 +81,6 @@ export const useAuth = () => {
     }
   };
 
-  const checkUserAccess = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('status, full_name')
-        .eq('id', userId)
-        .single();
-
-      if (error || !data) {
-        console.log(`[AUTH] Perfil não encontrado para usuário: ${userId}`);
-        await supabase.auth.signOut();
-        return false;
-      }
-
-      if (data.status === 'pending') {
-        console.log(`[AUTH] Acesso negado - conta pendente: ${userId}`);
-        toast({
-          title: 'Conta Pendente',
-          description: 'Sua conta ainda está pendente de aprovação. Aguarde a aprovação de um administrador.',
-          variant: 'destructive',
-        });
-        await supabase.auth.signOut();
-        return false;
-      }
-
-      if (data.status === 'inactive' || data.status === 'suspended') {
-        console.log(`[AUTH] Acesso negado - conta desativada: ${userId}`);
-        toast({
-          title: 'Conta Desativada',
-          description: 'Sua conta foi desativada. Entre em contato com um administrador.',
-          variant: 'destructive',
-        });
-        await supabase.auth.signOut();
-        return false;
-      }
-
-      return data.status === 'active';
-    } catch (error: any) {
-      console.error('Error checking user access:', error);
-      await supabase.auth.signOut();
-      return false;
-    }
-  };
-
   useEffect(() => {
     let mounted = true;
 
@@ -135,30 +92,17 @@ export const useAuth = () => {
             
             if (!mounted) return;
 
+            setSession(session);
+            setUser(session?.user ?? null);
+            
             if (session?.user) {
-              // Verificar acesso do usuário antes de definir a sessão
-              const hasAccess = await checkUserAccess(session.user.id);
-              
-              if (hasAccess && mounted) {
-                setSession(session);
-                setUser(session.user);
-                
-                setTimeout(async () => {
-                  if (mounted) {
-                    await fetchProfile(session.user.id);
-                    await fetchUserRole(session.user.id);
-                  }
-                }, 0);
-              } else {
-                // Se não tem acesso, limpar estado
-                setSession(null);
-                setUser(null);
-                setProfile(null);
-                setRole(null);
-              }
+              setTimeout(async () => {
+                if (mounted) {
+                  await fetchProfile(session.user.id);
+                  await fetchUserRole(session.user.id);
+                }
+              }, 0);
             } else {
-              setSession(session);
-              setUser(session?.user ?? null);
               setProfile(null);
               setRole(null);
             }
@@ -172,28 +116,16 @@ export const useAuth = () => {
         
         if (!mounted) return;
 
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
         if (currentSession?.user) {
-          const hasAccess = await checkUserAccess(currentSession.user.id);
-          
-          if (hasAccess && mounted) {
-            setSession(currentSession);
-            setUser(currentSession.user);
-            
-            setTimeout(async () => {
-              if (mounted) {
-                await fetchProfile(currentSession.user.id);
-                await fetchUserRole(currentSession.user.id);
-              }
-            }, 0);
-          } else {
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-            setRole(null);
-          }
-        } else {
-          setSession(currentSession);
-          setUser(currentSession?.user ?? null);
+          setTimeout(async () => {
+            if (mounted) {
+              await fetchProfile(currentSession.user.id);
+              await fetchUserRole(currentSession.user.id);
+            }
+          }, 0);
         }
         
         setLoading(false);
@@ -222,44 +154,6 @@ export const useAuth = () => {
     try {
       setLoading(true);
       
-      // Verificar status do usuário ANTES do login
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('status, full_name')
-        .eq('email', email)
-        .single();
-
-      if (!profileData) {
-        const errorMsg = 'Usuário não encontrado no sistema.';
-        toast({
-          title: 'Erro no login',
-          description: errorMsg,
-          variant: 'destructive',
-        });
-        return { data: null, error: { message: errorMsg } };
-      }
-
-      if (profileData.status === 'pending') {
-        const errorMsg = 'Sua conta ainda está pendente de aprovação. Aguarde a aprovação de um administrador.';
-        toast({
-          title: 'Conta Pendente',
-          description: errorMsg,
-          variant: 'destructive',
-        });
-        return { data: null, error: { message: errorMsg } };
-      }
-
-      if (profileData.status === 'inactive' || profileData.status === 'suspended') {
-        const errorMsg = 'Sua conta foi desativada. Entre em contato com um administrador.';
-        toast({
-          title: 'Conta Desativada',
-          description: errorMsg,
-          variant: 'destructive',
-        });
-        return { data: null, error: { message: errorMsg } };
-      }
-
-      // Só permite login se status for 'active'
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
@@ -408,6 +302,19 @@ export const useAuth = () => {
     return role === 'supervisor' || role === 'admin';
   };
 
+  // Novos métodos para verificar status do usuário
+  const isPending = (): boolean => {
+    return profile?.status === 'pending';
+  };
+
+  const isActive = (): boolean => {
+    return profile?.status === 'active';
+  };
+
+  const isSuspended = (): boolean => {
+    return profile?.status === 'suspended';
+  };
+
   return {
     user,
     session,
@@ -421,10 +328,13 @@ export const useAuth = () => {
     resetPassword,
     refreshProfile: () => user && fetchProfile(user.id),
     refreshRole: () => user && fetchUserRole(user.id),
-    isAuthenticated: !!session && !!user && profile?.status === 'active',
+    isAuthenticated: !!session,
     userRole: role,
     hasRole,
     isAdmin,
     isSupervisor,
+    isPending,
+    isActive,
+    isSuspended,
   };
 };

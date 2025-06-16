@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,7 +9,6 @@ import Layout from "./components/Layout";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ThemeProvider } from "./hooks/use-theme";
-import { PageLoaderLogin } from "./components/PageLoaderLogin";
 
 // Lazy load pages for better performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -52,7 +52,6 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            {/* Removido <PageLoaderLogin /> para evitar loader extra */}
             <Routes>
               <Route path="/auth" element={
                 <Suspense fallback={<PageFallback />}>
@@ -66,7 +65,7 @@ const App = () => (
               } />
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Layout />}>
-                  <Route path="/" element={
+                  <Route index element={
                     <Suspense fallback={<PageFallback />}>
                       <Dashboard />
                     </Suspense>

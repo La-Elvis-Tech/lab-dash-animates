@@ -11,12 +11,8 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 interface NotificationPreferences {
   email_appointments: boolean;
   email_results: boolean;
-  email_marketing: boolean;
-  push_appointments: boolean;
-  push_reminders: boolean;
-  push_results: boolean;
-  sms_reminders: boolean;
-  in_app_notifications: boolean;
+  email_alerts: boolean;
+  email_stock_notifications: boolean;
   digest_frequency: 'immediate' | 'daily' | 'weekly' | 'never';
 }
 
@@ -24,12 +20,8 @@ const NotificationSettings = () => {
   const [preferences, setPreferences] = useState<NotificationPreferences>({
     email_appointments: true,
     email_results: true,
-    email_marketing: false,
-    push_appointments: true,
-    push_reminders: true,
-    push_results: false,
-    sms_reminders: false,
-    in_app_notifications: true,
+    email_alerts: true,
+    email_stock_notifications: true,
     digest_frequency: 'daily',
   });
   const [loading, setLoading] = useState(false);
@@ -37,7 +29,7 @@ const NotificationSettings = () => {
   const { profile } = useUserProfile();
 
   useEffect(() => {
-    // Carregar preferências do localStorage por enquanto
+    // Carregar preferências do localStorage
     const saved = localStorage.getItem('notification_preferences');
     if (saved) {
       try {
@@ -51,7 +43,6 @@ const NotificationSettings = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Salvar no localStorage por enquanto
       localStorage.setItem('notification_preferences', JSON.stringify(preferences));
       
       toast({
@@ -113,77 +104,32 @@ const NotificationSettings = () => {
           </div>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="email-marketing">Novidades e Promoções</Label>
+            <Label htmlFor="email-alerts">Alertas de Estoque</Label>
             <Switch
-              id="email-marketing"
-              checked={preferences.email_marketing}
-              onCheckedChange={(checked) => updatePreference('email_marketing', checked)}
+              id="email-alerts"
+              checked={preferences.email_alerts}
+              onCheckedChange={(checked) => updatePreference('email_alerts', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <Label htmlFor="email-stock">Notificações de Inventário</Label>
+            <Switch
+              id="email-stock"
+              checked={preferences.email_stock_notifications}
+              onCheckedChange={(checked) => updatePreference('email_stock_notifications', checked)}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Push Notifications */}
+      {/* Summary Frequency */}
       <Card>
         <CardHeader>
-          <CardTitle>Notificações Push</CardTitle>
-          <CardDescription>Configure as notificações do navegador</CardDescription>
+          <CardTitle>Frequência do Resumo</CardTitle>
+          <CardDescription>Configure com que frequência você deseja receber resumos do sistema</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="push-appointments">Lembretes de Agendamento</Label>
-            <Switch
-              id="push-appointments"
-              checked={preferences.push_appointments}
-              onCheckedChange={(checked) => updatePreference('push_appointments', checked)}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="push-reminders">Lembretes de Preparação</Label>
-            <Switch
-              id="push-reminders"
-              checked={preferences.push_reminders}
-              onCheckedChange={(checked) => updatePreference('push_reminders', checked)}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="push-results">Resultados Disponíveis</Label>
-            <Switch
-              id="push-results"
-              checked={preferences.push_results}
-              onCheckedChange={(checked) => updatePreference('push_results', checked)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* SMS and Other */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Outras Notificações</CardTitle>
-          <CardDescription>Configure SMS e notificações no app</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="sms-reminders">SMS de Lembretes</Label>
-            <Switch
-              id="sms-reminders"
-              checked={preferences.sms_reminders}
-              onCheckedChange={(checked) => updatePreference('sms_reminders', checked)}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="in-app">Notificações no App</Label>
-            <Switch
-              id="in-app"
-              checked={preferences.in_app_notifications}
-              onCheckedChange={(checked) => updatePreference('in_app_notifications', checked)}
-            />
-          </div>
-          
           <div className="flex items-center justify-between">
             <Label htmlFor="digest-frequency">Frequência do Resumo</Label>
             <Select
@@ -200,6 +146,13 @@ const NotificationSettings = () => {
                 <SelectItem value="never">Nunca</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            <p><strong>Imediato:</strong> Receba notificações assim que eventos importantes acontecerem</p>
+            <p><strong>Diário:</strong> Resumo diário enviado às 8h da manhã</p>
+            <p><strong>Semanal:</strong> Resumo semanal enviado todas as segundas-feiras</p>
+            <p><strong>Nunca:</strong> Não receber resumos automáticos</p>
           </div>
         </CardContent>
       </Card>

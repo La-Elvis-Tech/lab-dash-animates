@@ -20,6 +20,9 @@ interface AuthContextType {
   hasRole: (role: 'admin' | 'user' | 'supervisor') => boolean;
   isAdmin: () => boolean;
   isSupervisor: () => boolean;
+  isPending: () => boolean;
+  isActive: () => boolean;
+  isSuspended: () => boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

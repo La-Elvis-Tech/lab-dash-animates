@@ -1,3 +1,4 @@
+
 import LaboratoryProfile from "@/components/settings/LaboratoryProfile";
 import NotificationSettings from "@/components/settings/NotificationSettings";
 import SecuritySettings from "@/components/settings/SecuritySettings";
@@ -7,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/context/AuthContext";
+import { SkeletonSettings } from "@/components/ui/skeleton-settings";
 import { gsap } from "gsap";
 import { Calendar, Settings as SettingsIcon, User, LogOut, Building2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +18,11 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const { toast } = useToast();
   const { signOut, user, isAdmin } = useAuthContext();
+
+  // Show loading skeleton while checking auth
+  if (!user) {
+    return <SkeletonSettings />;
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {

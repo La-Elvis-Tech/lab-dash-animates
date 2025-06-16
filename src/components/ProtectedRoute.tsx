@@ -1,18 +1,13 @@
 
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuthContext } from "@/context/AuthContext";
+import { PendingApprovalMessage } from "./auth/PendingApprovalMessage";
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, loading, profile, user } = useAuthContext();
+  const { isAuthenticated, loading, profile, user, signOut } = useAuthContext();
   const location = useLocation();
 
-  console.log('ProtectedRoute check:', { 
-    isAuthenticated, 
-    loading, 
-    profile: profile?.status,
-    hasUser: !!user,
-    hasProfile: !!profile 
-  });
+  console.log('ProtectedRoute check:', { isAuthenticated, loading, profile: profile?.status });
 
   if (loading) {
     return (
@@ -25,14 +20,27 @@ export const ProtectedRoute = () => {
     );
   }
 
-  // Se não está autenticado ou não tem usuário
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Se tem usuário mas não tem perfil ou perfil não está ativo
-  if (!profile || profile.status !== 'active') {
-    console.log('ProtectedRoute: redirecting due to profile status:', profile?.status);
+  // Se o usuário está autenticado mas com status pendente, mostrar tela de aguardo
+  if (profile && profile.status === 'pending') {
+    return (
+      <PendingApprovalMessage 
+        userEmail={user?.email} 
+        onSignOut={signOut}
+      />
+    );
+  }
+
+  // Se o usuário está suspenso, redirecionar para auth
+  if (profile && profile.status === 'suspended') {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // Só permite acesso se o status for 'active'
+  if (profile && profile.status !== 'active') {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 

@@ -85,11 +85,11 @@ const GaugeChart: React.FC<GaugeChartProps> = ({
       </div>
 
       {/* Texto central */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none py-2">
-        <span className="text-xs xl:text-xs text-gray-500 dark:text-gray-400 px-8 text-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span className="text-xs xl:text-base text-gray-500 dark:text-gray-400">
           {title}
         </span>
-        <span className="text-xl lg:text-lg font-bold text-gray-800 dark:text-gray-100">
+        <span className="text-xl lg:text-2xl font-bold text-gray-800 dark:text-gray-100">
           {value}%
         </span>
       </div>

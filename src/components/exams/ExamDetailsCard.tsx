@@ -1,141 +1,133 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Clock, DollarSign, FlaskConical, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Clock, DollarSign, AlertCircle, Calendar, FlaskConical, CheckCircle, XCircle } from 'lucide-react';
 import { ExamDetails } from '@/types/examDetails';
 
 interface ExamDetailsCardProps {
   exam: ExamDetails;
-  onSchedule?: () => void;
+  onSchedule: () => void;
 }
 
 const ExamDetailsCard: React.FC<ExamDetailsCardProps> = ({ exam, onSchedule }) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
+  const getCategoryColor = (category: string) => {
+    const colors: { [key: string]: string } = {
+      'Hematologia': 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800',
+      'Bioquímica': 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800',
+      'Endocrinologia': 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800',
+      'Cardiologia': 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800',
+      'Uroanálise': 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800',
+      'Microbiologia': 'bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-300 dark:border-pink-800',
+    };
+    return colors[category] || 'bg-neutral-50 text-neutral-700 border-neutral-200 dark:bg-neutral-900/20 dark:text-neutral-300 dark:border-neutral-800';
   };
 
-  // Defensive fallback for materials and preparation
-  const materials = Array.isArray(exam.materials) ? exam.materials : [];
-  const preparation = exam.preparation || { requires_preparation: false };
-
   return (
-    <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700">
-      <CardHeader className="pb-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-              {exam.name}
-            </CardTitle>
-            <Badge variant="secondary" className="mt-1">
-              {exam.category}
-            </Badge>
+    <Card className="group h-full bg-white/70 dark:bg-neutral-950/70 border-neutral-200 dark:border-neutral-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-100 dark:hover:shadow-indigo-900/20 backdrop-blur-sm">
+      <CardHeader className="p-5 pb-3">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
+            <FlaskConical className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
           </div>
-          <div className="text-right">
-            <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
-              {formatCurrency(exam.cost)}
-            </div>
-            <div className="text-sm text-neutral-500 dark:text-neutral-400">
-              + {formatCurrency(exam.total_material_cost)} materiais
-            </div>
-          </div>
+          <Badge className={`text-xs font-medium ${getCategoryColor(exam.category)}`}>
+            {exam.category}
+          </Badge>
         </div>
+        
+        <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-lg leading-tight">
+          {exam.name}
+        </h3>
       </CardHeader>
-      
-      <CardContent className="space-y-4">
-        {exam.description && (
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            {exam.description}
-          </p>
-        )}
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-neutral-500" />
-            <span className="text-sm text-neutral-600 dark:text-neutral-400">
-              {exam.duration_minutes} minutos
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <FlaskConical className="h-4 w-4 text-neutral-500" />
-            <span className="text-sm text-neutral-600 dark:text-neutral-400">
-              {materials.length} materiais
-            </span>
-          </div>
-        </div>
+      <CardContent className="p-5 pt-0 flex flex-col h-full">
+        <div className="flex-1 space-y-4">
+          {exam.description && (
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2 leading-relaxed">
+              {exam.description}
+            </p>
+          )}
 
-        {preparation.requires_preparation && (
-          <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-            <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-              <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                Requer Preparação
+          {/* Info Grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+              <Clock className="h-4 w-4 text-indigo-500" />
+              <span>{exam.duration_minutes}min</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+              <DollarSign className="h-4 w-4 text-indigo-500" />
+              <span>R$ {exam.cost?.toFixed(2) || '0.00'}</span>
+            </div>
+          </div>
+
+          {/* Preparation Alert */}
+          {exam.preparation.requires_preparation && (
+            <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+              <span className="text-sm text-amber-700 dark:text-amber-300 font-medium">
+                Requer preparação prévia
               </span>
             </div>
-            <p className="text-sm text-yellow-700 dark:text-yellow-300">
-              {preparation.preparation_instructions}
-            </p>
-          </div>
-        )}
+          )}
 
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-            Materiais Necessários:
-          </h4>
-          <div className="space-y-1">
-            {materials.map((material, index) => (
-              <div key={index} className="flex items-center justify-between text-xs">
-                <span className="text-neutral-600 dark:text-neutral-400">
-                  {material.item_name} ({material.quantity_required}x)
+          {/* Materials Status */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Disponibilidade
+              </span>
+              <div className="flex items-center gap-2">
+                {exam.materials_available ? (
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                ) : (
+                  <XCircle className="h-4 w-4 text-red-500" />
+                )}
+                <span className={`text-sm font-medium ${
+                  exam.materials_available 
+                    ? 'text-green-600 dark:text-green-400' 
+                    : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {exam.materials_available ? 'Disponível' : 'Indisponível'}
                 </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-neutral-500">
-                    {formatCurrency(material.estimated_cost)}
-                  </span>
-                  {material.sufficient_stock ? (
-                    <CheckCircle className="h-3 w-3 text-green-500" />
-                  ) : (
-                    <AlertTriangle className="h-3 w-3 text-red-500" />
-                  )}
-                </div>
               </div>
-            ))}
+            </div>
+            
+            <div className={`h-2 rounded-full overflow-hidden ${
+              exam.materials_available 
+                ? 'bg-green-100 dark:bg-green-900/30' 
+                : 'bg-red-100 dark:bg-red-900/30'
+            }`}>
+              <div className={`h-full transition-all duration-500 ${
+                exam.materials_available 
+                  ? 'bg-green-500 dark:bg-green-400 w-full' 
+                  : 'bg-red-500 dark:bg-red-400 w-0'
+              }`} />
+            </div>
           </div>
+
+          {/* Material Cost */}
+          {exam.total_material_cost > 0 && (
+            <div className="text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-900/50 px-3 py-2 rounded-lg">
+              Custo dos materiais: R$ {exam.total_material_cost.toFixed(2)}
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center justify-between pt-3 border-t border-neutral-200 dark:border-neutral-700">
-          <div className="flex items-center gap-2">
-            {exam.materials_available ? (
-              <>
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-green-600 dark:text-green-400">
-                  Materiais disponíveis
-                </span>
-              </>
-            ) : (
-              <>
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-                <span className="text-sm text-red-600 dark:text-red-400">
-                  Materiais insuficientes
-                </span>
-              </>
-            )}
-          </div>
-          
-          {onSchedule && (
-            <Button 
-              onClick={onSchedule}
-              disabled={!exam.materials_available}
-              size="sm"
-              className="bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
-            >
-              Agendar
-            </Button>
-          )}
+        {/* Schedule Button */}
+        <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+          <Button 
+            onClick={onSchedule}
+            disabled={!exam.materials_available}
+            className={`w-full py-2.5 font-medium transition-all duration-200 ${
+              exam.materials_available
+                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm hover:shadow-md'
+                : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 cursor-not-allowed'
+            }`}
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            {exam.materials_available ? 'Agendar Exame' : 'Materiais Indisponíveis'}
+          </Button>
         </div>
       </CardContent>
     </Card>
