@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,7 +31,7 @@ const Auth = () => {
   // Reset password form state
   const [resetEmail, setResetEmail] = useState('');
 
-  const { signIn, signUp, isAuthenticated, profile } = useAuthContext();
+  const { signIn, signUp, isAuthenticated, profile, user } = useAuthContext();
   const { resetPassword } = useSupabaseAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -39,10 +40,11 @@ const Auth = () => {
   const from = location.state?.from?.pathname || '/';
 
   useEffect(() => {
-    if (isAuthenticated && profile?.status === 'active') {
+    // Só redireciona se o usuário está totalmente autenticado E tem perfil ativo
+    if (isAuthenticated && user && profile?.status === 'active') {
       navigate(from, { replace: true });
     }
-  }, [isAuthenticated, profile?.status, navigate, from]);
+  }, [isAuthenticated, user, profile?.status, navigate, from]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,14 +53,17 @@ const Auth = () => {
     try {
       setLoading(true);
       setAuthError('');
-      await signIn(loginEmail, loginPassword);
       
-      toast({
-        title: 'Login realizado com sucesso!',
-        description: 'Bem-vindo ao Sistema DASA Labs.',
-      });
+      const result = await signIn(loginEmail, loginPassword);
       
-      navigate(from, { replace: true });
+      if (result.error) {
+        setAuthError(result.error.message || 'Erro no login. Verifique suas credenciais.');
+        return;
+      }
+      
+      // O toast de sucesso só deve aparecer se o login foi bem-sucedido
+      // e o usuário será redirecionado pelo useEffect
+      
     } catch (error: any) {
       console.error('Login error:', error);
       setAuthError(error.message || 'Erro no login. Verifique suas credenciais.');
@@ -85,7 +90,12 @@ const Auth = () => {
       setLoading(true);
       setAuthError('');
       
-      await signUp(registerEmail, registerPassword, registerName);
+      const result = await signUp(registerEmail, registerPassword, registerName);
+      
+      if (result.error) {
+        setAuthError(result.error.message || 'Erro no cadastro. Tente novamente.');
+        return;
+      }
       
       toast({
         title: 'Cadastro realizado com sucesso!',

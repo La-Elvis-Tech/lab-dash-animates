@@ -402,6 +402,7 @@ export type Database = {
           name: string
           preparation_instructions: string | null
           requires_preparation: boolean | null
+          unit_id: string | null
         }
         Insert: {
           active?: boolean | null
@@ -414,6 +415,7 @@ export type Database = {
           name: string
           preparation_instructions?: string | null
           requires_preparation?: boolean | null
+          unit_id?: string | null
         }
         Update: {
           active?: boolean | null
@@ -426,8 +428,17 @@ export type Database = {
           name?: string
           preparation_instructions?: string | null
           requires_preparation?: boolean | null
+          unit_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "exam_types_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       inventory_categories: {
         Row: {
