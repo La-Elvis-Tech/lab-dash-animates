@@ -105,10 +105,10 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         <CardHeader className="pb-4 border-b border-neutral-100 dark:border-neutral-800">
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-              <div className="p-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
-                <CalendarIcon className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
+              <div className="px-2 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg hidden md:inline">
+                <CalendarIcon className="h-4 w-4 text-neutral-600 dark:text-neutral-400 hidden md:inline" />
               </div>
-              <div>
+              <div className="pr-2">
                 <div className="text-base">Calendário Semanal</div>
                 <div className="text-xs font-normal text-neutral-500 dark:text-neutral-400">
                   Selecione uma data para ver horários disponíveis
@@ -126,7 +126,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               
-              <span className="text-sm font-medium px-3 text-neutral-700 dark:text-neutral-300 min-w-[140px] text-center">
+              <span className="text-xs md:text-sm font-medium sm:-mx-4 md:px-0 xl:px-4 text-neutral-700 dark:text-neutral-300 min-w-[140px] text-center">
                 {format(weekStart, 'dd/MM', { locale: ptBR })} - {format(weekEnd, 'dd/MM/yyyy', { locale: ptBR })}
               </span>
               
@@ -143,7 +143,7 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         </CardHeader>
         
         <CardContent className="p-4">
-          <div className="grid grid-cols-7 gap-3">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3">
             {weekDays.map((day) => {
               const dayAppointments = getAppointmentsForDate(day);
               const isSelected = selectedDate && isSameDay(day, selectedDate);
@@ -163,11 +163,11 @@ const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                   `}
                   onClick={() => !isPast && setSelectedDate(day)}
                 >
-                  <div className="text-center mb-2">
+                  <div className="text-center mb-0">
                     <div className="text-xs text-neutral-500 dark:text-neutral-400 uppercase font-medium">
                       {format(day, 'EEE', { locale: ptBR })}
                     </div>
-                    <div className={`text-lg font-semibold ${
+                    <div className={`text-lg font-semibold mt-1 ${
                       isToday(day) 
                         ? 'text-blue-600 dark:text-blue-400' 
                         : 'text-neutral-900 dark:text-neutral-100'
