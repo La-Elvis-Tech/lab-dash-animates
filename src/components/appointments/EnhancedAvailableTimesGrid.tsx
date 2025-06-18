@@ -39,18 +39,18 @@ const EnhancedAvailableTimesGrid: React.FC<EnhancedAvailableTimesGridProps> = ({
   onDoctorChange,
   selectedTimeSlot
 }) => {
-  const filteredSlots = selectedDoctor 
+  const filteredSlots = selectedDoctor && selectedDoctor !== 'all'
     ? timeSlots.filter(slot => slot.doctorId === selectedDoctor)
     : timeSlots;
 
   const getTimeSlotStyle = (slot: TimeSlot) => {
-    const isSelected = selectedTimeSlot === slot.time && (!selectedDoctor || slot.doctorId === selectedDoctor);
+    const isSelected = selectedTimeSlot === slot.time && (selectedDoctor === 'all' || !selectedDoctor || slot.doctorId === selectedDoctor);
     
     if (isSelected) {
       return 'bg-blue-500 hover:bg-blue-600 text-white border-blue-600 ring-2 ring-blue-200 dark:ring-blue-800 shadow-md';
     }
     
-    if (!slot.available || slot.hasConflict) {
+    if (!slot.available) {
       return 'bg-red-500 text-white cursor-not-allowed opacity-75 border-red-600';
     }
     
@@ -64,7 +64,7 @@ const EnhancedAvailableTimesGrid: React.FC<EnhancedAvailableTimesGridProps> = ({
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
             <CardTitle className="text-lg text-neutral-900 dark:text-neutral-100">
-              Horários Disponíveis
+              Horários de Todos os Médicos
             </CardTitle>
           </div>
           <div className="text-sm text-neutral-500 dark:text-neutral-400">
@@ -80,12 +80,12 @@ const EnhancedAvailableTimesGrid: React.FC<EnhancedAvailableTimesGridProps> = ({
                 Filtrar por médico:
               </span>
             </div>
-            <Select value={selectedDoctor} onValueChange={onDoctorChange}>
+            <Select value={selectedDoctor || 'all'} onValueChange={onDoctorChange}>
               <SelectTrigger className="w-full bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                 <SelectValue placeholder="Todos os médicos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos os médicos</SelectItem>
+                <SelectItem value="all">Todos os médicos</SelectItem>
                 {doctors.map((doctor) => (
                   <SelectItem key={doctor.id} value={doctor.id}>
                     {doctor.name} - {doctor.specialty}
@@ -101,8 +101,8 @@ const EnhancedAvailableTimesGrid: React.FC<EnhancedAvailableTimesGridProps> = ({
         {filteredSlots.length === 0 ? (
           <div className="text-center py-8 text-neutral-500 dark:text-neutral-400">
             <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">Nenhum horário disponível</p>
-            <p className="text-sm">Não há horários disponíveis para a data selecionada.</p>
+            <p className="text-lg font-medium mb-2">Nenhum médico disponível</p>
+            <p className="text-sm">Não há médicos cadastrados para esta unidade.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -117,7 +117,7 @@ const EnhancedAvailableTimesGrid: React.FC<EnhancedAvailableTimesGridProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-red-500 rounded"></div>
-                <span className="text-neutral-600 dark:text-neutral-400">Ocupado</span>
+                <span className="text-neutral-600 dark:text-neutral-400">Indisponível</span>
               </div>
             </div>
             
@@ -126,24 +126,24 @@ const EnhancedAvailableTimesGrid: React.FC<EnhancedAvailableTimesGridProps> = ({
                 <button
                   key={`${slot.time}-${slot.doctorId || 'all'}`}
                   onClick={() => {
-                    if (slot.available && !slot.hasConflict) {
+                    if (slot.available) {
                       onSelectTime(slot.time, slot.doctorId);
                     }
                   }}
-                  disabled={!slot.available || slot.hasConflict}
+                  disabled={!slot.available}
                   className={`
                     p-3 rounded-lg text-sm font-medium transition-all duration-200 border-2
                     ${getTimeSlotStyle(slot)}
-                    ${(!slot.available || slot.hasConflict) ? '' : 'hover:scale-105 active:scale-95'}
+                    ${!slot.available ? '' : 'hover:scale-105 active:scale-95'}
                   `}
                   title={
-                    !slot.available || slot.hasConflict 
-                      ? `Horário ocupado${slot.doctorName ? ` - ${slot.doctorName}` : ''}`
+                    !slot.available
+                      ? `Indisponível${slot.doctorName ? ` - ${slot.doctorName}` : ''}`
                       : `Disponível${slot.doctorName ? ` - ${slot.doctorName}` : ''}`
                   }
                 >
                   <div className="font-semibold">{slot.time}</div>
-                  {slot.doctorName && !selectedDoctor && (
+                  {slot.doctorName && (selectedDoctor === 'all' || !selectedDoctor) && (
                     <div className="text-xs opacity-80 truncate mt-1">
                       {slot.doctorName.split(' ')[0]}
                     </div>
