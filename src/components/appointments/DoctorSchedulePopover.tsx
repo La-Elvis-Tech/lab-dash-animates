@@ -107,6 +107,7 @@ const DoctorSchedulePopover: React.FC<DoctorSchedulePopoverProps> = ({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
+        
         <Button
           variant="outline"
           size="sm"
@@ -115,7 +116,7 @@ const DoctorSchedulePopover: React.FC<DoctorSchedulePopoverProps> = ({
         >
           <div className="flex flex-col items-center gap-1 w-full">
             <div className="text-sm font-semibold text-neutral-800 dark:text-neutral-200 truncate w-full">
-              Dr. {doctor.name}
+              {doctor.name}
             </div>
             {doctor.specialty && (
               <div className="text-xs text-neutral-500 dark:text-neutral-400 truncate w-full">
@@ -137,7 +138,7 @@ const DoctorSchedulePopover: React.FC<DoctorSchedulePopoverProps> = ({
               <Calendar className="h-4 w-4 text-neutral-600 dark:text-neutral-400" />
               <div>
                 <div className="font-semibold text-neutral-800 dark:text-neutral-200">
-                  Dr. {doctor.name}
+                    {doctor.name}
                 </div>
                 <div className="text-sm text-neutral-500 dark:text-neutral-400">
                   {format(day, "EEEE, d 'de' MMMM", { locale: ptBR })}

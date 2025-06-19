@@ -192,8 +192,9 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
         unitToUse = profile?.unit_id || '';
       }
       
-      if (!unitToUse) {
-        throw new Error('Não foi possível determinar a unidade para o agendamento.');
+      // Antes de tentar criar o agendamento
+      if (!unitToUse || !validUnits.some(unit => unit.id === unitToUse)) {
+        throw new Error('A unidade selecionada é inválida ou você não tem permissão para agendar nesta unidade.');
       }
 
       // Verificar se o médico selecionado existe e é válido
@@ -206,6 +207,18 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
       const selectedExamTypeData = filteredExamTypes.find(e => e.id === selectedExamType);
       if (!selectedExamTypeData) {
         throw new Error('Tipo de exame selecionado não é válido.');
+      }
+
+      // Verificar se o médico pode atender na unidade selecionada
+      const isDoctorInUnit = selectedDoctorData.units?.includes(unitToUse);
+      if (!isDoctorInUnit && !isAdmin()) {
+        throw new Error(`O médico ${selectedDoctorData.name} não atende na unidade selecionada.`);
+      }
+
+      // Verificar se o exame é compatível com a especialidade do médico
+      const isExamCompatible = selectedDoctorData.specialties?.includes(selectedExamTypeData.category);
+      if (!isExamCompatible) {
+        throw new Error(`O médico ${selectedDoctorData.name} não realiza exames do tipo ${selectedExamTypeData.name}.`);
       }
 
       console.log('Creating appointment with unit:', unitToUse);
@@ -240,7 +253,7 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
 
       toast({
         title: "Agendamento criado com sucesso!",
-        description: `Consulta marcada para ${formData.date} às ${formData.time} com Dr. ${selectedDoctorData.name}`,
+        description: `Consulta marcada para ${formData.date} às ${formData.time} com ${selectedDoctorData.name}`,
       });
 
       onAppointmentCreated?.();

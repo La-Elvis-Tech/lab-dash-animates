@@ -89,7 +89,7 @@ const EnhancedWeeklyCalendar: React.FC<EnhancedWeeklyCalendarProps> = ({
 
       {/* Layout horizontal dos dias */}
       <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-        <div className="grid grid-cols-7 divide-x divide-neutral-200 dark:divide-neutral-700">
+        <div className="grid md:grid-cols-1 lg:grid-cols-7 divide-x divide-neutral-200 dark:divide-neutral-700">
           {weekDays.map((day, index) => (
             <div key={day.toISOString()} className="min-h-[600px] flex flex-col">
               {/* Cabeçalho do dia */}
