@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, User, Stethoscope, DollarSign, Plus, X, AlertTriangle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -18,10 +19,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useSupabaseAppointments, type MaterialValidation as MaterialValidationType } from '@/hooks/useSupabaseAppointments';
+import { useSupabaseAppointments } from '@/hooks/useSupabaseAppointments';
 import { useAppointmentLogic } from '@/hooks/useAppointmentLogic';
 import { useAuthContext } from '@/context/AuthContext';
-import MaterialValidation from './MaterialValidation';
 import { useToast } from "@/hooks/use-toast";
 
 interface CreateAppointmentFormProps {
@@ -42,9 +42,10 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
 }) => {
   const { 
     createAppointment, 
-    calculateExamMaterials, 
     loading: dataLoading,
-    units
+    units,
+    doctors,
+    examTypes
   } = useSupabaseAppointments();
 
   const {
@@ -62,8 +63,6 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
   const { toast } = useToast();
   
   const [isCreating, setIsCreating] = useState(false);
-  const [materialValidation, setMaterialValidation] = useState<MaterialValidationType | null>(null);
-  const [loadingMaterials, setLoadingMaterials] = useState(false);
   
   // Pré-definir data com ano 2025
   const getDefaultDate = () => {
@@ -129,6 +128,26 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
       errors.push('Selecione um horário');
     }
 
+    // Validar se o médico selecionado existe
+    const doctorExists = doctors.find(d => d.id === selectedDoctor);
+    if (selectedDoctor && !doctorExists) {
+      errors.push('Médico selecionado não é válido');
+    }
+
+    // Validar se o tipo de exame selecionado existe
+    const examTypeExists = examTypes.find(e => e.id === selectedExamType);
+    if (selectedExamType && !examTypeExists) {
+      errors.push('Tipo de exame selecionado não é válido');
+    }
+
+    // Validar unidade para admin/supervisor
+    if ((isAdmin() || isSupervisor()) && selectedUnit) {
+      const unitExists = units.find(u => u.id === selectedUnit);
+      if (!unitExists) {
+        errors.push('Unidade selecionada não é válida');
+      }
+    }
+
     setValidationErrors(errors);
     return errors.length === 0;
   };
@@ -148,22 +167,6 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
     }
   }, [prefilledData, handleDoctorChange]);
 
-  // Calcular materiais quando o tipo de exame mudar
-  useEffect(() => {
-    if (selectedExamType) {
-      setLoadingMaterials(true);
-      calculateExamMaterials(selectedExamType)
-        .then(setMaterialValidation)
-        .catch((error) => {
-          console.warn('Could not calculate materials:', error);
-          setMaterialValidation(null);
-        })
-        .finally(() => setLoadingMaterials(false));
-    } else {
-      setMaterialValidation(null);
-    }
-  }, [selectedExamType, calculateExamMaterials]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -178,53 +181,70 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
       return;
     }
 
+    if (!profile?.id) {
+      toast({
+        title: "Erro de autenticação",
+        description: "Usuário não está autenticado.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsCreating(true);
 
     try {
-      // Determinar a unidade - lógica melhorada
+      // Determinar a unidade - seguindo a estrutura da tabela
       let unitToUse: string;
       
       if (isAdmin() || isSupervisor()) {
-        // Admin/supervisor pode escolher qualquer unidade
-        unitToUse = selectedUnit || profile?.unit_id || '';
+        // Admin/supervisor pode escolher qualquer unidade ou usar a própria
+        unitToUse = selectedUnit || profile.unit_id || '';
       } else {
         // Usuário comum usa sempre sua própria unidade
-        unitToUse = profile?.unit_id || '';
+        unitToUse = profile.unit_id || '';
       }
       
-      // Antes de tentar criar o agendamento
-      if (!unitToUse || !validUnits.some(unit => unit.id === unitToUse)) {
-        throw new Error('A unidade selecionada é inválida ou você não tem permissão para agendar nesta unidade.');
+      // Verificações de segurança baseadas na estrutura da tabela
+      if (!unitToUse) {
+        throw new Error('Unidade é obrigatória para criar agendamento.');
       }
 
-      // Verificar se o médico selecionado existe e é válido
-      const selectedDoctorData = filteredDoctors.find(d => d.id === selectedDoctor);
-      if (!selectedDoctorData) {
-        throw new Error('Médico selecionado não é válido.');
+      if (!selectedDoctor) {
+        throw new Error('Médico é obrigatório.');
       }
 
-      // Verificar se o tipo de exame selecionado existe e é válido
-      const selectedExamTypeData = filteredExamTypes.find(e => e.id === selectedExamType);
-      if (!selectedExamTypeData) {
-        throw new Error('Tipo de exame selecionado não é válido.');
+      if (!selectedExamType) {
+        throw new Error('Tipo de exame é obrigatório.');
       }
 
-      // Verificar se o médico pode atender na unidade selecionada
-      const isDoctorInUnit = selectedDoctorData.units?.includes(unitToUse);
-      if (!isDoctorInUnit && !isAdmin()) {
-        throw new Error(`O médico ${selectedDoctorData.name} não atende na unidade selecionada.`);
+      // Verificar se a unidade existe e é válida
+      const unitExists = units.find(unit => unit.id === unitToUse);
+      if (!unitExists) {
+        throw new Error('A unidade selecionada não existe.');
       }
 
-      // Verificar se o exame é compatível com a especialidade do médico
-      const isExamCompatible = selectedDoctorData.specialties?.includes(selectedExamTypeData.category);
-      if (!isExamCompatible) {
-        throw new Error(`O médico ${selectedDoctorData.name} não realiza exames do tipo ${selectedExamTypeData.name}.`);
+      // Verificar se o médico existe e é válido
+      const doctorExists = doctors.find(d => d.id === selectedDoctor);
+      if (!doctorExists) {
+        throw new Error('O médico selecionado não existe.');
       }
 
-      console.log('Creating appointment with unit:', unitToUse);
-      console.log('Doctor:', selectedDoctorData);
-      console.log('Exam type:', selectedExamTypeData);
+      // Verificar se o tipo de exame existe e é válido
+      const examTypeExists = examTypes.find(e => e.id === selectedExamType);
+      if (!examTypeExists) {
+        throw new Error('O tipo de exame selecionado não existe.');
+      }
 
+      console.log('Creating appointment with validated data:', {
+        unitToUse,
+        selectedDoctor,
+        selectedExamType,
+        doctorExists: doctorExists?.name,
+        examTypeExists: examTypeExists?.name,
+        unitExists: unitExists?.name
+      });
+
+      // Criar data no formato correto para PostgreSQL
       const appointmentDate = new Date(`${formData.date}T${formData.time}`);
       
       // Verificar se a data é válida
@@ -232,28 +252,29 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
         throw new Error('Data ou horário inválido.');
       }
 
+      // Dados do agendamento seguindo exatamente a estrutura da tabela
       const appointmentData = {
         patient_name: formData.patient_name.trim(),
         patient_email: formData.patient_email.trim() || null,
         patient_phone: formData.patient_phone.trim() || null,
-        exam_type_id: selectedExamType!,
-        doctor_id: selectedDoctor!,
+        exam_type_id: selectedExamType,
+        doctor_id: selectedDoctor,
         unit_id: unitToUse,
         scheduled_date: appointmentDate.toISOString(),
-        duration_minutes: formData.duration_minutes,
-        cost: formData.cost || null,
+        duration_minutes: formData.duration_minutes || 30,
+        status: 'Agendado' as const, // Usar valor exato do enum
+        cost: formData.cost > 0 ? Number(formData.cost.toFixed(2)) : null, // Formato correto para numeric(10,2)
         notes: formData.notes.trim() || null,
-        status: 'Agendado' as const,
-        created_by: profile?.id || ''
+        created_by: profile.id // Campo obrigatório
       };
 
-      console.log('Final appointment data:', appointmentData);
+      console.log('Final appointment data (matching table structure):', appointmentData);
 
       await createAppointment(appointmentData);
 
       toast({
         title: "Agendamento criado com sucesso!",
-        description: `Consulta marcada para ${formData.date} às ${formData.time} com ${selectedDoctorData.name}`,
+        description: `Consulta marcada para ${formData.date} às ${formData.time} com ${doctorExists.name}`,
       });
 
       onAppointmentCreated?.();
@@ -271,7 +292,7 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
       });
       handleDoctorChange('');
       handleExamTypeChange('');
-      setMaterialValidation(null);
+      handleUnitChange('');
       setValidationErrors([]);
 
     } catch (error: any) {
@@ -282,10 +303,20 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
       if (error?.message) {
         if (error.message.includes('violates row-level security')) {
           errorMessage = 'Você não tem permissão para criar agendamentos nesta unidade';
-        } else if (error.message.includes('Estoque insuficiente')) {
-          errorMessage = error.message;
-        } else if (error.message.includes('structure of query does not match function result type')) {
-          errorMessage = 'Erro na estrutura da consulta. Verifique os dados inseridos.';
+        } else if (error.message.includes('violates foreign key constraint')) {
+          if (error.message.includes('doctor_id')) {
+            errorMessage = 'O médico selecionado não é válido';
+          } else if (error.message.includes('exam_type_id')) {
+            errorMessage = 'O tipo de exame selecionado não é válido';
+          } else if (error.message.includes('unit_id')) {
+            errorMessage = 'A unidade selecionada não é válida';
+          } else if (error.message.includes('created_by')) {
+            errorMessage = 'Erro de autenticação do usuário';
+          } else {
+            errorMessage = 'Dados de referência inválidos';
+          }
+        } else if (error.message.includes('check constraint')) {
+          errorMessage = 'Status de agendamento inválido';
         } else {
           errorMessage = error.message;
         }
@@ -428,7 +459,7 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
                   </Label>
                   <Select value={selectedUnit} onValueChange={handleUnitChange}>
                     <SelectTrigger className={`border-neutral-200 dark:border-neutral-700 ${
-                      validationErrors.some(e => e.includes('unidade')) ? 'border-red-500' : ''
+                      validationErrors.some(e => e.includes('Unidade')) ? 'border-red-500' : ''
                     }`}>
                       <SelectValue placeholder="Selecione a unidade" />
                     </SelectTrigger>
@@ -590,7 +621,7 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
               )}
               <Button
                 type="submit"
-                disabled={isCreating}
+                disabled={isCreating || dataLoading}
                 className="bg-neutral-900 hover:bg-neutral-800 text-white px-6 disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
               >
                 {isCreating ? (
@@ -609,11 +640,6 @@ const CreateAppointmentForm: React.FC<CreateAppointmentFormProps> = ({
           </form>
         </CardContent>
       </Card>
-
-      <MaterialValidation 
-        validation={materialValidation} 
-        loading={loadingMaterials} 
-      />
     </div>
   );
 };

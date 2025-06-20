@@ -1,133 +1,82 @@
-import React, { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import DashboardChart from "@/components/DashboardChart.tsx";
 
-// Import refactored components
+import React, { Suspense } from "react";
+import { useAuthContext } from "@/context/AuthContext";
+import { useAdvancedDashboard } from "@/hooks/useAdvancedDashboard";
 import DashboardStats from "@/components/dashboard/DashboardStats";
-import RecentActivities from "@/components/dashboard/RecentActivities";
-import InventoryGauges from "@/components/dashboard/InventoryGauges";
-import LowStockTable from "@/components/dashboard/LowStockTable";
-
-// Import existing dashboard components
-import DemandForecastCard from "@/components/dashboard/DemandForecastCard";
-import RiskAlertsCard from "@/components/dashboard/RiskAlertsCard";
-import ForecastPerformanceCard from "@/components/dashboard/ForecastPerformanceCard";
 import QuickActionsCard from "@/components/dashboard/QuickActionsCard";
-import UnitSelectorCard from "@/components/dashboard/UnitSelectorCard";
-
-// Data imports
-import { useConsumptionData, useAppointmentTrends } from "@/hooks/useDashboardData";
+import ExamTrendsChart from "@/components/dashboard/ExamTrendsChart";
+import RecentExamsTable from "@/components/dashboard/RecentExamsTable";
+import SystemLogsPanel from "@/components/dashboard/SystemLogsPanel";
+import PredictiveInsights from "@/components/dashboard/PredictiveInsights";
+import InventoryValueWaffle from "@/components/dashboard/InventoryValueWaffle";
+import ExamResultsCalendar from "@/components/dashboard/ExamResultsCalendar";
 import { SkeletonDashboard } from "@/components/ui/skeleton-dashboard";
 
 const Dashboard: React.FC = () => {
-  const dashboardRef = useRef<HTMLDivElement>(null);
-  const { data: consumptionData, isLoading: consumptionLoading } = useConsumptionData();
-  const { data: appointmentTrends, isLoading: trendsLoading } = useAppointmentTrends();
+  const { profile, loading: authLoading } = useAuthContext();
+  const { metrics, examTrends, recentExams, systemLogs, loading } = useAdvancedDashboard();
 
-  const loading = consumptionLoading || trendsLoading;
-
-  useEffect(() => {
-    if (loading) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        ".dashboard-card",
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.4,
-          stagger: 0.1,
-          ease: "power2.out",
-        }
-      );
-
-      gsap.fromTo(
-        ".dashboard-chart",
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.15,
-          ease: "power2.out",
-          delay: 0.3,
-        }
-      );
-    }, dashboardRef);
-
-    return () => ctx.revert();
-  }, [loading]);
-
-  if (loading) {
+  if (authLoading || loading) {
     return <SkeletonDashboard />;
   }
 
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
+        <div className="text-center p-8 bg-white dark:bg-neutral-900 rounded-lg border border-neutral-200 dark:border-neutral-800">
+          <p className="text-neutral-600 dark:text-neutral-400">
+            Você precisa estar logado para acessar o dashboard.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      ref={dashboardRef}
-      className="space-y-6 dark:text-gray-100"
-    >
-      <div>
-        <h1 className="text-3xl sm:text-3xl font-bold text-gray-800 dark:text-white">
-          Dashboard
-        </h1>
-        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
-          Visão geral do sistema de agendamentos e inventário
-        </p>
-      </div>
-
-      {/* Estatísticas principais */}
-      <div className="dashboard-card">
-        <DashboardStats />
-      </div>
-
-      {/* Grid principal com layout mais equilibrado */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        {/* Coluna da esquerda - Unidades e métricas principais */}
-        <div className="xl:col-span-4 space-y-6">
-          <div className="dashboard-card h-[400px]">
-            <UnitSelectorCard />
-          </div>
-          <div className="dashboard-chart">
-        <RiskAlertsCard />
-      </div>
-          
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+        {/* Header Section */}
+        <div className="space-y-1">
+          <h1 className="text-xl md:text-2xl font-medium text-neutral-900 dark:text-neutral-100">
+            Dashboard
+          </h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            Bem-vindo de volta, {profile.full_name}
+          </p>
         </div>
 
-        {/* Coluna central - Analytics avançados */}
-        <div className="xl:col-span-4 space-y-6">
-          <div className="dashboard-chart">
-            <DashboardChart
-              type="area"
-              data={appointmentTrends || []}
-              title="Tendência de Agendamentos"
-              description="Agendamentos realizados nos últimos 6 meses"
-            />
-          </div>
-          
-          <div className="dashboard-card">
-            <ForecastPerformanceCard />
-          </div>
-        </div>
+        <Suspense fallback={<SkeletonDashboard />}>
+          {/* Stats Cards */}
+          <DashboardStats />
 
-        {/* Coluna da direita - Ações e alertas */}
-        <div className="xl:col-span-4 space-y-6">
-          <div className="dashboard-card">
-            <QuickActionsCard />
-          </div>
-          
-          <div className="dashboard-card">
-            <RecentActivities />
+          {/* Calendar Section */}
+          <ExamResultsCalendar />
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column - Charts */}
+            <div className="lg:col-span-2 space-y-6">
+              {examTrends && <ExamTrendsChart data={examTrends} />}
+              <InventoryValueWaffle />
+            </div>
+
+            {/* Right Column - Quick Actions and Insights */}
+            <div className="space-y-6">
+              <QuickActionsCard />
+              {metrics && <PredictiveInsights metrics={metrics} />}
+            </div>
           </div>
 
-          {/*<div className="dashboard-card">
-            <DemandForecastCard />
-          </div>*/}
-        </div>
-      </div>
-      <div className="dashboard-card">
-            <InventoryGauges />
+          {/* Bottom Section - Tables */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              {recentExams && <RecentExamsTable exams={recentExams} />}
+            </div>
+            <div>
+              {systemLogs && <SystemLogsPanel logs={systemLogs} />}
+            </div>
+          </div>
+        </Suspense>
       </div>
     </div>
   );

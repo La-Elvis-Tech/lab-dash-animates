@@ -1,117 +1,214 @@
-
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, AlertCircle, Users, Calendar, DollarSign, Package, AlertTriangle } from "lucide-react";
-import { useDashboardStats } from "@/hooks/useDashboardData";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuthContext } from "@/context/AuthContext";
+import { 
+  Calendar, 
+  Users, 
+  TrendingUp, 
+  Package, 
+  AlertTriangle,
+  Clock
+} from "lucide-react";
+import { format } from "date-fns";
+import { gsap } from "gsap";
 
 const DashboardStats: React.FC = () => {
-  const { data: stats, isLoading } = useDashboardStats();
+  const { profile } = useAuthContext();
+  const statsRef = useRef<HTMLDivElement>(null);
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
-            <CardContent className="pt-4 sm:pt-5 p-3 md:p-4">
-              <div className="animate-pulse">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['dashboard-stats', profile?.unit_id],
+    queryFn: async () => {
+      if (!profile?.unit_id) {
+        return {
+          totalAppointments: 0,
+          todayAppointments: 0,
+          totalInventoryItems: 0,
+          lowStockItems: 0,
+          totalRevenue: 0,
+          activeExamTypes: 0
+        };
+      }
+
+      const today = format(new Date(), 'yyyy-MM-dd');
+      
+      const [
+        { data: appointments },
+        { data: todayAppointments },
+        { data: inventoryItems },
+        { data: lowStockItems },
+        { data: revenue },
+        { data: examTypes }
+      ] = await Promise.all([
+        supabase
+          .from('appointments')
+          .select('id')
+          .eq('unit_id', profile.unit_id),
+        
+        supabase
+          .from('appointments')
+          .select('id')
+          .eq('unit_id', profile.unit_id)
+          .gte('created_at', today),
+        
+        supabase
+          .from('inventory_items')
+          .select('id')
+          .eq('unit_id', profile.unit_id)
+          .eq('active', true),
+        
+        supabase
+          .from('inventory_items')
+          .select('id, current_stock, min_stock')
+          .eq('unit_id', profile.unit_id)
+          .eq('active', true),
+        
+        supabase
+          .from('appointments')
+          .select('cost')
+          .eq('unit_id', profile.unit_id)
+          .not('cost', 'is', null),
+        
+        supabase
+          .from('exam_types')
+          .select('id')
+          .eq('unit_id', profile.unit_id)
+          .eq('active', true)
+      ]);
+
+      const lowStockCount = lowStockItems?.filter(item => 
+        item.current_stock < item.min_stock
+      ).length || 0;
+
+      const totalRevenue = revenue?.reduce((sum, appointment) => 
+        sum + (appointment.cost || 0), 0) || 0;
+
+      return {
+        totalAppointments: appointments?.length || 0,
+        todayAppointments: todayAppointments?.length || 0,
+        totalInventoryItems: inventoryItems?.length || 0,
+        lowStockItems: lowStockCount,
+        totalRevenue,
+        activeExamTypes: examTypes?.length || 0
+      };
+    },
+    enabled: !!profile?.unit_id
+  });
+
+  useEffect(() => {
+    if (!isLoading && statsRef.current) {
+      const cards = statsRef.current.querySelectorAll('.stat-card');
+      gsap.fromTo(cards, 
+        { 
+          opacity: 0, 
+          y: 10,
+          scale: 0.98
+        },
+        { 
+          opacity: 1, 
+          y: 0,
+          scale: 1,
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "power2.out"
+        }
+      );
+    }
+  }, [isLoading]);
 
   const statsData = [
     {
-      title: "Agendamentos Ativos",
-      value: stats?.pendingAppointments || 0,
+      title: "Total de Agendamentos",
+      value: stats?.totalAppointments || 0,
       icon: Calendar,
-      trend: "up",
-      trendValue: `${stats?.totalAppointments || 0} total`,
-      description: "pendentes",
-      color: "text-blue-600 dark:text-blue-400",
-      bgColor: "bg-blue-50 dark:bg-blue-950/40"
+      change: "+12%"
     },
     {
-      title: "Receita Mensal",
-      value: `R$ ${(stats?.monthlyRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      icon: DollarSign,
-      trend: "up",
-      trendValue: `R$ ${(stats?.totalRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} total`,
-      description: "este mês",
-      color: "text-green-600 dark:text-green-400",
-      bgColor: "bg-green-50 dark:bg-green-950/40"
+      title: "Agendamentos Hoje",
+      value: stats?.todayAppointments || 0,
+      icon: Clock,
+      change: "+5%"
+    },
+    {
+      title: "Receita Total",
+      value: `R$ ${(stats?.totalRevenue || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+      icon: TrendingUp,
+      change: "+8%"
     },
     {
       title: "Itens em Estoque",
-      value: stats?.totalItems || 0,
+      value: stats?.totalInventoryItems || 0,
       icon: Package,
-      trend: "up",
-      trendValue: `${stats?.activeExamTypes || 0} tipos de exames`,
-      description: "ativos",
-      color: "text-indigo-600 dark:text-indigo-400",
-      bgColor: "bg-indigo-50 dark:bg-indigo-950/40"
+      change: "-2%"
+    },
+    {
+      title: "Estoque Baixo",
+      value: stats?.lowStockItems || 0,
+      icon: AlertTriangle,
+      change: stats?.lowStockItems > 0 ? "Atenção" : "OK"
     },
     {
       title: "Tipos de Exames",
       value: stats?.activeExamTypes || 0,
-      icon: AlertTriangle,
-      trend: "up",
-      trendValue: `${stats?.totalExamTypes || 0} total`,
-      description: "disponíveis",
-      color: "text-orange-600 dark:text-orange-400",
-      bgColor: "bg-orange-50 dark:bg-orange-950/40"
+      icon: Users,
+      change: "+1%"
     }
   ];
 
-  const getTrendIcon = (trend: string) => {
-    switch (trend) {
-      case "up": return <TrendingUp size={12} className="mr-1" />;
-      case "down": return <TrendingDown size={12} className="mr-1" />;
-      case "warning": return <AlertCircle size={12} className="mr-1" />;
-      default: return null;
-    }
-  };
-
-  const getTrendColor = (trend: string) => {
-    switch (trend) {
-      case "up": return "text-green-600 dark:text-green-400";
-      case "down": return "text-red-600 dark:text-red-400";
-      case "warning": return "text-yellow-600 dark:text-yellow-400";
-      default: return "text-gray-600 dark:text-gray-400";
-    }
-  };
+  if (isLoading) {
+    return (
+      <Card className="bg-white dark:bg-neutral-900 border-neutral-200/60 dark:border-neutral-800/60">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="animate-pulse p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-lg">
+                <div className="h-8 w-8 bg-neutral-200 dark:bg-neutral-700 rounded mb-3"></div>
+                <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded mb-2"></div>
+                <div className="h-6 bg-neutral-200 dark:bg-neutral-700 rounded w-2/3"></div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-      {statsData.map((stat, index) => (
-        <Card key={index} className="bg-white dark:bg-neutral-950/50 border-neutral-200 dark:border-neutral-800 rounded-lg shadow-lg">
-          <CardContent className="pt-4 sm:pt-5 p-3 md:p-4">
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon size={16} className={stat.color} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                  {stat.title}
-                </p>
-                <h3 className="text-lg sm:text-xl font-bold text-gray-700 dark:text-white truncate">
-                  {stat.value}
-                </h3>
-                <p className={`text-xs flex items-center ${getTrendColor(stat.trend)}`}>
-                  {getTrendIcon(stat.trend)}
-                  <span className="truncate">{stat.trendValue}</span>
-                </p>
+    <Card className="bg-white dark:bg-neutral-900 border-neutral-200/60 dark:border-neutral-800/60">
+      <CardContent className="p-6">
+        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {statsData.map((stat, index) => (
+            <div 
+              key={index}
+              className="stat-card group p-4 bg-neutral-50/80 dark:bg-neutral-800/40 rounded-lg border border-neutral-200/40 dark:border-neutral-700/40 hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60 transition-all duration-200"
+            >
+              <div className="flex flex-col space-y-3">
+                <div className="flex items-center justify-between">
+                  <stat.icon className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    stat.change.includes('+') ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                    stat.change.includes('-') ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                    'bg-neutral-100 text-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-400'
+                  }`}>
+                    {stat.change}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1">
+                    {stat.title}
+                  </p>
+                  <p className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+                    {stat.value}
+                  </p>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
