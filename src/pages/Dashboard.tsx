@@ -33,8 +33,8 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen">
+      <div className="p-2 lg:p-4 md:p-6 max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
         <div className="space-y-1">
           <h1 className="text-xl md:text-2xl font-medium text-neutral-900 dark:text-neutral-100">
@@ -53,27 +53,36 @@ const Dashboard: React.FC = () => {
           <ExamResultsCalendar />
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Charts */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Primary Chart */}
+            <div className="lg:col-span-1 xl:col-span-1">
               {examTrends && <ExamTrendsChart data={examTrends} />}
+            </div>
+
+            {/* Secondary Chart */}
+            <div className="lg:col-span-1 xl:col-span-1">
               <InventoryValueWaffle />
             </div>
 
-            {/* Right Column - Quick Actions and Insights */}
-            <div className="space-y-6">
-              <QuickActionsCard />
-              {metrics && <PredictiveInsights metrics={metrics} />}
+            {/* Quick Actions */}
+            <div className="lg:col-span-1 xl:col-span-1">
+              <div className="space-y-6 h-full">
+                <QuickActionsCard />
+                
+              </div>
             </div>
           </div>
 
           {/* Bottom Section - Tables */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              {recentExams && <RecentExamsTable exams={recentExams} />}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="min-h-0">
+              <RecentExamsTable />
             </div>
-            <div>
+            <div className="min-h-0">
               {systemLogs && <SystemLogsPanel logs={systemLogs} />}
+            </div>
+            <div className="min-h-0">
+              {metrics && <PredictiveInsights metrics={metrics} />}
             </div>
           </div>
         </Suspense>
