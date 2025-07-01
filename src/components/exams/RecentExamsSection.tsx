@@ -22,12 +22,15 @@ interface RecentExam {
 const RecentExamsSection: React.FC = () => {
   const { profile } = useAuthContext();
 
-  const { data: recentExams, isLoading } = useQuery({
+  const { data: recentExams, isLoading, error } = useQuery({
     queryKey: ['recent-exam-results', profile?.unit_id],
     queryFn: async (): Promise<RecentExam[]> => {
       if (!profile?.unit_id) return [];
 
-      const { data, error } = await supabase
+      console.log('Buscando exames recentes para unidade:', profile.unit_id);
+
+      // Primeiro, tentar buscar da tabela exam_results
+      const { data: examResults, error: examError } = await supabase
         .from('exam_results')
         .select(`
           id,
@@ -40,54 +43,62 @@ const RecentExamsSection: React.FC = () => {
         `)
         .eq('unit_id', profile.unit_id)
         .order('exam_date', { ascending: false })
-        .limit(6);
+        .limit(8);
 
-      if (error) {
-        console.error('Erro ao buscar exames recentes:', error);
-        
-        // Fallback: buscar appointments recentes
-        const { data: appointments, error: appointmentError } = await supabase
-          .from('appointments')
-          .select(`
-            id,
-            patient_name,
-            status,
-            scheduled_date,
-            exam_types(name, category),
-            doctors(name)
-          `)
-          .eq('unit_id', profile.unit_id)
-          .eq('status', 'Concluído')
-          .order('scheduled_date', { ascending: false })
-          .limit(6);
-
-        if (appointmentError) {
-          console.error('Erro ao buscar appointments:', appointmentError);
-          return [];
-        }
-
-        return appointments?.map(appointment => ({
-          id: appointment.id,
-          patient_name: appointment.patient_name,
-          exam_type: appointment.exam_types?.name || 'N/A',
-          exam_category: appointment.exam_types?.category || 'N/A',
-          result_status: appointment.status,
-          exam_date: appointment.scheduled_date,
-          doctor_name: appointment.doctors?.name || 'N/A'
-        })) || [];
+      if (examError) {
+        console.error('Erro ao buscar exam_results:', examError);
       }
 
-      return data?.map(exam => ({
-        id: exam.id,
-        patient_name: exam.patient_name,
-        exam_type: exam.exam_types?.name || 'N/A',
-        exam_category: exam.exam_category || 'N/A',
-        result_status: exam.result_status,
-        exam_date: exam.exam_date,
-        doctor_name: exam.doctors?.name || 'N/A'
+      // Se temos dados de exam_results, usar eles
+      if (examResults && examResults.length > 0) {
+        console.log('Encontrados', examResults.length, 'resultados de exames');
+        return examResults.map(exam => ({
+          id: exam.id,
+          patient_name: exam.patient_name,
+          exam_type: exam.exam_types?.name || 'N/A',
+          exam_category: exam.exam_category || 'N/A',
+          result_status: exam.result_status,
+          exam_date: exam.exam_date,
+          doctor_name: exam.doctors?.name || 'N/A'
+        }));
+      }
+
+      // Fallback: buscar appointments concluídos
+      console.log('Fallback: buscando appointments concluídos');
+      const { data: appointments, error: appointmentError } = await supabase
+        .from('appointments')
+        .select(`
+          id,
+          patient_name,
+          status,
+          scheduled_date,
+          exam_types(name, category),
+          doctors(name)
+        `)
+        .eq('unit_id', profile.unit_id)
+        .in('status', ['Concluído', 'Em andamento'])
+        .order('scheduled_date', { ascending: false })
+        .limit(8);
+
+      if (appointmentError) {
+        console.error('Erro ao buscar appointments:', appointmentError);
+        return [];
+      }
+
+      console.log('Encontrados', appointments?.length || 0, 'appointments');
+      return appointments?.map(appointment => ({
+        id: appointment.id,
+        patient_name: appointment.patient_name,
+        exam_type: appointment.exam_types?.name || 'N/A',
+        exam_category: appointment.exam_types?.category || 'N/A',
+        result_status: appointment.status,
+        exam_date: appointment.scheduled_date,
+        doctor_name: appointment.doctors?.name || 'N/A'
       })) || [];
     },
-    enabled: !!profile?.unit_id
+    enabled: !!profile?.unit_id,
+    retry: 1,
+    retryDelay: 1000
   });
 
   const getStatusColor = (status: string) => {
@@ -95,6 +106,7 @@ const RecentExamsSection: React.FC = () => {
       case 'pendente':
         return 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/20 dark:text-yellow-300 dark:border-yellow-800';
       case 'em análise':
+      case 'em andamento':
         return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-300 dark:border-blue-800';
       case 'concluído':
         return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-300 dark:border-green-800';
@@ -115,14 +127,18 @@ const RecentExamsSection: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-16 bg-neutral-100 dark:bg-neutral-800/60 rounded"></div>
+              <div className="h-16 bg-neutral-100 dark:bg-neutral-800/60 rounded-lg"></div>
             </div>
           ))}
         </CardContent>
       </Card>
     );
+  }
+
+  if (error) {
+    console.error('Erro ao carregar exames:', error);
   }
 
   return (
@@ -134,7 +150,7 @@ const RecentExamsSection: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {recentExams?.length > 0 ? (
+        {recentExams && recentExams.length > 0 ? (
           recentExams.map((exam) => (
             <div 
               key={exam.id}

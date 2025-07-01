@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 import { useReportsData, useReportMetrics } from "@/hooks/useReportsData";
 import { useAuthContext } from "@/context/AuthContext";
@@ -33,7 +34,7 @@ const Reports = () => {
     ? selectedUnit
     : undefined;
 
-  const { data: reportData, isLoading } = useReportsData(unitFilter);
+  const { data: reportData, isLoading, error } = useReportsData(unitFilter);
   const metrics = reportData ? useReportMetrics(reportData) : null;
 
   useEffect(() => {
@@ -52,14 +53,34 @@ const Reports = () => {
     console.log(`Exporting ${dataTypes.join(', ')} in ${format} format`);
   };
 
-  if (!reportData || !metrics) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-neutral-50/30 dark:bg-neutral-950/30">
         <div className="flex items-center justify-center min-h-screen">
           <Card className="border-0 bg-white/60 dark:bg-neutral-900/30 backdrop-blur-sm shadow-sm">
             <CardContent className="p-8 text-center">
-              <p className="text-neutral-500 dark:text-neutral-400">
-                Não foi possível carregar os dados dos relatórios.
+              <div className="animate-pulse">
+                <div className="h-6 bg-neutral-200 dark:bg-neutral-700 rounded mb-4 w-48 mx-auto"></div>
+                <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-32 mx-auto"></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !reportData || !metrics) {
+    return (
+      <div className="min-h-screen bg-neutral-50/30 dark:bg-neutral-950/30">
+        <div className="flex items-center justify-center min-h-screen">
+          <Card className="border-0 bg-white/60 dark:bg-neutral-900/30 backdrop-blur-sm shadow-sm">
+            <CardContent className="p-8 text-center">
+              <p className="text-neutral-500 dark:text-neutral-400 mb-2">
+                Erro ao carregar dados dos relatórios
+              </p>
+              <p className="text-sm text-neutral-400 dark:text-neutral-500">
+                {error?.message || 'Tente recarregar a página'}
               </p>
             </CardContent>
           </Card>
@@ -71,8 +92,8 @@ const Reports = () => {
   const { appointmentMetrics, inventoryMetrics, chartData } = metrics;
 
   return (
-    <div ref={pageRef} className="min-h-screen ">
-      <div className="p-2 md:p-6 max-w-7xl mx-auto space-y-8">
+    <div ref={pageRef} className="min-h-screen bg-gradient-to-br from-neutral-50/50 via-white to-neutral-100/50 dark:from-neutral-950/50 dark:via-neutral-900 dark:to-neutral-950/50">
+      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <ReportsHeader
           selectedUnit={selectedUnit}
@@ -100,7 +121,7 @@ const Reports = () => {
             </TabsList>
           </div>
 
-          <TabsContent value="overview" className="mt-0 space-y-8">
+          <TabsContent value="overview" className="mt-0 space-y-6">
             {/* Metrics Cards */}
             <MetricsCards 
               appointmentMetrics={appointmentMetrics}
@@ -193,7 +214,7 @@ const Reports = () => {
                                 {app.patient_name}
                               </span>
                               <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                                {format(new Date(app.scheduled_date), "dd/MM/yyyy")} · {app.exam_types?.name || 'Exame'}
+                                {format(new Date(app.scheduled_date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })} · {app.exam_types?.name || 'Exame'}
                               </div>
                               {app.doctors?.name && (
                                 <div className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -255,13 +276,13 @@ const Reports = () => {
                                 {alert.title}
                               </span>
                               <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                                {alert.inventory_items?.name} · {format(new Date(alert.created_at), "dd/MM/yyyy")}
+                                {alert.inventory_items?.name} · {format(new Date(alert.created_at), "dd/MM/yyyy", { locale: ptBR })}
                               </div>
                             </div>
                             <div className="text-right">
                               <Badge
                                 variant="outline"
-                                className={`text-xs border-0 ${
+                                className={`text-xs border-0 mb-1 ${
                                   alert.priority === 'critical'
                                     ? 'bg-red-100/80 text-red-800 dark:bg-red-900/30 dark:text-red-200'
                                     : alert.priority === 'high'
@@ -271,7 +292,7 @@ const Reports = () => {
                               >
                                 {alert.priority}
                               </Badge>
-                              <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                              <div className="text-xs text-neutral-500 dark:text-neutral-400">
                                 {alert.alert_type}
                               </div>
                             </div>
