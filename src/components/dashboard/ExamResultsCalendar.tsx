@@ -100,12 +100,12 @@ const ExamResultsCalendar: React.FC = () => {
   if (isLoading) {
     return (
       <Card className="bg-white dark:bg-neutral-900/50 border border-neutral-200/50 dark:border-neutral-800/50 backdrop-blur-sm">
-        <div className="p-10">
+        <div className="p-6">
           <div className="animate-pulse">
-            <div className="h-4  bg-neutral-200 dark:bg-neutral-700 rounded mb-4 w-1/3"></div>
-            <div className="grid grid-rows-5 gap-1">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className="w-3.5 h-3.5 bg-neutral-200 dark:bg-neutral-700 rounded-sm"></div>
+            <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded mb-4 w-1/3"></div>
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: 35 }).map((_, i) => (
+                <div key={i} className="w-3 h-3 bg-neutral-200 dark:bg-neutral-700 rounded-sm"></div>
               ))}
             </div>
           </div>
@@ -170,43 +170,43 @@ const ExamResultsCalendar: React.FC = () => {
   }
 
   const monthLabels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-  const dayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const dayLabels = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
   return (
     <Card className="bg-white dark:bg-neutral-900 border-neutral-200/60 dark:border-neutral-800/60 backdrop-blur-sm">
-      <div className="px-8 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100">
-            Calendário de Exames Realizados
+      <div className="p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+          <h2 className="text-base md:text-lg font-medium text-neutral-900 dark:text-neutral-100">
+            Exames Realizados
           </h2>
           <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-            <span>Menos</span>
+            <span className="hidden sm:inline">Menos</span>
             <div className="flex gap-1">
               {[0, 1, 2, 3, 4].map(level => (
-                <div key={level} className={`w-2.5 h-2.5 rounded-sm ${getColor(level)}`} />
+                <div key={level} className={`w-2 h-2 rounded-sm ${getColor(level)}`} />
               ))}
             </div>
-            <span>Mais</span>
+            <span className="hidden sm:inline">Mais</span>
           </div>
         </div>
         
         <div ref={calendarRef} className="overflow-x-auto">
           <div className="inline-flex flex-col gap-1 min-w-max">
             {/* Month labels */}
-            <div className="flex gap-2 ml-10 mb-2">
+            <div className="flex gap-1 ml-6 mb-2 text-xs text-neutral-500 dark:text-neutral-400">
               {Array.from({ length: 12 }).map((_, monthIndex) => (
-                <div key={monthIndex} className="text-xs text-neutral-500 dark:text-neutral-400 w-12 text-left">
+                <div key={monthIndex} className="w-8 text-left">
                   {monthLabels[monthIndex]}
                 </div>
               ))}
             </div>
             
             {/* Calendar grid */}
-            <div className="flex gap-2">
+            <div className="flex gap-1">
               {/* Day labels */}
-              <div className="flex flex-col gap-1 w-10">
+              <div className="flex flex-col gap-1 w-6">
                 {dayLabels.map((day, index) => (
-                  <div key={index} className={`text-xs text-neutral-500 dark:text-neutral-400 h-2.5 flex items-center ${index % 2 === 1 ? 'opacity-0' : ''}`}>
+                  <div key={index} className={`text-xs text-neutral-500 dark:text-neutral-400 h-2 flex items-center ${index % 2 === 1 ? 'opacity-0' : ''}`}>
                     {day}
                   </div>
                 ))}
@@ -217,7 +217,7 @@ const ExamResultsCalendar: React.FC = () => {
                 <div key={weekIndex} className="flex flex-col gap-1">
                   {week.map((day, dayIndex) => {
                     if (day.getTime() === 0) {
-                      return <div key={dayIndex} className="w-2.5 h-2.5" />;
+                      return <div key={dayIndex} className="w-2 h-2" />;
                     }
                     
                     const dateString = format(day, 'yyyy-MM-dd');
@@ -227,7 +227,7 @@ const ExamResultsCalendar: React.FC = () => {
                     return (
                       <div
                         key={dayIndex}
-                        className={`calendar-square w-2.5 h-2.5 rounded-sm cursor-pointer hover:ring-1 hover:ring-neutral-400 dark:hover:ring-neutral-500 transition-all duration-200 ${getColor(level)}`}
+                        className={`calendar-square w-2 h-2 rounded-sm cursor-pointer hover:ring-1 hover:ring-neutral-400 dark:hover:ring-neutral-500 transition-all duration-200 ${getColor(level)}`}
                         title={`${format(day, 'dd/MM/yyyy', { locale: ptBR })}: ${examCount} exame${examCount !== 1 ? 's' : ''}`}
                       />
                     );

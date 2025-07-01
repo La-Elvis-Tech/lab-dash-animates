@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Calendar, Clock, User, FileText } from "lucide-react";
+import { Calendar, Clock, User, FileText, Activity } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthContext } from "@/context/AuthContext";
@@ -42,7 +42,40 @@ const RecentExamsSection: React.FC = () => {
         .order('exam_date', { ascending: false })
         .limit(6);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao buscar exames recentes:', error);
+        
+        // Fallback: buscar appointments recentes
+        const { data: appointments, error: appointmentError } = await supabase
+          .from('appointments')
+          .select(`
+            id,
+            patient_name,
+            status,
+            scheduled_date,
+            exam_types(name, category),
+            doctors(name)
+          `)
+          .eq('unit_id', profile.unit_id)
+          .eq('status', 'Concluído')
+          .order('scheduled_date', { ascending: false })
+          .limit(6);
+
+        if (appointmentError) {
+          console.error('Erro ao buscar appointments:', appointmentError);
+          return [];
+        }
+
+        return appointments?.map(appointment => ({
+          id: appointment.id,
+          patient_name: appointment.patient_name,
+          exam_type: appointment.exam_types?.name || 'N/A',
+          exam_category: appointment.exam_types?.category || 'N/A',
+          result_status: appointment.status,
+          exam_date: appointment.scheduled_date,
+          doctor_name: appointment.doctors?.name || 'N/A'
+        })) || [];
+      }
 
       return data?.map(exam => ({
         id: exam.id,
@@ -77,7 +110,7 @@ const RecentExamsSection: React.FC = () => {
       <Card className="border-0 shadow-sm bg-white/60 dark:bg-neutral-900/40 backdrop-blur-sm">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">
-            <Calendar className="h-4 w-4 text-neutral-400" />
+            <Activity className="h-4 w-4 text-neutral-400" />
             Últimos Exames Realizados
           </CardTitle>
         </CardHeader>
@@ -96,7 +129,7 @@ const RecentExamsSection: React.FC = () => {
     <Card className="border-0 shadow-sm bg-white/60 dark:bg-neutral-900/40 backdrop-blur-sm">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">
-          <Calendar className="h-4 w-4 text-neutral-400" />
+          <Activity className="h-4 w-4 text-neutral-400" />
           Últimos Exames Realizados
         </CardTitle>
       </CardHeader>
@@ -139,7 +172,7 @@ const RecentExamsSection: React.FC = () => {
           ))
         ) : (
           <div className="text-center py-8 text-neutral-400">
-            <Calendar className="h-8 w-8 mx-auto mb-3 opacity-50" />
+            <Activity className="h-8 w-8 mx-auto mb-3 opacity-50" />
             <p className="text-sm">Nenhum exame realizado</p>
             <p className="text-xs mt-1">para sua unidade</p>
           </div>
