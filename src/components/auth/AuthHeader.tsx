@@ -8,10 +8,10 @@ export const AuthHeader: React.FC = () => {
         <img 
           src="/logolaelvis.svg" 
           alt="La Elvis Tech" 
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain grayscale brightness-0 invert"
         />
       </div>
-      <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+      <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-300 to-indigo-600 bg-clip-text text-transparent mb-2">
         La Elvis Tech
       </h1>
       <p className="text-neutral-600 dark:text-neutral-400">Gestão laboratorial inteligente</p>
