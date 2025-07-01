@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/context/AuthContext';
@@ -57,28 +58,28 @@ export const useAdvancedDashboard = () => {
       const yesterday = subDays(today, 1);
       const weekAgo = subDays(today, 7);
 
-      // Tentar buscar dados de exames primeiro, depois appointments como fallback
+      // Tentar buscar dados de exam_results primeiro, depois appointments como fallback
       let todayExamsData, yesterdayExamsData, weekExamsData;
       
       try {
         const [todayExamsRes, yesterdayExamsRes, weekExamsRes] = await Promise.all([
           supabase
-            .from('exams')
+            .from('exam_results')
             .select('id')
-            .gte('performed_date', format(today, 'yyyy-MM-dd'))
+            .gte('exam_date', format(today, 'yyyy-MM-dd'))
             .eq('unit_id', profile.unit_id),
           
           supabase
-            .from('exams')
+            .from('exam_results')
             .select('id')
-            .gte('performed_date', format(yesterday, 'yyyy-MM-dd'))
-            .lt('performed_date', format(today, 'yyyy-MM-dd'))
+            .gte('exam_date', format(yesterday, 'yyyy-MM-dd'))
+            .lt('exam_date', format(today, 'yyyy-MM-dd'))
             .eq('unit_id', profile.unit_id),
           
           supabase
-            .from('exams')
+            .from('exam_results')
             .select('id')
-            .gte('performed_date', format(weekAgo, 'yyyy-MM-dd'))
+            .gte('exam_date', format(weekAgo, 'yyyy-MM-dd'))
             .eq('unit_id', profile.unit_id)
         ]);
 
@@ -86,7 +87,7 @@ export const useAdvancedDashboard = () => {
         yesterdayExamsData = yesterdayExamsRes.data;
         weekExamsData = weekExamsRes.data;
       } catch (error) {
-        // Fallback para appointments se exams não existir
+        // Fallback para appointments se exam_results não funcionar
         const [todayAppRes, yesterdayAppRes, weekAppRes] = await Promise.all([
           supabase
             .from('appointments')

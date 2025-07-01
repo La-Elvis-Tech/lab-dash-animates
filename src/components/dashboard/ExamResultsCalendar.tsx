@@ -25,19 +25,19 @@ const ExamResultsCalendar: React.FC = () => {
       const twelveMonthsAgo = startOfMonth(subMonths(new Date(), 11));
       const today = endOfMonth(new Date());
 
-      // Buscar exames realizados no período (dados reais de exames)
-      const { data: exams, error } = await supabase
-        .from('exams')
-        .select('performed_date, status')
+      // Buscar dados de resultados de exames primeiro
+      const { data: examResults, error: examError } = await supabase
+        .from('exam_results')
+        .select('exam_date, result_status')
         .eq('unit_id', profile.unit_id)
-        .in('status', ['Concluído', 'Finalizado', 'Completed'])
-        .gte('performed_date', format(twelveMonthsAgo, 'yyyy-MM-dd'))
-        .lte('performed_date', format(today, 'yyyy-MM-dd'));
+        .eq('result_status', 'Concluído')
+        .gte('exam_date', format(twelveMonthsAgo, 'yyyy-MM-dd'))
+        .lte('exam_date', format(today, 'yyyy-MM-dd'));
 
-      if (error) {
-        console.error('Erro ao buscar dados do calendário de exames:', error);
+      if (examError) {
+        console.error('Erro ao buscar dados de resultados de exames:', examError);
         
-        // Fallback: buscar appointments como backup se a tabela exams não existir
+        // Fallback: buscar appointments como backup
         const { data: appointments, error: appointmentError } = await supabase
           .from('appointments')
           .select('scheduled_date, status')
@@ -63,9 +63,10 @@ const ExamResultsCalendar: React.FC = () => {
         }));
       }
 
+      // Usar dados de exam_results
       const dateCount: Record<string, number> = {};
-      exams?.forEach(exam => {
-        const date = format(new Date(exam.performed_date), 'yyyy-MM-dd');
+      examResults?.forEach(result => {
+        const date = format(new Date(result.exam_date), 'yyyy-MM-dd');
         dateCount[date] = (dateCount[date] || 0) + 1;
       });
 
