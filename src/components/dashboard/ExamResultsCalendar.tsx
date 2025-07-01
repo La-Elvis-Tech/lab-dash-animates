@@ -25,23 +25,47 @@ const ExamResultsCalendar: React.FC = () => {
       const twelveMonthsAgo = startOfMonth(subMonths(new Date(), 11));
       const today = endOfMonth(new Date());
 
-      // Buscar appointments realizados no período
-      const { data: appointments, error } = await supabase
-        .from('appointments')
-        .select('scheduled_date, status')
+      // Buscar exames realizados no período (dados reais de exames)
+      const { data: exams, error } = await supabase
+        .from('exams')
+        .select('performed_date, status')
         .eq('unit_id', profile.unit_id)
-        .eq('status', 'Concluído')
-        .gte('scheduled_date', format(twelveMonthsAgo, 'yyyy-MM-dd'))
-        .lte('scheduled_date', format(today, 'yyyy-MM-dd'));
+        .in('status', ['Concluído', 'Finalizado', 'Completed'])
+        .gte('performed_date', format(twelveMonthsAgo, 'yyyy-MM-dd'))
+        .lte('performed_date', format(today, 'yyyy-MM-dd'));
 
       if (error) {
-        console.error('Erro ao buscar dados do calendário:', error);
-        return [];
+        console.error('Erro ao buscar dados do calendário de exames:', error);
+        
+        // Fallback: buscar appointments como backup se a tabela exams não existir
+        const { data: appointments, error: appointmentError } = await supabase
+          .from('appointments')
+          .select('scheduled_date, status')
+          .eq('unit_id', profile.unit_id)
+          .eq('status', 'Concluído')
+          .gte('scheduled_date', format(twelveMonthsAgo, 'yyyy-MM-dd'))
+          .lte('scheduled_date', format(today, 'yyyy-MM-dd'));
+
+        if (appointmentError) {
+          console.error('Erro ao buscar dados de appointments:', appointmentError);
+          return [];
+        }
+
+        const dateCount: Record<string, number> = {};
+        appointments?.forEach(appointment => {
+          const date = format(new Date(appointment.scheduled_date), 'yyyy-MM-dd');
+          dateCount[date] = (dateCount[date] || 0) + 1;
+        });
+
+        return Object.entries(dateCount).map(([day, value]) => ({
+          day,
+          value
+        }));
       }
 
       const dateCount: Record<string, number> = {};
-      appointments?.forEach(appointment => {
-        const date = format(new Date(appointment.scheduled_date), 'yyyy-MM-dd');
+      exams?.forEach(exam => {
+        const date = format(new Date(exam.performed_date), 'yyyy-MM-dd');
         dateCount[date] = (dateCount[date] || 0) + 1;
       });
 
