@@ -74,13 +74,13 @@ const ExamResultsCalendar: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="bg-white/50 dark:bg-neutral-900/50 border border-neutral-200/50 dark:border-neutral-800/50 backdrop-blur-sm">
-        <div className="p-6">
+      <Card className="bg-white dark:bg-neutral-900/50 border border-neutral-200/50 dark:border-neutral-800/50 backdrop-blur-sm">
+        <div className="p-10">
           <div className="animate-pulse">
-            <div className="h-6 bg-neutral-200 dark:bg-neutral-700 rounded mb-4 w-1/3"></div>
-            <div className="grid grid-cols-53 gap-1">
-              {Array.from({ length: 371 }).map((_, i) => (
-                <div key={i} className="w-2.5 h-2.5 bg-neutral-200 dark:bg-neutral-700 rounded-sm"></div>
+            <div className="h-4  bg-neutral-200 dark:bg-neutral-700 rounded mb-4 w-1/3"></div>
+            <div className="grid grid-rows-5 gap-1">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="w-3.5 h-3.5 bg-neutral-200 dark:bg-neutral-700 rounded-sm"></div>
               ))}
             </div>
           </div>
@@ -177,9 +177,9 @@ const ExamResultsCalendar: React.FC = () => {
             </div>
             
             {/* Calendar grid */}
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               {/* Day labels */}
-              <div className="flex flex-col gap-1 w-7">
+              <div className="flex flex-col gap-1 w-10">
                 {dayLabels.map((day, index) => (
                   <div key={index} className={`text-xs text-neutral-500 dark:text-neutral-400 h-2.5 flex items-center ${index % 2 === 1 ? 'opacity-0' : ''}`}>
                     {day}

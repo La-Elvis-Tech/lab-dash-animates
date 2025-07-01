@@ -75,13 +75,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "appointment_inventory_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "appointments"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "appointment_inventory_inventory_item_id_fkey"
             columns: ["inventory_item_id"]
             isOneToOne: false
@@ -380,13 +373,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "exam_results_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "appointments"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "exam_results_doctor_id_fkey"
             columns: ["doctor_id"]
@@ -895,6 +881,19 @@ export type Database = {
           total_volume_ml: number
           tubes_needed: number
           exam_details: Json
+        }[]
+      }
+      calculate_consumption_forecast: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          item_id: string
+          item_name: string
+          current_stock: number
+          predicted_weekly_consumption: number
+          predicted_daily_consumption: number
+          days_until_shortage: number
+          suggested_reorder_quantity: number
+          confidence_level: number
         }[]
       }
       calculate_detailed_exam_materials: {
