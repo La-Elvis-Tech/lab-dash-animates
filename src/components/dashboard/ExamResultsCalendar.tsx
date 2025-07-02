@@ -25,35 +25,49 @@ const ExamResultsCalendar: React.FC = () => {
       const twelveMonthsAgo = startOfMonth(subMonths(new Date(), 11));
       const today = endOfMonth(new Date());
 
-      // Buscar dados de resultados de exames primeiro
+      console.log('Buscando dados do calendário para unidade:', profile.unit_id);
+      console.log('Período:', format(twelveMonthsAgo, 'yyyy-MM-dd'), 'até', format(today, 'yyyy-MM-dd'));
+
+      // Tentar buscar appointments concluídos primeiro (dados mais confiáveis)
+      const { data: appointments, error: appointmentError } = await supabase
+        .from('appointments')
+        .select('scheduled_date, status, unit_id')
+        .eq('unit_id', profile.unit_id)
+        .eq('status', 'Concluído')
+        .gte('scheduled_date', format(twelveMonthsAgo, 'yyyy-MM-dd'))
+        .lte('scheduled_date', format(today, 'yyyy-MM-dd'));
+
+      console.log('Appointments encontrados:', appointments?.length || 0);
+
+      if (!appointmentError && appointments && appointments.length > 0) {
+        const dateCount: Record<string, number> = {};
+        appointments.forEach(appointment => {
+          const date = format(new Date(appointment.scheduled_date), 'yyyy-MM-dd');
+          dateCount[date] = (dateCount[date] || 0) + 1;
+        });
+
+        console.log('Dados processados do calendário:', Object.keys(dateCount).length, 'dias com exames');
+        return Object.entries(dateCount).map(([day, value]) => ({
+          day,
+          value
+        }));
+      }
+
+      // Fallback: buscar exam_results se appointments não funcionou
       const { data: examResults, error: examError } = await supabase
         .from('exam_results')
-        .select('exam_date, result_status')
+        .select('exam_date, result_status, unit_id')
         .eq('unit_id', profile.unit_id)
         .eq('result_status', 'Concluído')
         .gte('exam_date', format(twelveMonthsAgo, 'yyyy-MM-dd'))
         .lte('exam_date', format(today, 'yyyy-MM-dd'));
 
-      if (examError) {
-        console.error('Erro ao buscar dados de resultados de exames:', examError);
-        
-        // Fallback: buscar appointments como backup
-        const { data: appointments, error: appointmentError } = await supabase
-          .from('appointments')
-          .select('scheduled_date, status')
-          .eq('unit_id', profile.unit_id)
-          .eq('status', 'Concluído')
-          .gte('scheduled_date', format(twelveMonthsAgo, 'yyyy-MM-dd'))
-          .lte('scheduled_date', format(today, 'yyyy-MM-dd'));
+      console.log('Exam results encontrados:', examResults?.length || 0);
 
-        if (appointmentError) {
-          console.error('Erro ao buscar dados de appointments:', appointmentError);
-          return [];
-        }
-
+      if (!examError && examResults) {
         const dateCount: Record<string, number> = {};
-        appointments?.forEach(appointment => {
-          const date = format(new Date(appointment.scheduled_date), 'yyyy-MM-dd');
+        examResults.forEach(result => {
+          const date = format(new Date(result.exam_date), 'yyyy-MM-dd');
           dateCount[date] = (dateCount[date] || 0) + 1;
         });
 
@@ -63,17 +77,8 @@ const ExamResultsCalendar: React.FC = () => {
         }));
       }
 
-      // Usar dados de exam_results
-      const dateCount: Record<string, number> = {};
-      examResults?.forEach(result => {
-        const date = format(new Date(result.exam_date), 'yyyy-MM-dd');
-        dateCount[date] = (dateCount[date] || 0) + 1;
-      });
-
-      return Object.entries(dateCount).map(([day, value]) => ({
-        day,
-        value
-      }));
+      console.log('Nenhum dado encontrado para o calendário');
+      return [];
     },
     enabled: !!profile?.unit_id
   });
