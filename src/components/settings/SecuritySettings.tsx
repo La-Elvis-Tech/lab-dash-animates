@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +9,11 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { supabase } from '@/integrations/supabase/client';
 import { Shield, Key, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import ComplianceSettings from './ComplianceSettings';
+import MFASettings from './MFASettings';
+import SecurityAuditLogs from './SecurityAuditLogs';
 
 interface SecuritySettings {
   two_factor_enabled: boolean;
@@ -75,10 +80,10 @@ const SecuritySettings = () => {
       return;
     }
 
-    if (newPassword.length < 8) {
+    if (newPassword.length < 12) {
       toast({
         title: 'Erro',
-        description: 'A senha deve ter pelo menos 8 caracteres.',
+        description: 'A senha deve ter pelo menos 12 caracteres para compliance.',
         variant: 'destructive',
       });
       return;
@@ -86,7 +91,18 @@ const SecuritySettings = () => {
 
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      // Log do evento de segurança
+      await supabase.from('security_audit_log').insert({
+        action_type: 'password_change',
+        metadata: { timestamp: new Date().toISOString() },
+        risk_level: 'medium'
+      });
       
       setCurrentPassword('');
       setNewPassword('');
@@ -122,10 +138,20 @@ const SecuritySettings = () => {
           Configurações de Segurança
         </h2>
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          Gerencie a segurança da sua conta
+          Gerencie a segurança da sua conta e configurações de compliance
           {profile?.unit?.name && ` na unidade ${profile.unit.name}`}
         </p>
       </div>
+
+      <Tabs defaultValue="general" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="general">Geral</TabsTrigger>
+          <TabsTrigger value="mfa">MFA</TabsTrigger>
+          <TabsTrigger value="compliance">Compliance</TabsTrigger>
+          <TabsTrigger value="audit">Auditoria</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="space-y-6">
 
       {/* Change Password */}
       <Card className="border-0 shadow-sm bg-white/60 dark:bg-neutral-900/40 backdrop-blur-sm">
@@ -297,15 +323,29 @@ const SecuritySettings = () => {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
-        <Button 
-          onClick={handleSaveSettings} 
-          disabled={loading}
-          className="bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900 text-white"
-        >
-          {loading ? 'Salvando...' : 'Salvar Configurações'}
-        </Button>
-      </div>
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSaveSettings} 
+            disabled={loading}
+            className="bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-900 text-white"
+          >
+            {loading ? 'Salvando...' : 'Salvar Configurações'}
+          </Button>
+        </div>
+        </TabsContent>
+
+        <TabsContent value="mfa">
+          <MFASettings />
+        </TabsContent>
+
+        <TabsContent value="compliance">
+          <ComplianceSettings />
+        </TabsContent>
+
+        <TabsContent value="audit">
+          <SecurityAuditLogs />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
