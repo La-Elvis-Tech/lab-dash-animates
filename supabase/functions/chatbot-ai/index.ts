@@ -19,7 +19,14 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    console.log('Chatbot function called')
+    
+    if (!PERPLEXITY_API_KEY) {
+      throw new Error('PERPLEXITY_API_KEY not found')
+    }
+
     const { message, conversationId, userId } = await req.json()
+    console.log('Request data:', { messageLength: message?.length, conversationId, userId })
 
     // Criar ou buscar conversa
     let conversation
@@ -80,6 +87,7 @@ ${conversationContext}
 Responda de forma precisa, técnica quando necessário, mas sempre clara e útil. Se não souber algo específico sobre os dados do sistema, sugira como o usuário pode encontrar a informação ou que tipo de consulta SQL seria útil.`
 
     // Chamar API da Perplexity
+    console.log('Calling Perplexity API with model: sonar-deep-research')
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
@@ -87,7 +95,7 @@ Responda de forma precisa, técnica quando necessário, mas sempre clara e útil
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-large-128k-online',
+        model: 'sonar-deep-research',
         messages: [
           {
             role: 'system',
@@ -109,7 +117,9 @@ Responda de forma precisa, técnica quando necessário, mas sempre clara e útil
     })
 
     if (!response.ok) {
-      throw new Error(`Perplexity API error: ${response.statusText}`)
+      const errorText = await response.text()
+      console.error('Perplexity API error:', response.status, errorText)
+      throw new Error(`Perplexity API error: ${response.status} - ${errorText}`)
     }
 
     const aiResponse = await response.json()

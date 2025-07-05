@@ -65,8 +65,12 @@ export const useChatbot = () => {
 
   // Enviar mensagem para o chatbot
   const sendMessage = useCallback(async (message: string) => {
-    if (!user || !message.trim()) return;
+    if (!user || !message.trim()) {
+      console.log('SendMessage cancelled:', { user: !!user, message: message?.trim() })
+      return;
+    }
 
+    console.log('Sending message:', { userId: user.id, message })
     setIsLoading(true);
     setIsTyping(true);
 
@@ -80,6 +84,7 @@ export const useChatbot = () => {
     setMessages(prev => [...prev, userMessage]);
 
     try {
+      console.log('Invoking chatbot-ai function...')
       const { data, error } = await supabase.functions.invoke('chatbot-ai', {
         body: {
           message,
@@ -87,6 +92,8 @@ export const useChatbot = () => {
           userId: user.id,
         },
       });
+
+      console.log('Function response:', { data, error })
 
       if (error) throw error;
 
