@@ -13,7 +13,8 @@ import {
   Users,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageSquare
 } from 'lucide-react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
@@ -44,6 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
     { icon: AlertTriangle, label: 'Alertas', path: '/alerts' },
     { icon: Play, label: 'Simulações', path: '/simulations' },
     { icon: BarChart3, label: 'Relatórios', path: '/reports' },
+    { icon: MessageSquare, label: 'Chat IA', path: '/chat' },
     { icon: Users, label: 'Usuários', path: '/users' },
     { icon: Settings, label: 'Configurações', path: '/settings' },
   ];
