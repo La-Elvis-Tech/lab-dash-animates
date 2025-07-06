@@ -68,13 +68,13 @@ export const ChatInterface = () => {
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] bg-gradient-to-br from-background to-muted/20">
+    <div className="flex h-[calc(100vh-4rem)] bg-background">
       {/* Sidebar com conversas */}
-      <div className="w-80 border-r border-border/50 bg-card/30 backdrop-blur-sm">
-        <div className="p-4 border-b border-border/50">
+      <div className="w-80 border-r border-border bg-card">
+        <div className="p-4 border-b border-border">
           <Button
             onClick={startNewConversation}
-            className="w-full gap-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20"
+            className="w-full gap-2"
             variant="outline"
           >
             <Plus className="h-4 w-4" />
@@ -90,12 +90,12 @@ export const ChatInterface = () => {
                   variant="ghost"
                   onClick={() => selectConversation(conversation.id)}
                   className={cn(
-                    "w-full justify-start text-left h-auto p-3 hover:bg-primary/10",
-                    currentConversationId === conversation.id && "bg-primary/10 border border-primary/20"
+                    "w-full justify-start text-left h-auto p-3 hover:bg-muted/50",
+                    currentConversationId === conversation.id && "bg-muted"
                   )}
                 >
                   <div className="flex items-start gap-2 w-full">
-                    <MessageSquare className="h-4 w-4 mt-1 flex-shrink-0 text-primary" />
+                    <MessageSquare className="h-4 w-4 mt-1 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">
                         {conversation.title}
@@ -132,13 +132,13 @@ export const ChatInterface = () => {
       {/* Área principal do chat */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-border/50 bg-card/30 backdrop-blur-sm">
+        <div className="p-4 border-b border-border bg-card">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-primary-foreground flex items-center justify-center">
-              <Bot className="h-5 w-5 text-primary-foreground" />
+            <div className="h-8 w-8 rounded-full bg-foreground flex items-center justify-center">
+              <Bot className="h-4 w-4 text-background" />
             </div>
             <div>
-              <h1 className="font-semibold text-lg">Assistente DASA Labs</h1>
+              <h1 className="font-semibold">Assistente DASA Labs</h1>
               <p className="text-sm text-muted-foreground">
                 Especialista em gestão laboratorial
               </p>
@@ -150,27 +150,27 @@ export const ChatInterface = () => {
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4 max-w-4xl mx-auto">
             {messages.length === 0 && (
-              <Card className="p-8 text-center bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-                <Bot className="h-16 w-16 mx-auto mb-4 text-primary" />
-                <h3 className="text-xl font-semibold mb-2">
-                  Olá! Sou seu assistente especializado
+              <Card className="p-6 text-center bg-card border-border">
+                <Bot className="h-12 w-12 mx-auto mb-3 text-foreground" />
+                <h3 className="font-semibold mb-2">
+                  Assistente Especializado
                 </h3>
-                <p className="text-muted-foreground mb-4">
-                  Posso ajudar com inventário, agendamentos, compliance e muito mais.
+                <p className="text-muted-foreground mb-4 text-sm">
+                  Posso ajudar com inventário, agendamentos e compliance.
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {[
-                    "Como está o estoque de reagentes?",
-                    "Mostrar próximos agendamentos",
+                    "Estoque de reagentes",
+                    "Próximos agendamentos",
                     "Relatório de compliance",
-                    "Alertas de baixo estoque"
+                    "Alertas de estoque"
                   ].map((suggestion) => (
                     <Button
                       key={suggestion}
                       variant="outline"
                       size="sm"
                       onClick={() => setInputMessage(suggestion)}
-                      className="text-xs hover:bg-primary/10 hover:border-primary/30"
+                      className="text-xs"
                       disabled={isLoading}
                     >
                       {suggestion}
@@ -189,8 +189,8 @@ export const ChatInterface = () => {
                 )}
               >
                 {message.sender === 'assistant' && (
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary-foreground flex items-center justify-center flex-shrink-0">
-                    <Bot className="h-4 w-4 text-primary-foreground" />
+                  <div className="h-8 w-8 rounded-full bg-foreground flex items-center justify-center flex-shrink-0">
+                    <Bot className="h-4 w-4 text-background" />
                   </div>
                 )}
                 
@@ -198,8 +198,8 @@ export const ChatInterface = () => {
                   className={cn(
                     "max-w-[70%] p-3",
                     message.sender === 'user'
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card border-border/50"
+                      ? "bg-foreground text-background"
+                      : "bg-card border-border"
                   )}
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">
@@ -208,7 +208,7 @@ export const ChatInterface = () => {
                   <p
                     className={cn(
                       "text-xs mt-2 opacity-70",
-                      message.sender === 'user' ? "text-primary-foreground" : "text-muted-foreground"
+                      message.sender === 'user' ? "text-background" : "text-muted-foreground"
                     )}
                   >
                     {formatTime(message.created_at)}
@@ -216,8 +216,8 @@ export const ChatInterface = () => {
                 </Card>
 
                 {message.sender === 'user' && (
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-secondary to-secondary-foreground flex items-center justify-center flex-shrink-0">
-                    <User className="h-4 w-4 text-secondary-foreground" />
+                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <User className="h-4 w-4" />
                   </div>
                 )}
               </div>
@@ -225,14 +225,14 @@ export const ChatInterface = () => {
 
             {isTyping && (
               <div className="flex gap-3 animate-in slide-in-from-bottom-2">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-primary-foreground flex items-center justify-center flex-shrink-0">
-                  <Bot className="h-4 w-4 text-primary-foreground" />
+                <div className="h-8 w-8 rounded-full bg-foreground flex items-center justify-center flex-shrink-0">
+                  <Bot className="h-4 w-4 text-background" />
                 </div>
-                <Card className="p-3 bg-card border-border/50">
+                <Card className="p-3 bg-card border-border">
                   <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-foreground rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                    <div className="w-2 h-2 bg-foreground rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                    <div className="w-2 h-2 bg-foreground rounded-full animate-bounce"></div>
                   </div>
                 </Card>
               </div>
@@ -243,7 +243,7 @@ export const ChatInterface = () => {
         </ScrollArea>
 
         {/* Input */}
-        <div className="p-4 border-t border-border/50 bg-card/30 backdrop-blur-sm">
+        <div className="p-4 border-t border-border bg-card">
           <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto">
             <div className="flex gap-2">
               <Input
@@ -252,12 +252,12 @@ export const ChatInterface = () => {
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Digite sua mensagem..."
                 disabled={isLoading}
-                className="flex-1 bg-background/50 border-border/50 focus:border-primary/50"
+                className="flex-1"
               />
               <Button
                 type="submit"
                 disabled={isLoading || !inputMessage.trim()}
-                className="px-4 bg-primary hover:bg-primary/90"
+                className="px-4"
               >
                 <Send className="h-4 w-4" />
               </Button>

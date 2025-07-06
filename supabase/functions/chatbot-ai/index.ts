@@ -22,11 +22,19 @@ serve(async (req) => {
     
     // Verificar se a API Key existe
     const PERPLEXITY_API_KEY = Deno.env.get('PERPLEXITY_API_KEY')
-    console.log('PERPLEXITY_API_KEY exists:', !!PERPLEXITY_API_KEY)
     
     if (!PERPLEXITY_API_KEY) {
       console.error('PERPLEXITY_API_KEY not found in environment')
-      throw new Error('PERPLEXITY_API_KEY not configured')
+      return new Response(
+        JSON.stringify({ 
+          error: 'Configuração da API não encontrada. Verifique as configurações do sistema.',
+          details: 'API key missing'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500
+        }
+      )
     }
 
     // Parse request body
@@ -134,12 +142,10 @@ serve(async (req) => {
 Contexto da conversa anterior:
 ${conversationContext}
 
-Responda de forma precisa, técnica quando necessário, mas sempre clara e útil. Se não souber algo específico sobre os dados do sistema, sugira como o usuário pode encontrar a informação ou que tipo de consulta SQL seria útil.`
+Responda de forma concisa, precisa e útil. Seja técnico quando necessário, mas mantenha a clareza.`
 
     // Chamar API da Perplexity
-    console.log('Calling Perplexity API...')
-    console.log('Model: sonar-deep-research')
-    console.log('Message length:', message.length)
+    console.log('Calling Perplexity API with model: sonar-deep-research')
     
     const perplexityResponse = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -159,8 +165,8 @@ Responda de forma precisa, técnica quando necessário, mas sempre clara e útil
             content: message
           }
         ],
-        temperature: 0.2,
-        max_tokens: 1000
+        temperature: 0.3,
+        max_tokens: 800
       }),
     })
 
