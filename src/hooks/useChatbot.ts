@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -28,49 +29,88 @@ export const useChatbot = () => {
 
   // Carregar conversas do usuário
   const loadConversations = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, skipping conversation load')
+      return;
+    }
 
     try {
+      console.log('Loading conversations for user:', user.id)
       const { data, error } = await supabase
         .from('chat_conversations')
         .select('*')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading conversations:', error)
+        throw error;
+      }
+      
+      console.log('Loaded conversations:', data?.length || 0)
       setConversations(data || []);
     } catch (error: any) {
-      console.error('Error loading conversations:', error);
+      console.error('Failed to load conversations:', error);
+      toast({
+        title: 'Erro ao carregar conversas',
+        description: 'Não foi possível carregar as conversas anteriores.',
+        variant: 'destructive',
+      });
     }
-  }, [user]);
+  }, [user, toast]);
 
   // Carregar mensagens de uma conversa
   const loadMessages = useCallback(async (conversationId: string) => {
     try {
+      console.log('Loading messages for conversation:', conversationId)
       const { data, error } = await supabase
         .from('chat_messages')
         .select('*')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading messages:', error)
+        throw error;
+      }
+      
+      console.log('Loaded messages:', data?.length || 0)
       setMessages((data || []).map(msg => ({
         ...msg,
         sender: msg.sender as 'user' | 'assistant'
       })));
     } catch (error: any) {
-      console.error('Error loading messages:', error);
+      console.error('Failed to load messages:', error);
+      toast({
+        title: 'Erro ao carregar mensagens',
+        description: 'Não foi possível carregar as mensagens da conversa.',
+        variant: 'destructive',
+      });
     }
-  }, []);
+  }, [toast]);
 
   // Enviar mensagem para o chatbot
   const sendMessage = useCallback(async (message: string) => {
-    if (!user || !message.trim()) {
-      console.log('SendMessage cancelled:', { user: !!user, message: message?.trim() })
+    if (!user) {
+      console.error('No user found when trying to send message')
+      toast({
+        title: 'Erro de autenticação',
+        description: 'Você precisa estar logado para usar o chat.',
+        variant: 'destructive',
+      });
       return;
     }
 
-    console.log('Sending message:', { userId: user.id, message })
+    if (!message.trim()) {
+      console.log('Empty message, skipping send')
+      return;
+    }
+
+    console.log('=== SENDING MESSAGE ===')
+    console.log('User ID:', user.id)
+    console.log('Message:', message.substring(0, 100) + (message.length > 100 ? '...' : ''))
+    console.log('Current conversation ID:', currentConversationId)
+
     setIsLoading(true);
     setIsTyping(true);
 
@@ -84,7 +124,8 @@ export const useChatbot = () => {
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      console.log('Invoking chatbot-ai function...')
+      console.log('Invoking chatbot-ai edge function...')
+      
       const { data, error } = await supabase.functions.invoke('chatbot-ai', {
         body: {
           message,
@@ -93,14 +134,39 @@ export const useChatbot = () => {
         },
       });
 
-      console.log('Function response:', { data, error })
+      console.log('Edge function response:', { 
+        hasData: !!data, 
+        hasError: !!error,
+        errorMessage: error?.message 
+      })
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge function error:', error)
+        throw new Error(error.message || 'Falha na comunicação com o servidor')
+      }
+
+      if (!data) {
+        console.error('No data received from edge function')
+        throw new Error('Resposta vazia do servidor')
+      }
+
+      if (data.error) {
+        console.error('Server returned error:', data.error)
+        throw new Error(data.error)
+      }
 
       const { response, conversationId: newConversationId } = data;
 
+      if (!response) {
+        console.error('No response content received')
+        throw new Error('Resposta vazia da IA')
+      }
+
+      console.log('AI response received successfully')
+
       // Atualizar ID da conversa se for nova
       if (!currentConversationId && newConversationId) {
+        console.log('Setting new conversation ID:', newConversationId)
         setCurrentConversationId(newConversationId);
         loadConversations(); // Recarregar lista de conversas
       }
@@ -113,13 +179,18 @@ export const useChatbot = () => {
         created_at: new Date().toISOString(),
       };
 
+      // Substituir a mensagem temporária do usuário e adicionar resposta da IA
       setMessages(prev => [...prev.slice(0, -1), userMessage, aiMessage]);
 
+      console.log('=== MESSAGE SENT SUCCESSFULLY ===')
+
     } catch (error: any) {
-      console.error('Error sending message:', error);
+      console.error('=== MESSAGE SEND FAILED ===')
+      console.error('Error details:', error)
+      
       toast({
         title: 'Erro no Chatbot',
-        description: 'Não foi possível enviar a mensagem. Tente novamente.',
+        description: error.message || 'Não foi possível enviar a mensagem. Tente novamente.',
         variant: 'destructive',
       });
       
@@ -133,12 +204,14 @@ export const useChatbot = () => {
 
   // Iniciar nova conversa
   const startNewConversation = useCallback(() => {
+    console.log('Starting new conversation')
     setCurrentConversationId(null);
     setMessages([]);
   }, []);
 
   // Selecionar conversa existente
   const selectConversation = useCallback(async (conversationId: string) => {
+    console.log('Selecting conversation:', conversationId)
     setCurrentConversationId(conversationId);
     await loadMessages(conversationId);
   }, [loadMessages]);
@@ -146,6 +219,7 @@ export const useChatbot = () => {
   // Deletar conversa
   const deleteConversation = useCallback(async (conversationId: string) => {
     try {
+      console.log('Deleting conversation:', conversationId)
       const { error } = await supabase
         .from('chat_conversations')
         .delete()
@@ -163,6 +237,8 @@ export const useChatbot = () => {
         title: 'Conversa deletada',
         description: 'A conversa foi removida com sucesso.',
       });
+      
+      console.log('Conversation deleted successfully')
     } catch (error: any) {
       console.error('Error deleting conversation:', error);
       toast({
@@ -175,7 +251,13 @@ export const useChatbot = () => {
 
   useEffect(() => {
     if (user) {
+      console.log('User detected, loading conversations')
       loadConversations();
+    } else {
+      console.log('No user, clearing conversations')
+      setConversations([]);
+      setMessages([]);
+      setCurrentConversationId(null);
     }
   }, [user, loadConversations]);
 

@@ -1,10 +1,13 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Plus, MessageSquare, Trash2, Bot, User } from 'lucide-react';
+import { Send, Plus, MessageSquare, Trash2, Bot, User, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useChatbot } from '@/hooks/useChatbot';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 export const ChatInterface = () => {
@@ -23,6 +26,8 @@ export const ChatInterface = () => {
     selectConversation,
     deleteConversation,
   } = useChatbot();
+
+  const { user } = useAuth();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -48,6 +53,19 @@ export const ChatInterface = () => {
       minute: '2-digit',
     });
   };
+
+  if (!user) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center bg-gradient-to-br from-background to-muted/20">
+        <Alert className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Você precisa estar logado para usar o chat IA.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[calc(100vh-4rem)] bg-gradient-to-br from-background to-muted/20">
@@ -99,6 +117,14 @@ export const ChatInterface = () => {
                 </Button>
               </div>
             ))}
+            
+            {conversations.length === 0 && (
+              <div className="text-center text-muted-foreground text-sm py-8">
+                Nenhuma conversa ainda.
+                <br />
+                Comece uma nova conversa!
+              </div>
+            )}
           </div>
         </ScrollArea>
       </div>
@@ -145,6 +171,7 @@ export const ChatInterface = () => {
                       size="sm"
                       onClick={() => setInputMessage(suggestion)}
                       className="text-xs hover:bg-primary/10 hover:border-primary/30"
+                      disabled={isLoading}
                     >
                       {suggestion}
                     </Button>
@@ -235,6 +262,12 @@ export const ChatInterface = () => {
                 <Send className="h-4 w-4" />
               </Button>
             </div>
+            
+            {isLoading && (
+              <div className="mt-2 text-sm text-muted-foreground text-center">
+                Processando sua mensagem...
+              </div>
+            )}
           </form>
         </div>
       </div>
