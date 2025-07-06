@@ -160,12 +160,7 @@ Responda de forma precisa, técnica quando necessário, mas sempre clara e útil
           }
         ],
         temperature: 0.2,
-        top_p: 0.9,
-        max_tokens: 1000,
-        return_images: false,
-        return_related_questions: false,
-        frequency_penalty: 1,
-        presence_penalty: 0
+        max_tokens: 1000
       }),
     })
 
